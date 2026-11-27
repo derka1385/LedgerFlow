@@ -2,160 +2,165 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LedgerFlow · Snap the receipt. It's in your Excel.</title>
+<meta name="description" content="LedgerFlow is an accounting agent for small businesses. Photograph a receipt and it books it in the Excel workbook you already use, after you approve.">
 <meta name="theme-color" content="#06291F">
-<title>LedgerFlow · Every receipt lands in the right cells</title>
-<meta name="description" content="LedgerFlow reads a receipt, writes the exact cells in the Excel workbook you already use, proves the change in a sandbox and waits for your approval.">
 <link rel="icon" href="assets/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
-<script src="app.js" defer></script>
 </head>
 <body>
-<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="mark" viewBox="-7 0 124 124"><path fill="#eaf2d8" d="M18 6h53l21 21v85l-12-8-12 8-12-8-12 8-12-8-14 8z"/><path fill="#a9c395" d="M71 6v21h21z"/><path fill="none" stroke="#245843" stroke-linecap="round" stroke-width="3" d="M31 26h23m-23 16h43M31 55h43M31 68h43m-18 18 7 7 13-15"/></symbol>
-  <symbol id="arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="mac" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5V16H4ZM2 19h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="lock" viewBox="0 0 24 24"><path d="M5 11h14v10H5zM8 11V7a4 4 0 1 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
-  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
-  <symbol id="pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="mark" viewBox="0 0 110 124"><path fill="#eaf2d8" stroke="#245843" stroke-width="3" stroke-linejoin="round" d="M18 6h53l21 21v85l-12-8-12 8-12-8-12 8-12-8-14 8z"/><path fill="#a9c395" d="M71 6v21h21z"/><path fill="none" stroke="#245843" stroke-linecap="round" stroke-width="3" d="M31 26h23m-23 16h43M31 55h43M31 68h43m-18 18 7 7 13-15"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-mac" viewBox="0 0 24 24"><path d="M4 5h16v10H4zM2 18h20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
 <header class="nav">
-  <a class="brand" href="#top" aria-label="LedgerFlow"><svg class="mark" width="34" height="34"><use href="#mark"/></svg><svg class="wordmark" viewBox="0 0 207 32" width="132" height="21" role="img" aria-label="LedgerFlow"><use href="assets/wordmark.svg#wordmark"/></svg></a>
-  <nav aria-label="Main">
-    <a href="#how" data-i18n="nav.how">How it works</a><a href="#proof" data-i18n="nav.proof">Proof</a><a href="#security" data-i18n="nav.security">Security</a><a href="#download" data-i18n="nav.download">Download</a>
-  </nav>
-  <div class="nav-end">
-    <div class="lang" role="group" aria-label="Language"><button lang="en" data-lang="en">EN</button><button lang="fr" data-lang="fr">FR</button><button lang="sv" data-lang="sv">SV</button></div>
-    <a class="btn mint small" href="#download"><span data-i18n="cta.mac">Download for Mac</span><svg width="16" height="16"><use href="#arrow"/></svg></a>
-  </div>
+  <a class="brand" href="#top" aria-label="LedgerFlow home"><svg class="mark" width="22" height="25"><use href="#mark"/></svg><svg class="wordmark" viewBox="0 0 207 32" role="img" aria-label="LedgerFlow"><use href="assets/wordmark.svg#wordmark" width="207" height="32"/></svg></a>
+  <nav aria-label="Sections"><a href="#use">How you use it</a><a href="#who">Who it's for</a><a href="#trust">Why it's safe</a><a href="#film">Demo</a></nav>
+  <a class="btn btn-mint small" href="#start">Get the beta</a>
 </header>
 
-<main id="main">
-<section class="hero" id="top">
-  <div class="hero-copy">
-    <h1 data-i18n="hero.title">Every receipt lands in the right cells. With proof.</h1>
-    <p class="lead" data-i18n="hero.lead">LedgerFlow reads a receipt, writes it into the Excel workbook you already use, proves the change in a sandbox, and waits for your approval of that exact file.</p>
-    <div class="actions">
-      <a class="btn mint" href="#download"><svg width="18" height="18"><use href="#mac"/></svg><span data-i18n="cta.mac">Download for Mac</span></a>
-      <a class="btn outline" href="#how"><span data-i18n="cta.how">See how it works</span><svg width="16" height="16"><use href="#down"/></svg></a>
-    </div>
-  </div>
-
-  <figure class="hero-sheet" aria-label="Animated example: a receipt written into four cells" data-step="0">
-    <div class="receipt-chip"><b>PAPPERSKOMPANIET SÖDER AB</b><span>TOTALT <em>1 562,50</em></span><span>MOMS 25 % <em>312,50</em></span></div>
-    <div class="sheet">
-      <div class="cols"><i></i><b>Q</b><b>R</b><b>S</b><b>T</b></div>
-      <div class="r"><i>6</i><span class="h">6110 Office supplies</span><span></span><span></span><span></span></div>
-      <div class="r"><i>7</i><span></span><span class="c" data-v="[6110]"></span><span class="c n" data-v="1 250,00"></span><span></span></div>
-      <div class="r"><i>8</i><span></span><span class="c" data-v="[2640]"></span><span class="c n" data-v="312,50"></span><span></span></div>
-      <div class="r"><i>9</i><span></span><span></span><span></span><span></span></div>
-      <span class="sel"><i></i></span>
-    </div>
-    <figcaption>
-      <span class="state s0" data-i18n="state.0">Reading the receipt</span><span class="state s1" data-i18n="state.1">Writing the planned cells</span>
-      <span class="state s2" data-i18n="state.2">Verified · 21/21 checks</span><span class="state s3" data-i18n="state.3">Approved · version 2</span>
-      <span class="sample" data-i18n="sample">Sample figures</span>
-    </figcaption>
-  </figure>
-
-  <ul class="baseline">
-    <li data-i18n="base.1">Vultr Serverless Inference</li><li data-i18n="base.2">Python in a locked sandbox</li><li data-i18n="base.3">Independent verifier</li><li data-i18n="base.4">Your approval, by file hash</li>
-  </ul>
-</section>
-
-<section class="how" id="how" aria-labelledby="how-title">
-  <div class="how-head">
-    <h2 id="how-title" data-i18n="how.title">Four steps. About twenty seconds.</h2>
-    <button class="pause" type="button" aria-pressed="false"><svg class="ico-pause" width="14" height="14"><use href="#pause"/></svg><svg class="ico-play" width="14" height="14"><use href="#play"/></svg><span class="pause-label" data-i18n="pause">Pause effects</span><span class="play-label" data-i18n="play">Play effects</span></button>
-  </div>
-  <div class="how-grid">
-    <ol class="steps">
-      <li data-step="0"><h3><span class="n">01</span> <span data-i18n="s1.t">Snap the receipt</span></h3><p data-i18n="s1.b">On the iPhone, or drop a PDF or photo on the Mac. The original is kept, untouched.</p></li>
-      <li data-step="1"><h3><span class="n">02</span> <span data-i18n="s2.t">A model reads it, rules decide</span></h3><p data-i18n="s2.b">A Vultr-hosted model reads supplier, date, total and VAT. Swedish rules, not the model, choose debit and credit, and stop when payment or VAT is not evidenced.</p></li>
-      <li data-step="2"><h3><span class="n">03</span> <span data-i18n="s3.t">Code writes, a sandbox runs, a verifier checks</span></h3><p data-i18n="s3.b">The model writes a small Python program for exactly the planned cells. It runs without network in a throwaway container. A verifier with no AI re-reads the real file.</p></li>
-      <li data-step="3"><h3><span class="n">04</span> <span data-i18n="s4.t">You approve the exact file</span></h3><p data-i18n="s4.b">Every changed cell is in front of you. Your approval is bound to that file's hash. The previous version stays as it was.</p></li>
-    </ol>
-    <div class="how-stage" aria-hidden="true">
-      <div class="stage-sheet" data-step="0">
-        <div class="cols"><i></i><b>A</b><b>B</b></div>
-        <div class="r"><i>2</i><span data-i18n="l.supplier">Supplier</span><span class="v">Papperskompaniet Söder AB</span></div>
-        <div class="r"><i>3</i><span data-i18n="l.date">Date</span><span class="v">2026-11-27</span></div>
-        <div class="r"><i>4</i><span data-i18n="l.total">Total</span><span class="v">1 562,50</span></div>
-        <div class="r"><i>5</i><span data-i18n="l.vat">VAT 25 %</span><span class="v">312,50</span></div>
-        <div class="r"><i>6</i><span data-i18n="l.entry">Entry</span><span class="v">6110 · 2640 / 1940</span></div>
-        <span class="sel"><i></i></span>
-        <div class="photo"><b>PAPPERSKOMPANIET</b><span></span><span></span><span></span><strong>TOTALT 1 562,50</strong></div>
-        <div class="sandbox"><span><svg width="13" height="13"><use href="#lock"/></svg>network none · read-only · 128 MiB</span><code>patch_cells(book, "T-Accounts", writes)</code><ul><li><svg width="13" height="13"><use href="#check"/></svg>exact_write_set</li><li><svg width="13" height="13"><use href="#check"/></svg>formulas_unchanged</li><li><svg width="13" height="13"><use href="#check"/></svg>new_entry_balanced</li></ul></div>
-        <div class="approve"><span class="hash">sha256 fea407e9…</span><span class="ok" data-i18n="l.approve">Approve 8 cells</span><span class="ver">v1 <i></i> v2</span></div>
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Snap the receipt.<br><span>It's in your Excel.</span></h1>
+      <p class="lede">LedgerFlow is an accounting agent for small businesses. Photograph a receipt, and it books it in the workbook you already use. It asks before it writes a single cell.</p>
+      <div class="cta-row">
+        <a class="btn btn-mint" href="#start"><svg width="18" height="18"><use href="#i-mac"/></svg>Download for Mac · beta</a>
+        <a class="btn btn-ghost" href="#film"><svg width="16" height="16"><use href="#i-play"/></svg>Watch the 4-minute demo</a>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="proof" id="proof" aria-labelledby="proof-title">
-  <h2 id="proof-title" data-i18n="proof.title">Measured, not promised.</h2>
-  <p class="lead" data-i18n="proof.lead">Results from 27 November 2026. Each line says what was measured and how. Synthetic receipts, fictional companies.</p>
-  <table class="ledger">
-    <thead><tr><th data-i18n="proof.h1">Measurement</th><th data-i18n="proof.h2">Result</th><th data-i18n="proof.h3">Sample</th><th data-i18n="proof.h4">How</th></tr></thead>
-    <tbody>
-      <tr><td data-i18n="proof.r1">Expected outcome reached on our synthetic benchmark</td><td class="num">22/22</td><td data-i18n="proof.r1s">22 receipts</td><td data-i18n="proof.live">Live Vultr</td></tr>
-      <tr><td data-i18n="proof.r2">Critical facts invented by the model</td><td class="num">0</td><td data-i18n="proof.r2s">12 fields × 22 receipts</td><td data-i18n="proof.live">Live Vultr</td></tr>
-      <tr><td data-i18n="proof.r3">Generated programs verified on the first try</td><td class="num">11/11</td><td data-i18n="proof.r3s">11 plans</td><td data-i18n="proof.live">Live Vultr</td></tr>
-      <tr><td data-i18n="proof.r4">Data validations kept after a write</td><td class="num">66/66</td><td data-i18n="proof.r4s">a plain openpyxl save keeps 0/66</td><td data-i18n="proof.det">Deterministic</td></tr>
-      <tr><td data-i18n="proof.r5">Sandbox escape probes contained</td><td class="num">13/13</td><td data-i18n="proof.r5s">network, files, secrets, memory, time, disk</td><td data-i18n="proof.docker">Local Docker</td></tr>
-      <tr><td data-i18n="proof.r6">Inference cost per receipt</td><td class="num">USD 0.0042</td><td data-i18n="proof.r6s">mean per receipt, 22 receipts and 11 code plans · tokens × list price</td><td data-i18n="proof.live">Live Vultr</td></tr>
-    </tbody>
-  </table>
-  <p class="fine" data-i18n="proof.fine">22/22 is a correct-outcome rate on a synthetic benchmark, not general accounting accuracy. A wrong but allowed expense account cannot be caught by rules: that is why you approve every entry.</p>
-</section>
-
-<section class="security" id="security" aria-labelledby="sec-title">
-  <div>
-    <h2 id="sec-title" data-i18n="sec.title">The code runs where it can do no harm.</h2>
-    <p data-i18n="sec.b1">Every program the model writes runs in a fresh container: no network, read-only system, no secrets, one CPU, 512 MB, a deadline. Then the container is destroyed.</p>
-    <p data-i18n="sec.b2">Printed instructions on a receipt are treated as data. The run is held for a human, and receipt text never reaches the code prompt.</p>
-  </div>
-  <pre class="log" aria-label="Containment probe output"><code><span class="k">PROBE</span> network:   OSError [Errno 101] Network is unreachable
-<span class="k">PROBE</span> /etc:      Read-only file system
-<span class="k">PROBE</span> /input:    Read-only file system
-<span class="k">PROBE</span> secrets:   none · /run/secrets absent
-<span class="k">PROBE</span> loop:      killed at deadline · container destroyed
-<span class="ok">RESULT</span> CONTAINED</code></pre>
-</section>
-
-<section class="download" id="download" aria-labelledby="dl-title">
-  <h2 id="dl-title" data-i18n="dl.title">LedgerFlow lives on your Mac.</h2>
-  <p class="lead" data-i18n="dl.lead">The Mac runs the agent and keeps your workbook. Your iPhone pairs with it to capture receipts.</p>
-  <div class="dl-grid">
-    <div class="dl-card mac">
-      <svg class="mark big" width="72" height="72" style="--ring:#F2F5F3"><use href="#mark"/></svg>
-      <h3 data-i18n="dl.mac">LedgerFlow for Mac</h3>
-      <p data-i18n="dl.macb">Beta build for macOS. Unsigned during the beta: open it with right-click, then Open.</p>
-      <a class="btn forest" href="https://github.com/derka1385/LedgerFlow/releases/latest"><svg width="18" height="18"><use href="#mac"/></svg><span data-i18n="cta.mac">Download for Mac</span></a>
-      <span class="store" aria-disabled="true"><svg width="16" height="16"><use href="#mac"/></svg><span data-i18n="dl.store">Mac App Store · planned</span></span>
+    <div class="hero-stage" aria-label="A receipt photographed on iPhone becomes two rows in an Excel T-account">
+      <div class="sheet">
+        <div class="sheet-bar"><span>Expenses_2026.xlsx</span><span class="pill">v2 · approved</span></div>
+        <table>
+          <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+          <tbody>
+            <tr><th>4</th><td>2026-11-24</td><td>Clas Ohlson</td><td>5410</td><td class="num">249.00</td></tr>
+            <tr><th>5</th><td>2026-11-25</td><td>SJ AB</td><td>5800</td><td class="num">412.00</td></tr>
+            <tr class="new"><th>6</th><td>2026-11-26</td><td>Rusta</td><td>5410</td><td class="num">62.17</td></tr>
+            <tr class="new"><th>7</th><td>2026-11-26</td><td>Rusta · VAT 6 %</td><td>2640</td><td class="num">3.73</td></tr>
+            <tr><th>8</th><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="sel" aria-hidden="true"></div>
+      </div>
+      <figure class="phone hero-phone"><img src="assets/real/phone-camera.jpg" alt="LedgerFlow scanning a Rusta receipt on iPhone"></figure>
+      <p class="stage-note">Real iPhone capture · illustrative sheet rows</p>
     </div>
-    <div class="dl-card phone">
-      <h3 data-i18n="dl.phone">iPhone</h3>
-      <ol>
-        <li data-i18n="dl.p1">Open LedgerFlow on the Mac and choose “Scan with iPhone”.</li>
-        <li data-i18n="dl.p2">Scan the code with the LedgerFlow iPhone app (beta, TestFlight planned).</li>
-        <li data-i18n="dl.p3">Snap receipts. They arrive on the Mac, in the right cells.</li>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <h2>A shoebox of receipts.<br><span>An evening in Excel.</span></h2>
+    <p>Read the total. Work out the VAT. Find the right account. Type it in. Check it balances. Then the next one. LedgerFlow does that part, in your own file, and leaves the decisions to you.</p>
+  </section>
+
+  <!-- HOW YOU USE IT -->
+  <section class="use" id="use">
+    <div class="use-intro">
+      <h2>Four moments.<br>That's the whole job.</h2>
+    </div>
+    <div class="story">
+      <div class="story-visual" aria-hidden="true">
+        <figure class="phone sv" data-step="0"><img src="assets/real/phone-camera.jpg" alt=""></figure>
+        <figure class="mac sv" data-step="1"><img src="assets/real/mac-review.jpg" alt=""></figure>
+        <figure class="phone sv" data-step="2"><img src="assets/real/phone-notification.jpg" alt=""></figure>
+        <figure class="sv cells" data-step="3">
+          <table><thead><tr><th></th><th>R</th><th>S</th></tr></thead>
+            <tbody><tr><th>7</th><td>[6110]</td><td class="num">1,000</td></tr><tr><th>8</th><td>[2640]</td><td class="num">250</td></tr></tbody></table>
+          <div class="sel"></div>
+          <p>v1 kept · v2 written · 8 cells changed, nothing else</p>
+        </figure>
+      </div>
+      <ol class="steps">
+        <li data-step="0"><h3>Snap it.</h3><p>Open the app and point it at the receipt. The edges are found for you. No iPhone? Drop a photo or PDF on the Mac.</p></li>
+        <li data-step="1"><h3>It reads it.</h3><p>Supplier, date, total, VAT and payment, in seconds. Every value sits next to the words it came from, so you can check it at a glance.</p></li>
+        <li data-step="2"><h3>You approve.</h3><p>If something is unclear, LedgerFlow asks you instead of guessing. You get a notification. Nothing is written until you say yes.</p></li>
+        <li data-step="3"><h3>It's in your books.</h3><p>The entry lands in the exact cells of your own workbook. The previous version stays, so you can always go back.</p></li>
       </ol>
-      <span class="store" aria-disabled="true"><svg width="16" height="16"><use href="#mac"/></svg><span data-i18n="dl.ios">App Store · planned</span></span>
     </div>
-  </div>
-</section>
+  </section>
+
+  <!-- WHO -->
+  <section class="who" id="who">
+    <h2>Made for the receipts<br>you actually have.</h2>
+    <dl class="cases">
+      <div><dt>The hardware run</dt><dd>Screws, boxes, a lamp from Rusta. Snapped in the car park, booked to the right expense account with 6 % or 25 % VAT before you are home.</dd></div>
+      <div><dt>The trip abroad</dt><dd>A taxi in euros. Converted to kronor at the Riksbank rate of the day, with foreign VAT kept out of your deduction.</dd></div>
+      <div><dt>The duplicate</dt><dd>The same receipt sent twice from two phones. LedgerFlow notices and holds the second one for you.</dd></div>
+      <div><dt>The accountant</dt><dd>Clients send receipts from their phones. You open the Mac to a queue of proposed entries, each one ready to approve or correct.</dd></div>
+    </dl>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust" id="trust">
+    <h2>The AI never touches<br>your books alone.</h2>
+    <div class="trust-grid">
+      <p><strong>It reads.</strong> A model on Vultr reads the receipt. Reading is all it is trusted with.</p>
+      <p><strong>Rules decide.</strong> Fixed Swedish accounting rules, not the model, choose debit, credit and VAT.</p>
+      <p><strong>A sealed box writes.</strong> The small program that edits your file runs in a container with no internet and no keys, then the container is destroyed.</p>
+      <p><strong>You approve.</strong> An independent checker re-opens the file. Your yes is tied to that exact file, by its fingerprint.</p>
+    </div>
+    <details class="engineering">
+      <summary>See the engineering</summary>
+      <div class="eng-body">
+        <div class="eng-box">
+          <div class="eng-tag mono">docker · python:3.12-slim</div>
+          <ul class="mono">
+            <li>--network none</li><li>--read-only · uid 10001 · cap-drop ALL</li><li>1 CPU · 512 MB · 128 pids</li><li>/work tmpfs 128 MiB · 30 s deadline</li><li>destroyed after every run</li>
+          </ul>
+        </div>
+        <ol class="flow">
+          <li><b>Read</b> Vultr Serverless Inference, qwen3.8-27b</li>
+          <li><b>Plan</b> deterministic rules pick the exact cells</li>
+          <li><b>Write</b> generated Python runs in the sandbox</li>
+          <li><b>Verify</b> 21 checks on the real output file</li>
+          <li><b>Approve</b> bound to the file's sha256</li>
+        </ol>
+      </div>
+    </details>
+  </section>
+
+  <!-- PROOF -->
+  <section class="proof" aria-label="Measured results">
+    <div><b class="mono">22/22</b><span>test receipts booked right, live on Vultr</span></div>
+    <div><b class="mono">13/13</b><span>escape attempts contained by the sandbox</span></div>
+    <div><b class="mono">16/16</b><span>tampered files rejected by the checker</span></div>
+    <div><b class="mono">$0.004</b><span>of inference per receipt</span></div>
+    <p class="fine">Synthetic benchmark of fictional receipts, measured 27 Nov 2026. Not a guarantee of accuracy.</p>
+  </section>
+
+  <!-- FILM -->
+  <section class="film" id="film">
+    <h2>See it work, start to finish.</h2>
+    <video controls preload="none" playsinline poster="assets/demo-poster.jpg" src="assets/demo-film.mp4"></video>
+  </section>
+
+  <!-- START -->
+  <section class="start" id="start">
+    <h2>Your Excel.<br>Your business.<br>Our agent.</h2>
+    <div class="start-actions">
+      <a class="btn btn-ink" href="https://github.com/derka1385/LedgerFlow/releases/latest"><svg width="18" height="18"><use href="#i-mac"/></svg>Download for Mac · beta</a>
+      <p class="start-note"><svg width="16" height="16"><use href="#i-phone"/></svg>iPhone app is optional: TestFlight on request during the beta.</p>
+      <p class="start-note">The Mac build is unsigned in the beta: right-click, then Open.</p>
+    </div>
+  </section>
 </main>
 
-<footer>
-  <a class="brand" href="#top" aria-label="LedgerFlow"><svg class="mark" width="28" height="28" style="--ring:#0C1210"><use href="#mark"/></svg><svg class="wordmark" viewBox="0 0 207 32" width="112" height="18"><use href="assets/wordmark.svg#wordmark"/></svg></a>
-  <p data-i18n="foot">Built in Stockholm for the Vultr Agent Runtime Hackathon, 2026. Synthetic demo data only.</p>
-  <a href="#top" data-i18n="top">Back to top</a>
+<footer class="foot">
+  <a class="brand" href="#top"><svg class="mark" width="18" height="20"><use href="#mark"/></svg><svg class="wordmark" viewBox="0 0 207 32" role="img" aria-label="LedgerFlow"><use href="assets/wordmark.svg#wordmark" width="207" height="32"/></svg></a>
+  <p>Built in Stockholm for the Vultr Agent Runtime Hackathon, 2026. Demo data is fictional.</p>
+  <a href="#top">Back to top</a>
 </footer>
+<script src="app.js"></script>
 </body>
 </html>

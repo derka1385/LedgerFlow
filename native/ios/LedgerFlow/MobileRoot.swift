@@ -97,10 +97,11 @@ private struct WorkbookScreen: View {
         let open = items.filter { $0.state != "COMMITTED" }
         return VStack(alignment: .leading, spacing: 14) {
             Text("This month").font(.subheadline.weight(.semibold)).foregroundStyle(.white.opacity(0.75))
-            Text(sek(booked)).font(.system(.largeTitle, design: .serif).weight(.semibold)).foregroundStyle(.white).monospacedDigit()
+            Text(sek(booked + open.compactMap(\.gross_minor).reduce(0, +))).font(.system(.largeTitle, design: .serif).weight(.semibold)).foregroundStyle(.white).monospacedDigit()
+            Text("\(sek(booked)) booked · \(sek(open.compactMap(\.gross_minor).reduce(0, +))) to check").font(.footnote).foregroundStyle(.white.opacity(0.8)).monospacedDigit()
             HStack(spacing: 18) {
-                Label("\(items.count) receipts", systemImage: "doc.text")
-                Label("\(open.count) to check", systemImage: "hourglass")
+                Label("\(items.count) on the Mac", systemImage: "doc.text")
+                if !workspace.pending.isEmpty { Label("\(workspace.pending.count) waiting on this iPhone", systemImage: "iphone.and.arrow.forward") }
             }.font(.footnote.weight(.medium)).foregroundStyle(.white.opacity(0.85))
         }
         .padding(20).frame(maxWidth: .infinity, alignment: .leading)

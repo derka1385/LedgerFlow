@@ -1,0 +1,35 @@
+LedgerFlow — Official Demo · final voiceover script (English)
+Voice: macOS system voice Samantha, rate 168 wpm.
+
+[S01] Every day, businesses generate receipts. And behind every receipt, someone has to turn a piece of paper into an accounting transaction.
+
+[S02] Businesses already have their own financial systems. We didn't want to replace them. We wanted to automate the work happening inside them. Introducing LedgerFlow.
+
+[S03] Connect your existing Excel workbook. LedgerFlow identifies its accounts, its structure, and the exact places where new entries can safely be written.
+
+[S04] Employees don't need to understand double-entry bookkeeping. They capture a receipt, and send it to their workspace. The iPhone is optional. A direct upload works too.
+
+[S05] One receipt, one workflow, with the browser-based agent at its core. Seconds later, the receipt is waiting on the Mac.
+
+[S06] Vultr Serverless Inference reads the receipt and turns it into structured financial information. Every value is linked to the text it came from, and still has to be checked.
+
+[S07] Financial decisions cannot depend on model confidence alone. Deterministic accounting rules build a balanced entry, and define the exact cells the agent is allowed to change.
+
+[S08] LedgerFlow doesn't just recommend an entry. It uses Vultr to generate a program that performs the work.
+
+[S09] Every generated program runs in a disposable sandbox. No network, no secrets, one CPU, five hundred twelve megabytes, a hard deadline. Then the container is destroyed.
+
+[S10] But what happens when the code misbehaves? Here, a hostile program tries the network, tries to overwrite its input, and then never stops. The sandbox blocks each attempt, kills it at the deadline, and destroys the container.
+
+[S11] Running is not enough. An independent verifier opens the resulting workbook, checks every change, keeps formulas and features intact, and confirms the entry is balanced.
+
+[S12] The accountant sees exactly what will change. Approval is bound to the verified file itself, not to the model's recommendation.
+
+[S13] The result is a real Excel workbook. Eight cells written, nothing else touched, and the original version preserved.
+
+[S14] We compared eighteen model configurations on real Vultr inference, attacked the sandbox with hostile programs, and measured how well existing workbooks are preserved.
+
+[S15] Cloud inference, deterministic controls, sandboxed execution, and independent verification. An agent that doesn't just answer questions, but performs real work.
+
+[S16] Your employees capture the receipts. LedgerFlow performs the work. LedgerFlow. Every receipt lands in the right cells. With proof.
+

@@ -1,0 +1,281 @@
+{
+ "run_id": "run_17d34c4d3f2e41ee",
+ "revision": 9,
+ "workbook_id": "wb_9145a1fd5e214af5",
+ "document_id": "doc_bddc8e89058e4293",
+ "state": "COMMITTED",
+ "state_reason": "COMMITTED",
+ "base_version_id": "ver_1470f090a8054f77",
+ "mapping_version": 1,
+ "transaction_revision": 1,
+ "attempt_count": 1,
+ "last_event_sequence": 20,
+ "transaction": {
+  "schema_version": "ledgerflow.transaction.v1",
+  "transaction_id": "txn_d93cbea6787a44c8",
+  "document_id": "doc_bddc8e89058e4293",
+  "tenant_id": "ten_nordvik",
+  "revision": 1,
+  "document_sha256": "debc197ecbade24136d7bd1a418229797ceafaf5f2fea6dda4c64dc2eb1691b2",
+  "normalized_image_sha256": "debc197ecbade24136d7bd1a418229797ceafaf5f2fea6dda4c64dc2eb1691b2",
+  "kind": "purchase_receipt",
+  "merchant_name": "KONTORSBOLAGET NORD AB",
+  "supplier_reference": "K-448120",
+  "supplier_org_no": "559999-0101",
+  "document_date": "2026-11-26",
+  "currency": "SEK",
+  "gross_minor": 125000,
+  "net_minor": 100000,
+  "tax_minor": 25000,
+  "tax_lines": [
+   {
+    "base_minor": 100000,
+    "tax_minor": 25000,
+    "rate_basis_points": 2500,
+    "source_evidence_ids": [
+     "vsi_vat"
+    ]
+   }
+  ],
+  "payment_status": "paid",
+  "payment_source": "company_bank",
+  "payment_account_id": null,
+  "category_account_id": "6110",
+  "tax_treatment": "configured_deductible",
+  "policy_version": "policy_nordvik_v1",
+  "evidence": [
+   {
+    "evidence_id": "vsi_document_kind",
+    "field": "document_kind",
+    "source": "receipt_image",
+    "text": "KVIITO",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_supplier_name",
+    "field": "merchant_name",
+    "source": "receipt_image",
+    "text": "KONTORSBOLAGET NORD AB",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_supplier_org_no",
+    "field": "supplier_org_no",
+    "source": "receipt_image",
+    "text": "Org.nr 559999-0101",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_document_date",
+    "field": "document_date",
+    "source": "receipt_image",
+    "text": "2026-11-26 14:32",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_document_number",
+    "field": "supplier_reference",
+    "source": "receipt_image",
+    "text": "Kvittonr K-448120",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_currency",
+    "field": "currency",
+    "source": "receipt_image",
+    "text": "SEK 1 250,00",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_gross",
+    "field": "gross_minor",
+    "source": "receipt_image",
+    "text": "TOTALT SEK 1 250,00",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_net",
+    "field": "net_minor",
+    "source": "receipt_image",
+    "text": "Netto 1 000,00",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_vat",
+    "field": "tax_minor",
+    "source": "receipt_image",
+    "text": "Moms 25% 250,00",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_vat_rate",
+    "field": "vat_rate",
+    "source": "receipt_image",
+    "text": "Moms 25%",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_payment_method",
+    "field": "payment_source",
+    "source": "receipt_image",
+    "text": "KORT ************4821",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_payment_status",
+    "field": "payment_status",
+    "source": "receipt_image",
+    "text": "GODKÄNT",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_card_last4",
+    "field": "card_last4",
+    "source": "receipt_image",
+    "text": "KORT ************4821",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_description",
+    "field": "description",
+    "source": "receipt_image",
+    "text": "KOPIERINGSPAPPER A4 5-PACK 450,00 TONER SVART 800,00",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   },
+   {
+    "evidence_id": "vsi_category",
+    "field": "category_account_id",
+    "source": "receipt_image",
+    "text": "The receipt is for copy paper (A4 5-pack) and black toner from an office supplies company (Kontorsbolaget Nord AB), which are standard office supplies.",
+    "bbox": null,
+    "page": 1,
+    "status": "observed"
+   }
+  ],
+  "unresolved_fields": [],
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "exact_duplicate_key": "debc197ecbade24136d7bd1a418229797ceafaf5f2fea6dda4c64dc2eb1691b2",
+  "semantic_duplicate_key": null
+ },
+ "entry": {
+  "entry_id": "entry_txn_d93cbea6787a44c8_1",
+  "transaction_id": "txn_d93cbea6787a44c8",
+  "transaction_revision": 1,
+  "accounting_date": "2026-11-26",
+  "currency": "SEK",
+  "policy_version": "policy_nordvik_v1",
+  "lines": [
+   {
+    "line_id": "line_expense",
+    "account_id": "6110",
+    "side": "debit",
+    "amount_minor": 100000,
+    "purpose": "expense",
+    "evidence_ids": [
+     "vsi_category",
+     "vsi_gross",
+     "vsi_net",
+     "vsi_supplier_name",
+     "vsi_vat"
+    ]
+   },
+   {
+    "line_id": "line_tax",
+    "account_id": "2640",
+    "side": "debit",
+    "amount_minor": 25000,
+    "purpose": "input_tax",
+    "evidence_ids": [
+     "vsi_vat"
+    ]
+   },
+   {
+    "line_id": "line_credit",
+    "account_id": "1940",
+    "side": "credit",
+    "amount_minor": 125000,
+    "purpose": "payment",
+    "evidence_ids": [
+     "vsi_gross",
+     "vsi_net",
+     "vsi_payment_method",
+     "vsi_payment_status",
+     "vsi_vat"
+    ]
+   }
+  ],
+  "explanation": "KONTORSBOLAGET NORD AB: SEK 1 000.00 to 6110 + deductible VAT SEK 250.00; total SEK 1 250.00 paid from 1940.",
+  "source_evidence_ids": [
+   "vsi_category",
+   "vsi_gross",
+   "vsi_net",
+   "vsi_payment_method",
+   "vsi_payment_status",
+   "vsi_supplier_name",
+   "vsi_vat"
+  ]
+ },
+ "plan_sha256": "2e5931b4f1afe53e900bcce3cfa6aa9a1e0d1f91a839dea85c14191d4d0da743",
+ "validation_summary": {
+  "result": "pass",
+  "report_sha256": "afbaf5e9921ab246f5b90f603fa626a3dd73f27c4017ca2521518fa3a5f5ef2e",
+  "checks_passed": 21,
+  "checks_total": 21,
+  "runtime": "docker"
+ },
+ "candidate_artifact_id": "art_856efebf65b94930",
+ "candidate_sha256": "d607aa486ca0075b1351b8f00e75b0bd01374eda7efc9ddc751551eeb1664fec",
+ "commit": {
+  "commit_id": "cmt_4991900d92694509",
+  "approval_id": "apr_3f47966df1ba4982",
+  "run_id": "run_17d34c4d3f2e41ee",
+  "workbook_id": "wb_9145a1fd5e214af5",
+  "previous_version_id": "ver_1470f090a8054f77",
+  "version_id": "ver_9adae0e78da041af",
+  "artifact_id": "art_1dff766602d741f4",
+  "artifact_sha256": "d607aa486ca0075b1351b8f00e75b0bd01374eda7efc9ddc751551eeb1664fec",
+  "transaction_id": "txn_d93cbea6787a44c8",
+  "transaction_revision": 1,
+  "committed_by": "usr_owner",
+  "committed_at": "2026-11-27T17:17:04Z",
+  "audit_artifact_id": "art_fa64ff53478e42f5"
+ },
+ "created_at": "2026-11-27T17:16:32Z",
+ "updated_at": "2026-11-27T17:17:04Z",
+ "review_items": [],
+ "advisories": [],
+ "security_flags": [],
+ "duplicate_of": null,
+ "code_artifact_id": "art_57619464b79345d0",
+ "approval_expires_at": "2026-11-27T17:31:51Z",
+ "mock_labels": []
+}

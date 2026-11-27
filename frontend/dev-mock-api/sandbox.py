@@ -135,6 +135,10 @@ def run(inputs: dict[str, bytes], entry: str = "main.py", on_event=None, deadlin
         for rel, data in inputs.items():
             p = root / rel
             p.parent.mkdir(parents=True, exist_ok=True)
+            for parent in p.parents:
+                if parent == root:
+                    break
+                parent.chmod(0o755)
             p.write_bytes(data)
             p.chmod(0o444)
         cmd = ["docker", "run", "-d", "--name", name, *FLAGS,

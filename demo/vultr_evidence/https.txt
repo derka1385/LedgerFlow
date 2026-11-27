@@ -1,0 +1,11 @@
+HTTP/2 200
+accept-ranges: bytes
+alt-svc: h3=":443"; ma=2592000
+content-type: text/html; charset=utf-8
+etag: "tp6hzl92r"
+last-modified: Fri, 27 Nov 2026 20:52:33 GMT
+permissions-policy: camera=(self)
+server: Caddy
+x-content-type-options: nosniff
+content-length: 11763
+date: Fri, 27 Nov 2026 20:52:36 GMT

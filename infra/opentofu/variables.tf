@@ -5,9 +5,20 @@ variable "region" {
 }
 
 variable "plan" {
-  description = "Vultr VM plan (candidate: 4 vCPU / 8 GiB)."
+  description = "Vultr VM plan (default: 2 vCPU / 4 GiB)."
   type        = string
-  default     = "vc2-4c-8gb"
+  default     = "vc2-2c-4gb"
+}
+
+variable "public_hostname" {
+  description = "Optional DNS name pointing at the VM. When empty, use the IPv4 address with sslip.io."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.public_hostname == "" || (length(var.public_hostname) <= 253 && can(regex("^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z][a-z0-9-]*[a-z0-9]$", var.public_hostname)))
+    error_message = "Provide a lowercase DNS name without a scheme or path, or leave it empty."
+  }
 }
 
 variable "os_id" {

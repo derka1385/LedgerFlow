@@ -18,3 +18,12 @@ output "firewall_group_id" {
 output "region" {
   value = vultr_instance.runner.region
 }
+
+output "public_hostname" {
+  value = var.public_hostname != "" ? var.public_hostname : "${vultr_instance.runner.main_ip}.sslip.io"
+}
+
+output "jury_url" {
+  description = "Expected HTTPS demo URL once Caddy and the application are verified."
+  value       = "https://${var.public_hostname != "" ? var.public_hostname : "${vultr_instance.runner.main_ip}.sslip.io"}/welcome/"
+}

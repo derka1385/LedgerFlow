@@ -9,8 +9,8 @@ run "restricted_runner_plan" {
   command = plan
 
   assert {
-    condition     = vultr_instance.runner.region == "sto" && vultr_instance.runner.plan == "vc2-4c-8gb" && vultr_instance.runner.os_id == 2284
-    error_message = "Runner must default to the reviewed Stockholm / 8 GiB / Ubuntu configuration."
+    condition     = vultr_instance.runner.region == "sto" && vultr_instance.runner.plan == "vc2-2c-4gb" && vultr_instance.runner.os_id == 2284
+    error_message = "Runner must default to the reviewed Stockholm / 4 GiB / Ubuntu configuration."
   }
 
   assert {

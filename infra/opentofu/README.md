@@ -1,174 +1,98 @@
-# LedgerFlow Vultr runner — OpenTofu
+# LedgerFlow jury demo on Vultr
 
-This module manages one VM, one SSH-key registration, one firewall group, and
-three inbound IPv4 rules. Defaults: Stockholm (`sto`), `vc2-4c-8gb`, Ubuntu 24.04
-x64 (`os_id = 2284`). Check current catalog availability/pricing before apply;
-the handoff's USD 40/month is a catalog observation, not a guaranteed quote.
+OpenTofu manages a disposable Ubuntu 24.04 VM in Stockholm by default. The
+`vc2-2c-4gb` plan has 2 vCPU and 4 GiB. Vultr's public catalog lists USD 20/month.
+At the published 672-hour cap this is about USD 0.030/hour, excluding inference
+and applicable taxes. Confirm the exact rate in the Vultr console before apply.
+[Billing details](https://docs.vultr.com/support/platform/billing/how-am-i-billed-for-my-servers)
 
-**Status:** validated locally with OpenTofu 1.13.10 and Vultr provider 2.33.2;
-four mocked-plan tests passed. No authenticated plan/apply, VM bootstrap, or
-Vultr containment measurement has been performed. Mocked plans validate policy
-and resource schemas, not provider capacity or runtime enforcement.
+Cloud-init installs Python 3.12, Docker, gVisor and Caddy. Docker defaults to
+`runsc` with systrap. The host and cloud firewalls allow TCP 80/443 publicly and
+SSH from the operator's IPv4 /32. Caddy serves the landing and proxies the API
+and application to `127.0.0.1:8790`.
 
-## What gets configured
+The browser demo is a shared synthetic workspace. The service seeds the sample
+workbook at startup and stores the shared demo session in memory. Restarting
+clears the demo runs. The host service can control Docker; receipt-generated
+programs never receive the Docker socket or the inference key.
 
-- SSH on TCP 22 from one explicitly supplied IPv4 `/32`.
-- Public TCP 80/443; IPv6 disabled. No Docker API or application-development ports.
-- Key-only `deploy` user with operator sudo access; root/password SSH disabled.
-- Ubuntu Docker package and official signed gVisor APT repository.
-- Docker default runtime `runsc`, with `--platform=systrap`; no silent runc fallback.
-- Host UFW rules matching the cloud firewall, plus bounded daemon log rotation.
-- Python venv tools, `uv` 0.11.17, and `/srv/ledgerflow` for reviewed source.
-- Actual installed versions at `/var/lib/ledgerflow/bootstrap-versions.txt`.
+## 1. Review the plan
 
-The deploy operator has root-equivalent sudo privileges. Application/worker users
-are not given Docker access. Bootstrap does not start the development mock API,
-install a reverse proxy, configure DNS/TLS, or deploy an application service.
-Public 80/443 rules reserve those entrypoints; no listener is created here.
-
-gVisor packages and Ubuntu updates are fetched at first boot, so bootstrap is not
-a reproducible immutable image build. Record installed versions and image digests
-with every measurement. Compatibility of gVisor, tmpfs options, Excel processing,
-and the complete containment profile must be measured on the resulting VM.
-
-## Configure and plan
-
-Install OpenTofu 1.13.10. Run these commands from the **repository root**:
+From the repository root, supply the **account** key in your shell and set
+`TF_VAR_ssh_admin_cidr` to your public IPv4 /32. The SSH variable is a public key.
+Use an existing Ed25519 key whose private counterpart you can use from this Mac.
 
 ```sh
-export VULTR_API_KEY   # supply through your shell/secret environment first
-export TF_VAR_ssh_admin_cidr='YOUR_PUBLIC_IPV4/32'
-export TF_VAR_ssh_public_key="$(ssh-keygen -y -f "$HOME/.ssh/id_ed25519")"
 umask 077
+export VULTR_API_KEY
+export TF_VAR_ssh_admin_cidr='YOUR_PUBLIC_IPV4/32'
+export TF_VAR_ssh_public_key="$(cat ~/.ssh/id_ed25519.pub)"
 
 tofu -chdir=infra/opentofu init -lockfile=readonly
-tofu -chdir=infra/opentofu plan -out=runner.tfplan
-tofu -chdir=infra/opentofu apply runner.tfplan
+tofu -chdir=infra/opentofu plan -out=jury.tfplan
 ```
 
-Only the derived public key reaches the configuration. Never supply an account
-key, inference key, private SSH key, or repository access token in variables,
-cloud-init, or user data. The provider consumes `VULTR_API_KEY` directly from the
-operator's environment. `terraform.tfvars.example` shows the variable format if
-you prefer a local ignored `terraform.tfvars` file.
+If you own a DNS name for the demo, set `TF_VAR_public_hostname` before planning
+and point its A record to the VM after apply. Otherwise the stack uses
+`<public-ip>.sslip.io`, which resolves to the VM. Caddy requests a public
+Let's Encrypt certificate. [Caddy HTTPS requirements](https://caddyserver.com/docs/automatic-https)
 
-The module uses local state. State and saved plans are git-ignored, but can contain
-Vultr-generated passwords and infrastructure metadata. Keep them private and
-retain state for updates/destruction. Only one operator should apply at a time;
-use a team-controlled encrypted, locking remote backend before shared operation.
-Do not upload state/plans as CI artifacts. The provider lock file is included
-with this module and should be committed alongside the templates.
-
-Vultr's Terraform provider takes **raw** `user_data` and base64-encodes it internally;
-this differs from constructing the REST request yourself. Cloud-init runs on first
-boot: updating `user_data` on an existing instance is not a configuration-management
-run. For bootstrap changes, rebuild the disposable runner with an explicit reviewed
-`-replace=vultr_instance.runner` plan, after exporting evidence you want to keep.
-
-## Wait for bootstrap and verify runtime
+After reviewing the exact plan and approving the hourly cost:
 
 ```sh
-HOST="deploy@$(tofu -chdir=infra/opentofu output -raw ipv4_address)"
-INSTANCE_ID="$(tofu -chdir=infra/opentofu output -raw instance_id)"
-ssh "$HOST" 'sudo cloud-init status --wait --long'
-ssh "$HOST" 'sudo test -f /var/lib/ledgerflow/bootstrap-complete'
-ssh "$HOST" 'sudo cat /var/lib/ledgerflow/bootstrap-versions.txt'
-ssh "$HOST" 'sudo docker info --format "{{.DefaultRuntime}}"'
+tofu -chdir=infra/opentofu apply jury.tfplan
 ```
 
-Expected default runtime: `runsc`. A Terraform apply completing does not mean
-cloud-init succeeded. If bootstrapping fails, inspect
-`sudo journalctl -u cloud-final` and `/var/log/cloud-init-output.log` over SSH.
-Verify the SSH host-key fingerprint through the Vultr console on first connection.
+Keep local state and plans private. They may contain Vultr-generated credentials
+and are ignored by Git. Keep the state until the instance has been destroyed.
 
-## Transfer reviewed source and measure
+## 2. Deploy and verify before switching the jury link
 
-First commit the intended source, including `uv.lock`; the archive below contains
-only that commit, and avoids copying local secrets/private workbooks to the VM.
-Choose the reviewed commit hash rather than assuming the current checkout is it.
+Verify the new VM's SSH host-key fingerprint using the Vultr console before the
+first connection. Set `VULTR_INFERENCE_API_KEY` in the local shell environment or
+the repository's ignored `.env`. The deploy command builds the frontend in a
+temporary directory and uploads only the runtime, landing and synthetic
+fixtures. It streams the inference credential separately through SSH into the
+root-owned 0600 environment file on the VM.
 
 ```sh
-RELEASE='REPLACE_WITH_REVIEWED_COMMIT_HASH'
-git archive --format=tar "$RELEASE" | ssh "$HOST" 'tar -xf - -C /srv/ledgerflow'
-ssh "$HOST" 'uv --directory /srv/ledgerflow sync --frozen --extra dev --python 3.12'
-ssh "$HOST" 'uv --directory /srv/ledgerflow run --frozen --extra dev python benchmark/corpus.py'
-ssh "$HOST" 'sudo docker pull python:3.12-slim'
+bash infra/opentofu/deploy-demo.sh
+bash infra/opentofu/verify-demo.sh
 ```
 
-The tag pull is a discovery step. Inspect its `RepoDigests`, choose the vetted
-digest, and use that exact digest for the measurement:
+The verification command checks trusted HTTPS, the actual VM's runtime and
+container image, the containment result from the VM, and the two Playwright
+jury flows. It saves the results to `demo/vultr_evidence/`. The camera test uses
+a simulated device in Chrome. A failure in Docker, gVisor or inference is a
+deployment failure. Keep the existing jury link active until these checks pass.
+
+After passing, update `landing/index.html` in the working tree and the public
+checkout with the validated HTTPS origin in the `ledgerflow-app` meta tag.
+Replace the temporary jury link in the public README, push the reviewed files,
+and verify that GitHub Pages opens the new workspace and creates a session.
+Record the results in `DEMO_EVIDENCE.md`, `FINAL_RELEASE_CHECKLIST.md` and
+`film/VERIFICATION_REPORT.md` before retiring the temporary tunnel.
+
+## 3. Destroy after the evaluation
+
+Archive the verified evidence first, then use the same OpenTofu state directory:
 
 ```sh
-ssh "$HOST" 'sudo docker image inspect python:3.12-slim --format "{{json .RepoDigests}}"'
+tofu -chdir=infra/opentofu destroy
 ```
 
-In an SSH session on the VM, from `/srv/ledgerflow`:
+Destroy removes the VM, firewall and SSH-key registration managed by this stack.
+Powering off the VM leaves it billable.
 
-```sh
-export LEDGERFLOW_SANDBOX_IMAGE='python@sha256:REPLACE_WITH_VETTED_DIGEST'
-export PYTHONPATH='frontend/dev-mock-api:accounting:benchmark'
-sudo env LEDGERFLOW_SANDBOX_IMAGE="$LEDGERFLOW_SANDBOX_IMAGE" PYTHONPATH="$PYTHONPATH" \
-  .venv/bin/python -m pytest -ra frontend/dev-mock-api/test_sandbox.py \
-  frontend/dev-mock-api/test_mock_api.py frontend/dev-mock-api/test_vsi_integration.py
-sudo env LEDGERFLOW_SANDBOX_IMAGE="$LEDGERFLOW_SANDBOX_IMAGE" PYTHONPATH="$PYTHONPATH" \
-  .venv/bin/python benchmark/security_evidence.py \
-  --host-label vultr-REPLACE_WITH_INSTANCE_ID \
-  --output /srv/ledgerflow/security-evidence.vultr.json
-```
-
-Reject skipped required runtime tests. Pair the JSON with `INSTANCE_ID`, the
-console's region/OS identity, bootstrap versions, and a terminal recording.
-Archive the reviewed release hash alongside the evidence. The evidence host label
-is operator-supplied, not provider attestation. See
-[`docs/SANDBOX_REVIEW.md`](../../docs/SANDBOX_REVIEW.md) for remaining runner gaps.
-
-## Validate without credentials
+## Local validation
 
 ```sh
 tofu -chdir=infra/opentofu fmt -check -recursive
-tofu -chdir=infra/opentofu init -backend=false -input=false -lockfile=readonly
 tofu -chdir=infra/opentofu validate
 tofu -chdir=infra/opentofu test
-bash -n infra/opentofu/bootstrap.sh
+for script in infra/opentofu/*.sh; do bash -n "$script"; done
 ```
 
-GitHub Actions runs these checks with a mocked provider and no cloud credentials.
-Tests cover the default VM shape, restricted SSH, expected public ports,
-key-only bootstrap, raw cloud-config, and rejection of public/IPv6 SSH and
-private-key input. The HCL uses Terraform-compatible constructs; the checked
-toolchain and lock file target OpenTofu. Terraform uses a different default
-provider registry, so initialize/lock separately if switching tools.
-
-## Destroy the disposable runner
-
-Export evidence first, then destroy from the same state directory:
-
-```sh
-tofu -chdir=infra/opentofu plan -destroy -out=destroy.tfplan
-tofu -chdir=infra/opentofu apply destroy.tfplan
-```
-
-This removes the module's VM, firewall, and SSH-key registration. A halted VM may
-remain billable; verify deletion in the Vultr console.
-
-## Kubernetes / Helm scope
-
-This repository currently targets a single runner VM. Kubernetes would require
-VKE provisioning, workload identities, persistent storage, ingress/TLS, and an
-explicit `RuntimeClass` installed/configured on every execution node. Sandboxes
-would need separate Jobs with `runAsNonRoot`, dropped capabilities,
-`readOnlyRootFilesystem`, `allowPrivilegeEscalation: false`, default seccomp,
-network-deny policy, deadlines, and enforced storage limits. An `emptyDir.sizeLimit`
-on its own is not a replacement for a demonstrated kernel-enforced quota.
-
-The current runner invokes a local Docker daemon; simply wrapping the API in a
-Deployment or mounting the node's Docker socket would not implement that design.
-Helm can package a future Kubernetes backend once this execution model exists.
-
-## Verified implementation sources
-
-- [Vultr instance resource](https://github.com/vultr/terraform-provider-vultr/blob/v2.33.2/website/docs/r/instance.html.markdown)
-- [Vultr firewall rule](https://github.com/vultr/terraform-provider-vultr/blob/v2.33.2/website/docs/r/firewall_rule.html.markdown)
-- [Vultr SSH key](https://github.com/vultr/terraform-provider-vultr/blob/v2.33.2/website/docs/r/ssh_key.html.markdown)
-- [Provider user-data encoding](https://github.com/vultr/terraform-provider-vultr/blob/v2.33.2/vultr/resource_vultr_instance.go)
-- [gVisor installation](https://gvisor.dev/docs/user_guide/install/)
+Mocked OpenTofu tests verify the configuration and firewall plan. They do not
+exercise an authenticated apply, cloud-init on Vultr, or container enforcement
+on that VM.

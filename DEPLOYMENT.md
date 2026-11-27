@@ -12,32 +12,31 @@ The path is: **configure Vultr credentials → validate/plan → provision → v
 cloud-init → transfer a reviewed release → run containment and Excel checks →
 export evidence → destroy when finished**.
 
-**Verification status:** the module has passed local schema validation and four
-mocked-plan tests with OpenTofu 1.13.10 and Vultr provider 2.33.2. Authenticated
-provisioning, first-boot configuration, and 13/13 containment on Vultr have not
-been established. Follow the gates below before publishing deployment claims.
+The public jury demo was provisioned on Vultr Cloud Compute in Stockholm on
+27 November 2026. The HTTPS response, VM runtime details, and on-VM containment
+probe are recorded in [demo/vultr_evidence](demo/vultr_evidence). The broader
+13/13 benchmark was measured on the original local runner.
 
 ## 1. Stack contents and boundaries
 
 | Component | Configuration |
 |---|---|
-| VM | `ledgerflow-1`, Stockholm `sto`, `vc2-4c-8gb`, Ubuntu 24.04 x64 (`os_id = 2284`) |
+| VM | `ledgerflow-1`, Stockholm `sto`, `vc2-2c-4gb`, Ubuntu 24.04 x64 (`os_id = 2284`) |
 | SSH | Public-key registration; key-only `deploy` user with sudo; root/password SSH disabled |
 | Cloud firewall | TCP 22 from your public IPv4 `/32`; public TCP 80/443; IPv6 disabled |
 | Host firewall | UFW with matching inbound rules; outgoing traffic allowed for installation and host operations |
 | Execution runtime | Docker with gVisor `runsc` as the default, using `systrap` |
-| Tooling | Git, Python venv support, `uv` 0.11.17; source directory `/srv/ledgerflow` |
+| Tooling | Caddy, Python venv support, `uv` 0.11.17; source directory `/srv/ledgerflow` |
 | Bootstrap evidence | Installed versions and completion marker under `/var/lib/ledgerflow` |
 
-The default plan was previously listed at **USD 40/month**; verify current price,
+The default plan was listed at **USD 20/month**; verify current price,
 availability, and account limits in [Vultr](https://console.vultr.com/) before
 applying. The template disables paid automatic backups.
 
-This stack prepares the execution host. It does not start a public LedgerFlow
-application, configure DNS, or install HTTPS/reverse-proxy services. Open ports
-80/443 do not imply a web service is running. Application/service deployment is
-described as a separate design in [`docs/VULTR_DEPLOYMENT.md`](docs/VULTR_DEPLOYMENT.md).
-The development mock API must not be treated as a production service.
+OpenTofu prepares the execution host and installs Caddy. The
+[jury demo deployment](infra/opentofu/README.md) installs the app as a systemd
+service, configures the HTTPS reverse proxy, and verifies the public URL. This
+service runs the shared synthetic workspace for the jury.
 
 ## 2. Local prerequisites
 

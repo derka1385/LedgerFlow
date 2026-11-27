@@ -1,0 +1,36 @@
+[Unit]
+Description=LedgerFlow public jury demo
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=ledgerflow
+SupplementaryGroups=docker
+WorkingDirectory=/srv/ledgerflow/current
+Environment=LEDGERFLOW_BROWSER_DEMO=1
+Environment=LEDGERFLOW_LISTEN_HOST=127.0.0.1
+Environment=PORT=8790
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=TMPDIR=/var/lib/ledgerflow-demo
+Environment=DOCKER_CONFIG=/var/lib/ledgerflow-demo/docker
+EnvironmentFile=/etc/ledgerflow/demo.env
+StateDirectory=ledgerflow-demo
+StateDirectoryMode=0750
+ExecStartPre=/usr/local/sbin/ledgerflow-check-runtime
+ExecStart=/srv/ledgerflow/current/.venv/bin/python -u frontend/dev-mock-api/server.py
+Restart=on-failure
+RestartSec=5
+UMask=0027
+ProtectSystem=strict
+ProtectHome=true
+NoNewPrivileges=true
+PrivateDevices=true
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

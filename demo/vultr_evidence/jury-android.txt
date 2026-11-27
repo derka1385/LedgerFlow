@@ -1,0 +1,11 @@
+== android
+PASS  landing shows 'Open the web app'
+PASS  signed in without account (role=owner)
+PASS  sample workbook connected and ready
+PASS  workbook opens in the Excel grid
+PASS  receipt processed (state=AWAITING_APPROVAL, MOLNVERK AB)
+PASS  agent answered: "MOLNVERK AB, 5 000,00 SEK, is currently awaiting your approval. The other document (KONTOR…"
+PASS  entry approved and committed (state=COMMITTED)
+PASS  modified .xlsx downloaded (Expenses (sample)_v3.xlsx, 7876 bytes)
+PASS  'Try the phone camera' opens capture
+PASS  camera preview takes a photo (simulated browser device)

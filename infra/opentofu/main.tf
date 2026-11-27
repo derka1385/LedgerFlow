@@ -43,7 +43,7 @@ locals {
       sudo                = ["ALL=(ALL) NOPASSWD:ALL"]
       ssh_authorized_keys = [var.ssh_public_key]
     }]
-    packages = ["ca-certificates", "curl", "gnupg", "docker.io", "git", "python3-venv", "ufw"]
+    packages = ["ca-certificates", "caddy", "curl", "gnupg", "docker.io", "python3.12-venv", "ufw"]
     write_files = [
       {
         path        = "/usr/local/sbin/ledgerflow-bootstrap"
@@ -73,7 +73,7 @@ resource "vultr_instance" "runner" {
   enable_ipv6       = false
   backups           = "disabled"
   activation_email  = false
-  tags              = ["ledgerflow", "containment-runner"]
+  tags              = ["ledgerflow", "jury-demo"]
   user_data         = "#cloud-config\n${yamlencode(local.cloud_config)}"
 
   # Ensure the VM is never created before its inbound rules are installed.

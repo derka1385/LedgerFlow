@@ -34,14 +34,11 @@ Recorded 27 Nov 2026, 17:14–17:17 (Stockholm time), on the development Mac.
 | 22/22, 11/11, 16/16, 13/13, 66/66, $0.0042, 18 configurations, 0 invented, 98.1 % | `kpis.json` and `BENCHMARK_RESULTS.md` | ✓ with on-screen qualification (synthetic corpus, local sandbox) |
 | Opening in Microsoft Excel | The v2 file was opened in Excel, but a leftover file-access dialog covered the window; not used. Scene 13 shows values read from the file instead | Partial |
 
-## Release blockers (hackathon requirements not met by evidence)
+## Scope of the recording and later public deployment
 
-1. **Backend and sandbox are not on Vultr.** The run used Docker on the development Mac and the DEV MOCK API backend. The Vultr Cloud Compute runner is prepared with OpenTofu, but no deployment is recorded. The film says so in scenes 09 and 15.
-2. **No public demo URL.** None exists, so none is shown.
-3. **The repository is private** (`derka1385/LedgerFlow`). No public GitHub link is shown.
-4. **The native iOS app is not filmed**; the phone footage is the browser app in a mobile viewport. No iPhone↔Mac QR pairing is shown.
+The film was recorded using the DEV MOCK API and Docker on the development Mac, as stated in scenes 09 and 15. The phone footage shows the browser app in a mobile viewport.
 
-Once a Vultr deployment exists, re-run `film/capture_live.mjs` against the public URL and `benchmark/security_evidence.py` on the VM, then re-render scenes 09, 10 and 15.
+After filming, the [public jury demo](https://70.34.203.216.sslip.io/welcome/) was deployed to Vultr Cloud Compute in Stockholm on 27 November 2026. The [runtime record](../demo/vultr_evidence/host.txt) and [containment probe](../demo/vultr_evidence/containment.txt) are from that VM. The source and landing page are available in the [public repository](https://github.com/derka1385/LedgerFlow).
 
 ## Not delivered
 

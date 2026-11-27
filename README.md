@@ -3,7 +3,7 @@
 **Snap the receipt. It's in your Excel.**
 An accounting agent for small businesses: photograph a receipt and LedgerFlow books it in the Excel workbook you already use, after you approve.
 
-### 🧪 Jury: [try the live web app — no account](https://smilies-hoping-derived-delivering.trycloudflare.com/welcome/)
+### 🧪 Jury: [try the live web app — no account](https://70.34.203.216.sslip.io/welcome/)
 
 Opens the real LedgerFlow app with a shared demo workspace (fictional data): connect the sample workbook, send a sample receipt, ask the agent, approve, download the modified `.xlsx`. Works in any browser (Windows, Android, Mac). If a receipt was already sent by someone else, LedgerFlow flags it as a possible duplicate: choose **Different purchase: continue**.
 
@@ -26,7 +26,7 @@ Opens the real LedgerFlow app with a shared demo workspace (fictional data): con
 
 Measured on a synthetic benchmark (27 Nov 2026): 22/22 receipts booked right live on Vultr, 13/13 sandbox escape probes contained, 16/16 tampered workbooks rejected, about USD 0.004 of inference per receipt. Details: [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md), [film/VERIFICATION_REPORT.md](film/VERIFICATION_REPORT.md).
 
-**Honest limits:** in the recorded demo the backend and sandbox run on the Mac (Docker Desktop); the Vultr Cloud Compute runner is prepared with OpenTofu but not yet deployed. The Mac build is unsigned during the beta.
+The public web demo runs on Vultr Cloud Compute in Stockholm with Docker and gVisor, and uses Vultr Serverless Inference. Both the desktop and Android browser-emulation walkthroughs passed. The film was recorded earlier on the development Mac. See [deployment evidence](demo/vultr_evidence/) for the cloud results.
 
 ## Run it locally
 

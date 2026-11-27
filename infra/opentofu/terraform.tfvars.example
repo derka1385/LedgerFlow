@@ -3,6 +3,6 @@ ssh_admin_cidr = "203.0.113.10/32"
 ssh_public_key = "ssh-ed25519 REPLACE_WITH_YOUR_PUBLIC_KEY"
 
 region = "sto"
-plan   = "vc2-4c-8gb"
+plan   = "vc2-2c-4gb"
 os_id  = 2284
 name   = "ledgerflow-1"

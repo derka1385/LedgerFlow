@@ -138,8 +138,9 @@ outcomes, then no invented critical facts, then injections caught, then cost, th
 
 ## 9. Known limitations
 
-- **No public deployment or production backend.** The Vultr VM stack is validated only in mocked plans (`DEPLOYMENT.md`). There is no public HTTPS application yet. Codex's backend has health routes only, so every end-to-end result above ran on the DEV MOCK API with real inference and a local Docker sandbox.
-- **Measurement scope.** All runs happened on one development Mac. Sandbox results come from Docker Desktop, not from the planned gVisor runtime on the Vultr VM.
+- **Backend scope.** The [public jury demo](https://70.34.203.216.sslip.io/welcome/) runs the shared synthetic workspace and the DEV MOCK API on Vultr Cloud Compute in Stockholm. The separate production backend remains a scaffold.
+- **Measurement scope.** The earlier benchmark used Docker Desktop on the development Mac. The 27 November 2026 deployment independently verified [HTTPS](demo/vultr_evidence/https.txt), [Docker with gVisor](demo/vultr_evidence/host.txt), and [containment on the VM](demo/vultr_evidence/containment.txt).
+- **Public browser checks.** The [desktop](demo/vultr_evidence/jury-desktop.txt) and [Android emulation](demo/vultr_evidence/jury-android.txt) runs each passed ten checks, from account-free access through receipt processing, agent response, approval, and download of the revised workbook. Both camera checks used a simulated browser camera.
 - **Corpus.** 22 synthetic, typeset receipts from fictional companies, plus 7 in the final run and 3 in the demo; no real phone photos. Results can vary by one receipt from run to run.
 - **Errors rules cannot catch.** A wrong day within the open period, a decimal comma lost on every amount, and a wrong but allowed expense account all get through the rules. The evidence-linked review and the human approval are the control for these.
 - **Not a statutory ledger.** A T-account workbook is not statutory bookkeeping. Voucher data lives in LedgerFlow's audit log.

@@ -1,0 +1,11 @@
+== desktop
+PASS  landing shows 'Open the web app'
+PASS  signed in without account (role=owner)
+PASS  sample workbook connected and ready
+PASS  workbook opens in the Excel grid
+PASS  receipt processed (state=AWAITING_APPROVAL, KONTORSBOLAGET NORD AB)
+PASS  agent answered: "One receipt is waiting for your approval: KONTORSBOLAGET NORD AB for 1 250,00 SEK. You can…"
+PASS  entry approved and committed (state=COMMITTED)
+PASS  modified .xlsx downloaded (Expenses (sample)_v2.xlsx, 7837 bytes)
+PASS  'Try the phone camera' opens capture
+PASS  camera preview takes a photo (simulated browser device)

@@ -1,0 +1,15 @@
+Verified at (UTC): 2026-11-27T20:52:36Z
+URL: https://70.34.203.216.sslip.io/welcome/
+Instance: 60a39198-d6ea-45ac-8864-db82b9321415
+Region: sto
+2026-11-27T20:26:58+00:00
+caddy	2.6.2-6ubuntu0.24.04.3
+docker.io	29.1.3-0ubuntu3~24.04.2
+runsc	20261123.1
+Python 3.12.3
+runsc version release-20261123.1
+spec: 1.2.1
+Docker default runtime: runsc
+["python@sha256:191083cdf6c7bda8c76158983163ead5d5cf7b77cf3033e805bb0f5296f51b4b"]
+uv 0.11.17 (x86_64-unknown-linux-gnu)
+{"status": "alive", "backend": "DEV-MOCK", "docker": true, "sandbox_image": "python:3.12-slim", "inference": "vultr:qwen3.8-27b"}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="forest" x1="8" y1="2" x2="55" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#397961"/><stop offset=".5" stop-color="#145343"/><stop offset="1" stop-color="#092F29"/></linearGradient>
+    <linearGradient id="ivory" x1="18" y1="14" x2="30" y2="49" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFF5"/><stop offset="1" stop-color="#DADCC9"/></linearGradient>
+    <linearGradient id="mist" x1="34" y1="14" x2="46" y2="49" gradientUnits="userSpaceOnUse"><stop stop-color="#DDEACF"/><stop offset="1" stop-color="#9BB9A3"/></linearGradient>
+    <filter id="relief" x="-40%" y="-30%" width="180%" height="180%"><feDropShadow dx="0" dy="1.8" stdDeviation="1.4" flood-color="#05271F" flood-opacity=".4"/></filter>
+    <symbol id="mark" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="16" fill="url(#forest)"/>
+      <rect x=".7" y=".7" width="62.6" height="62.6" rx="15.3" fill="none" stroke="#A5C7A7" stroke-opacity=".22"/>
+      <g filter="url(#relief)">
+        <path d="M16 14H24V41H34V49H16Z" fill="url(#ivory)"/>
+        <path d="M32 14H49V22H40V29H47V37H40V49H32Z" fill="url(#mist)"/>
+      </g>
+      <path d="M32 14H41L32 23Z" fill="#F6F6E5"/>
+      <path d="M16 14H24M16 14V48M33 14H49" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".6"/>
+    </symbol>
+  </defs>
+  <use href="#mark"/>
+</svg>

@@ -1,0 +1,7 @@
+{
+  "url": "https://api.vultr.com/v2/plans?per_page=500",
+  "retrieved_at": "2026-11-26T22:24:12.212910+00:00",
+  "http_status": 200,
+  "sha256": "e693aa41be788e42f97be7d7623643327575e047f328d9ab74ed95cecef64d52",
+  "kind": "public catalog GET, not provisioning or capacity verification"
+}

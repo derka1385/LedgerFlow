@@ -1,0 +1,2 @@
+#include "Base.xcconfig"
+// Release has no HTTP transport exception and no mocked-inference fallback.

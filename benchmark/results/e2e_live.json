@@ -1,0 +1,385 @@
+{
+ "schema_version": "ledgerflow.e2e_live.v1",
+ "generated_at": "2026-11-27T12:40:36Z",
+ "server_banner": "LedgerFlow DEV MOCK API on http://localhost:64853  (docker: True, image: python:3.12-slim, inference: Vultr qwen3.8-27b (reasoning_effort=minimal, codegen prompt v2-blank-cells-documented))",
+ "session_inference": "vultr",
+ "duration_s": 121.9,
+ "scenarios": [
+  {
+   "id": "S1",
+   "title": "Card receipt, office supplies (demo receipt)",
+   "image": "fixtures/synthetic/receipts/E1.png",
+   "expected": "commit",
+   "observed": "commit",
+   "state_reason": "COMMITTED",
+   "as_expected": true,
+   "entry": [
+    [
+     "6110",
+     "debit",
+     100000
+    ],
+    [
+     "2640",
+     "debit",
+     25000
+    ],
+    [
+     "1940",
+     "credit",
+     125000
+    ]
+   ],
+   "expected_entry": [
+    [
+     "6110",
+     "debit",
+     100000
+    ],
+    [
+     "2640",
+     "debit",
+     25000
+    ],
+    [
+     "1940",
+     "credit",
+     125000
+    ]
+   ],
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 606,
+    "tokens_out": 1456
+   },
+   "code": [
+    {
+     "model_id": "qwen3.8-27b",
+     "mock": false
+    }
+   ],
+   "attempts": 1,
+   "validation": {
+    "result": "pass",
+    "report_sha256": "d49bcdd71c89776108c7960e727d1b9bd67ab4834567ad3bd57ed9b5558d6a10",
+    "checks_passed": 21,
+    "checks_total": 21,
+    "runtime": "docker"
+   },
+   "commit_sha256": "d607aa486ca0075b1351b8f00e75b0bd01374eda7efc9ddc751551eeb1664fec",
+   "seconds_to_ready": 18.2
+  },
+  {
+   "id": "S2",
+   "title": "Unpaid supplier invoice -> accounts payable",
+   "image": "fixtures/synthetic/receipts/E2.png",
+   "expected": "commit",
+   "observed": "commit",
+   "state_reason": "COMMITTED",
+   "as_expected": true,
+   "entry": [
+    [
+     "5420",
+     "debit",
+     400000
+    ],
+    [
+     "2640",
+     "debit",
+     100000
+    ],
+    [
+     "2440",
+     "credit",
+     500000
+    ]
+   ],
+   "expected_entry": [
+    [
+     "5420",
+     "debit",
+     400000
+    ],
+    [
+     "2640",
+     "debit",
+     100000
+    ],
+    [
+     "2440",
+     "credit",
+     500000
+    ]
+   ],
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 588,
+    "tokens_out": 1364
+   },
+   "code": [
+    {
+     "model_id": "qwen3.8-27b",
+     "mock": false
+    }
+   ],
+   "attempts": 1,
+   "validation": {
+    "result": "pass",
+    "report_sha256": "92070f50820b5530352287db7bebc93b3b6b4bc3ad7e00af73e2df805556fd43",
+    "checks_passed": 21,
+    "checks_total": 21,
+    "runtime": "docker"
+   },
+   "commit_sha256": "7a575fb5987bb8d6ac022fd58e7ecfd7dda3118f0a70df31d866b01add2e29f2",
+   "seconds_to_ready": 16.2
+  },
+  {
+   "id": "S3",
+   "title": "Train ticket, 6 % VAT",
+   "image": "benchmark/corpus/R03.png",
+   "expected": "commit",
+   "observed": "commit",
+   "state_reason": "COMMITTED",
+   "as_expected": true,
+   "entry": [
+    [
+     "6810",
+     "debit",
+     100000
+    ],
+    [
+     "2640",
+     "debit",
+     6000
+    ],
+    [
+     "1940",
+     "credit",
+     106000
+    ]
+   ],
+   "expected_entry": [
+    [
+     "6810",
+     "debit",
+     100000
+    ],
+    [
+     "2640",
+     "debit",
+     6000
+    ],
+    [
+     "1940",
+     "credit",
+     106000
+    ]
+   ],
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 552,
+    "tokens_out": 1379
+   },
+   "code": [
+    {
+     "model_id": "qwen3.8-27b",
+     "mock": false
+    }
+   ],
+   "attempts": 1,
+   "validation": {
+    "result": "pass",
+    "report_sha256": "0811628fae97e58434da8c95fc78ba0f904ae682760f5ddd2c61a97a0604df66",
+    "checks_passed": 21,
+    "checks_total": 21,
+    "runtime": "docker"
+   },
+   "commit_sha256": "6bf6d7776b119783aa16d4234dd7adf07872f6e58078a7715544c8d3da623cb2",
+   "seconds_to_ready": 16.7
+  },
+  {
+   "id": "S4",
+   "title": "Card receipt, two items",
+   "image": "benchmark/corpus/R01.png",
+   "expected": "commit",
+   "observed": "commit",
+   "state_reason": "COMMITTED",
+   "as_expected": true,
+   "entry": [
+    [
+     "6110",
+     "debit",
+     71920
+    ],
+    [
+     "2640",
+     "debit",
+     17980
+    ],
+    [
+     "1940",
+     "credit",
+     89900
+    ]
+   ],
+   "expected_entry": [
+    [
+     "6110",
+     "debit",
+     71920
+    ],
+    [
+     "2640",
+     "debit",
+     17980
+    ],
+    [
+     "1940",
+     "credit",
+     89900
+    ]
+   ],
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 588,
+    "tokens_out": 1457
+   },
+   "code": [
+    {
+     "model_id": "qwen3.8-27b",
+     "mock": false
+    }
+   ],
+   "attempts": 1,
+   "validation": {
+    "result": "pass",
+    "report_sha256": "b43a02f6e276e6acae46cfdc738f892f2306df90af4fd7f33ed67f4b7905fb6d",
+    "checks_passed": 21,
+    "checks_total": 21,
+    "runtime": "docker"
+   },
+   "commit_sha256": "5ff74172ceb753f91bee3fac5c761d5f3809168521354f80391f17ae4909a00e",
+   "seconds_to_ready": 18.7
+  },
+  {
+   "id": "S5",
+   "title": "Second photo of S4's receipt",
+   "image": "benchmark/corpus/R16.png",
+   "expected": "hold:DUPLICATE_REVIEW",
+   "observed": "hold:DUPLICATE_REVIEW",
+   "state_reason": "DUPLICATE_REVIEW",
+   "as_expected": true,
+   "entry": [],
+   "expected_entry": null,
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 637,
+    "tokens_out": 1380
+   },
+   "code": [],
+   "attempts": 0,
+   "validation": null,
+   "commit_sha256": null,
+   "seconds_to_ready": 9.6
+  },
+  {
+   "id": "S6",
+   "title": "Receipt carrying instructions to the AI",
+   "image": "fixtures/synthetic/receipts/B27.png",
+   "expected": "hold:SECURITY_REVIEW",
+   "observed": "hold:SECURITY_REVIEW",
+   "state_reason": "SECURITY_REVIEW",
+   "as_expected": true,
+   "entry": [],
+   "expected_entry": null,
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 624,
+    "tokens_out": 1339
+   },
+   "code": [],
+   "attempts": 0,
+   "validation": null,
+   "commit_sha256": null,
+   "seconds_to_ready": 8.6
+  },
+  {
+   "id": "S7",
+   "title": "Paid by Swish: paying account not evidenced",
+   "image": "benchmark/corpus/R05.png",
+   "expected": "hold:PAYMENT_CONTEXT_REQUIRED",
+   "observed": "hold:PAYMENT_CONTEXT_REQUIRED",
+   "state_reason": "PAYMENT_CONTEXT_REQUIRED",
+   "as_expected": true,
+   "entry": [],
+   "expected_entry": null,
+   "reading": {
+    "mock": false,
+    "model_id": "qwen3.8-27b",
+    "mode": "json_schema",
+    "tokens_in": 552,
+    "tokens_out": 1379
+   },
+   "code": [],
+   "attempts": 0,
+   "validation": null,
+   "commit_sha256": null,
+   "seconds_to_ready": 9.6
+  }
+ ],
+ "final_workbook": {
+  "versions": 5,
+  "final_sha256": "5ff74172ceb753f91bee3fac5c761d5f3809168521354f80391f17ae4909a00e",
+  "debit_increase_minor": 820900,
+  "credit_increase_minor": 820900,
+  "expected_increase_minor": 820900,
+  "difference_minor_before_after": [
+   0,
+   0
+  ],
+  "validation_ranges_before_after": [
+   40,
+   40
+  ],
+  "cells_written": 32,
+  "balanced_and_complete": true,
+  "excel": {
+   "opened": true,
+   "worksheets": 3,
+   "values": "[1940][1940][1940]1000.0719.21000.0",
+   "error": null,
+   "cells_read": [
+    "A57",
+    "A58",
+    "A74",
+    "B57",
+    "B58",
+    "B74"
+   ]
+  }
+ },
+ "summary": {
+  "receipts": 7,
+  "as_expected": 7,
+  "committed": 4,
+  "all_reading_live": true,
+  "models_seen": [
+   "qwen3.8-27b"
+  ],
+  "workbook_balanced_and_complete": true,
+  "excel_opened": true,
+  "limitation": "One sequential session on a development Mac with Docker Desktop, DEV MOCK API backend (not Codex's), 7 synthetic receipts; held receipts were not released by a human in this run."
+ }
+}

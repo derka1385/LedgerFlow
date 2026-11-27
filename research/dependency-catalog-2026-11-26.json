@@ -1,0 +1,165 @@
+{
+  "notice": "Registry metadata only. Versions not installed or tested together.",
+  "packages": [
+    {
+      "registry": "pypi",
+      "package": "fastapi",
+      "version": "0.165.0",
+      "requires_python": ">=3.11",
+      "engines": null,
+      "url": "https://pypi.org/pypi/fastapi/json",
+      "http_status": 200,
+      "sha256_response": "7bc36b9c19336bbf8f878f03d493ce8abc881eb5b47026458cf525693a8ddace",
+      "retrieved_at": "2026-11-26T22:38:23.202271+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "pydantic",
+      "version": "2.14.4",
+      "requires_python": ">=3.10",
+      "engines": null,
+      "url": "https://pypi.org/pypi/pydantic/json",
+      "http_status": 200,
+      "sha256_response": "b9ed8ebca6e552e137110a8e7d43c5c46df47f461d12bcdb5c6c4e19d995bd0d",
+      "retrieved_at": "2026-11-26T22:38:23.238356+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "uvicorn",
+      "version": "0.54.0",
+      "requires_python": ">=3.10",
+      "engines": null,
+      "url": "https://pypi.org/pypi/uvicorn/json",
+      "http_status": 200,
+      "sha256_response": "4effd1bda1c885a4a23e89a96630afbdbaed784c7cf606635310655e5f6d2bbb",
+      "retrieved_at": "2026-11-26T22:38:23.180985+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "httpx",
+      "version": "0.29.0",
+      "requires_python": ">=3.10",
+      "engines": null,
+      "url": "https://pypi.org/pypi/httpx/json",
+      "http_status": 200,
+      "sha256_response": "117dfe205e97c505896660609c1248a87b41d0ef681274324bf99d5f1ec1b8e4",
+      "retrieved_at": "2026-11-26T22:38:23.164987+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "python-multipart",
+      "version": "0.0.34",
+      "requires_python": ">=3.11",
+      "engines": null,
+      "url": "https://pypi.org/pypi/python-multipart/json",
+      "http_status": 200,
+      "sha256_response": "af7bde200fa18d37fd16a989abfcb9e29f51e079e38677146410a0753d6a511e",
+      "retrieved_at": "2026-11-26T22:38:23.160461+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "Pillow",
+      "version": "13.0.0",
+      "requires_python": ">=3.11",
+      "engines": null,
+      "url": "https://pypi.org/pypi/Pillow/json",
+      "http_status": 200,
+      "sha256_response": "56cd02ba0c8d44417b3f5e6b5bff96861810d89a4f14ba2863a91f619f86a842",
+      "retrieved_at": "2026-11-26T22:38:23.349249+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "openpyxl",
+      "version": "3.1.5",
+      "requires_python": ">=3.8",
+      "engines": null,
+      "url": "https://pypi.org/pypi/openpyxl/json",
+      "http_status": 200,
+      "sha256_response": "2bbf01d2a1146e878113777019080e8f8d0b14fd07d431a3f743dd54978718c4",
+      "retrieved_at": "2026-11-26T22:38:23.242149+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "defusedxml",
+      "version": "0.7.1",
+      "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+      "engines": null,
+      "url": "https://pypi.org/pypi/defusedxml/json",
+      "http_status": 200,
+      "sha256_response": "77e1fa1122827b5627570913c5a65ff6226b41589dd596a6dbee53a556b5ca9e",
+      "retrieved_at": "2026-11-26T22:38:23.245802+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "pytest",
+      "version": "9.2.0",
+      "requires_python": ">=3.10",
+      "engines": null,
+      "url": "https://pypi.org/pypi/pytest/json",
+      "http_status": 200,
+      "sha256_response": "57f548cb785c5d41f5292b34e956c60c7a44cfa06ab1fd17e6969b6208a3cb60",
+      "retrieved_at": "2026-11-26T22:38:23.314500+00:00"
+    },
+    {
+      "registry": "pypi",
+      "package": "hypothesis",
+      "version": "6.170.17",
+      "requires_python": ">=3.11",
+      "engines": null,
+      "url": "https://pypi.org/pypi/hypothesis/json",
+      "http_status": 200,
+      "sha256_response": "422a4845606c31c4489d9adb2fc1645e24fcad05e749135e2ef922728e717cb5",
+      "retrieved_at": "2026-11-26T22:38:23.813921+00:00"
+    },
+    {
+      "registry": "npm",
+      "package": "react",
+      "version": "19.3.1",
+      "requires_python": null,
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "url": "https://registry.npmjs.org/react/latest",
+      "http_status": 200,
+      "sha256_response": "ecf8c02b9096a7813842d87fae50a707a8809c5c3d0ec6b359ac51d40188ff6f",
+      "retrieved_at": "2026-11-26T22:38:23.445982+00:00"
+    },
+    {
+      "registry": "npm",
+      "package": "typescript",
+      "version": "7.0.2",
+      "requires_python": null,
+      "engines": {
+        "node": ">=16.20.0"
+      },
+      "url": "https://registry.npmjs.org/typescript/latest",
+      "http_status": 200,
+      "sha256_response": "28a8ef314c6bbc3fddb831088f80eb2fcac6351cb618c8ac029f7229f587b8aa",
+      "retrieved_at": "2026-11-26T22:38:23.446268+00:00"
+    },
+    {
+      "registry": "npm",
+      "package": "vite",
+      "version": "8.4.0",
+      "requires_python": null,
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "url": "https://registry.npmjs.org/vite/latest",
+      "http_status": 200,
+      "sha256_response": "464efe077634ecbdab376d48917204ef076f15e437a3630fd36ab6063ef07be5",
+      "retrieved_at": "2026-11-26T22:38:23.456860+00:00"
+    },
+    {
+      "registry": "npm",
+      "package": "tailwindcss",
+      "version": "4.3.5",
+      "requires_python": null,
+      "engines": null,
+      "url": "https://registry.npmjs.org/tailwindcss/latest",
+      "http_status": 200,
+      "sha256_response": "7ae9a23d9bbd2e7a7b1fb22a05283670a575b69694ea70bd8813b17e60e1de44",
+      "retrieved_at": "2026-11-26T22:38:23.678630+00:00"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+#include "Base.xcconfig"
+// Simulator loopback reaches the Mac's running frontend. Physical iPhone uses HTTPS.
+LEDGERFLOW_ORIGIN[sdk=iphonesimulator*] = http:/$()/127.0.0.1:5174

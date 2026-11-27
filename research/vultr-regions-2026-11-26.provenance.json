@@ -1,0 +1,7 @@
+{
+  "url": "https://api.vultr.com/v2/regions?per_page=500",
+  "retrieved_at": "2026-11-26T22:24:12.578707+00:00",
+  "http_status": 200,
+  "sha256": "169efc64ded6fb6399199dbdec093e45bee3dc276359f8cd8fbd6401dc360b91",
+  "kind": "public catalog GET, not provisioning or capacity verification"
+}

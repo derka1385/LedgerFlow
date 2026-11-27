@@ -1,0 +1,105 @@
+{
+  "title": "LedgerFlow: choose the visual world",
+  "question": "The roll assigned The Receipt Roll. Keep it, take an alternate, or re-roll. Logo spirit, Orvect ergonomics (numbered steps, language switch EN/FR/SV, outlined controls, honest states) and the trilingual agent are fixed in every option.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Receipt Roll",
+      "kicker": "THE ROLL",
+      "lineage": "Swedish card-terminal thermal receipts, perforated roll paper, the BOKFÖRD rubber stamp",
+      "thesis": "Every receipt prints its own proof: a paper strip unrolls line by line as LedgerFlow reads, posts, runs and verifies, and tears off at the perforation when a human signs the exact file.",
+      "palette": ["#0E5A47", "#F1F3F1", "#141615", "#8E948F", "#5B4CF0", "#E0436B"],
+      "materials": ["cool thermal paper strips with zigzag tear edges", "dotted leaders and dashed rules", "thermal fade from grey to black", "violet BOKFÖRD stamp", "forest field from the logo"],
+      "viewport": "iPhone home: wordmark and EN/FR/SV switch on top; a live paper strip fills the upper half, printing the latest receipt's real status lines (READ · POSTED · RUN · VERIFIED · BOKFÖRD); a large camera shutter docked bottom-centre. First launch: a numbered 01–04 how-it-works strip that prints itself, screen by screen.",
+      "risk": "Thermal paper can drift into cream nostalgia: it must stay cool, crisp and data-true, and the printing motion may only ever print real events, never fake progress.",
+      "raised": [
+        {"from": "variable-font-specimen", "raise": "Hierarchy by scale contrast alone: the total prints at display size, every other line in small mono."},
+        {"from": "notation-diagram-systems-labanotation", "raise": "Length is time: the strip only grows when a real execution event arrives, so its length is the run's honest timeline."},
+        {"from": "emigre-bitmap-specimen", "raise": "Rendering is a state: lines print faded grey until the verifier confirms them, then re-print in full black."},
+        {"from": "pop-culture-shelf-streaming-title-card-wall", "raise": "On the Mac, the run you are reviewing lifts and the rest of the queue dims."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Ledger Grid",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "the spreadsheet itself: cell addresses, the selection rectangle, the formula bar",
+      "thesis": "The cell is the brand: LedgerFlow speaks in cell addresses and selection rectangles, and every screen shows exactly which cells a receipt will change.",
+      "palette": ["#FFFFFF", "#141615", "#D7DDD6", "#0E5A47", "#C98A12"],
+      "materials": ["visible hairline grid", "selection rectangle with a corner handle", "formula-bar line", "tabular numerals"],
+      "viewport": "iPhone home as a single living sheet: the last receipt's eight cells highlighted in their rows, a formula-bar line explaining the entry, the shutter button as the active cell.",
+      "risk": "Familiar: every spreadsheet product looks like a grid; it can read as an Excel clone and says little about the receipt or the proof."
+    },
+    {
+      "id": "challenger-centre-rail",
+      "label": "Centre-Rail Reference",
+      "verdict": "competitive",
+      "lineage": "wide-margin reference editions with a keyed centre rail",
+      "thesis": "Receipt and workbook as twin columns around a centre rail of numbered keys: each key is a pipeline step, ruled at one device pixel.",
+      "palette": ["#F4F1EA", "#1A1A1A", "#C8361F"],
+      "materials": ["ruled hairlines", "keyed centre rail", "annotation margin"],
+      "viewport": "Mac review: receipt left, cell changes right, the rail of steps 01–06 down the middle with detents for each verified check.",
+      "case": "Fuses well on the Mac review screen (product clarity holds); loses on audience identification for the phone-first employee.",
+      "risk": "Reads academic and slow on a phone; small type fights the camera-first task.",
+      "hero": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting.webp"
+    },
+    {
+      "id": "challenger-crouwel",
+      "label": "Crouwel Grid",
+      "verdict": "competitive",
+      "lineage": "Wim Crouwel's gridded specimens",
+      "thesis": "The workbook grid as visible construction: big figures built cell by cell, the grid toggled on as a real state.",
+      "palette": ["#FFFFFF", "#111111", "#1E4BD2"],
+      "materials": ["construction-grid hairlines", "cell-built numerals"],
+      "viewport": "iPhone home: the month's total assembled from grid cells, the scan action as the one accent plane.",
+      "case": "Accountants identify with the grid (audience axis holds); the receipt-to-proof story gets lost (clarity loses).",
+      "risk": "Becomes a type poster rather than a bookkeeping tool.",
+      "hero": "https://impeccable.style/worlds/cards/crouwel-grid-specimen-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/crouwel-grid-specimen.webp"
+    },
+    {
+      "id": "challenger-variable-font",
+      "label": "Variable Font Specimen",
+      "verdict": "declined",
+      "lineage": "interactive type specimens",
+      "case": "Fuses poorly: nobody books receipts by dragging a weight axis.",
+      "kept": "Hierarchy by scale contrast alone (raised into The Receipt Roll)."
+    },
+    {
+      "id": "challenger-labanotation",
+      "label": "Labanotation Score",
+      "verdict": "declined",
+      "lineage": "dance notation",
+      "case": "Fuses poorly: notation is foreign to finance staff.",
+      "kept": "Length encodes duration (raised: the strip grows only with real events)."
+    },
+    {
+      "id": "challenger-emigre",
+      "label": "Emigre Bitmap Specimen",
+      "verdict": "declined",
+      "lineage": "bitmap type posters",
+      "case": "Fuses partly (receipts are dot-printed) but legibility of amounts suffers.",
+      "kept": "Rendering as an honest state (raised: faded until verified)."
+    },
+    {
+      "id": "challenger-streaming-wall",
+      "label": "Streaming Title Wall",
+      "verdict": "declined",
+      "lineage": "streaming catalogs",
+      "case": "Fuses poorly: receipts are not entertainment posters.",
+      "kept": "Focused item lifts, the rest dims (raised into the Mac queue)."
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A clean fintech expense app, executed impeccably.",
+    "palette": ["#FFFFFF", "#0F172A", "#2563EB"],
+    "materials": ["white cards", "soft shadows", "product photography"],
+    "viewport": "Greeting, monthly spend card, big scan button, recent expenses list.",
+    "risk": "Indistinguishable from Pleo, Expensify and the accounting suites by design."
+  },
+  "steer": true
+}

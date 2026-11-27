@@ -1,0 +1,227 @@
+COMPTE RENDU DE PRÉPARATION — LEDGERFLOW
+Travail effectué par Codex le 26 novembre 2026
+Document destiné à être joint ou copié dans une conversation ChatGPT.
+
+1. RÉSULTAT RÉEL DU TRAVAIL
+
+Codex a préparé un dossier de recherche, de conception technique et de spécifications pour LedgerFlow, un projet destiné au Vultr Agent Runtime Hackathon à Stockholm le 27 novembre 2026.
+
+Le résultat est une base documentaire pour que l’équipe puisse commencer à développer avec des décisions, des contrats et des priorités déjà définis. Ce n’est pas une application fonctionnelle.
+
+Le travail initial a duré environ 29 minutes. Il a été terminé le 26 novembre, avant la limite demandée du 27 novembre à 08:00, heure de Stockholm. Codex n’a pas travaillé toute la nuit et n’a pas programmé de poursuite automatique du travail.
+
+Livrables produits :
+- 19 documents techniques, plus un README d’entrée.
+- 4 fichiers JSON issus de l’inspection du classeur réel.
+- 7 fichiers JSON de recherche et de provenance publiques.
+- Une archive ZIP partageable, vérifiée à la relecture.
+- Un manifeste de sommes de contrôle SHA-256.
+
+Emplacement local : /Users/petrinolann/Coding/vultr
+Archive : LedgerFlow-Handoff-2026-11-27.zip
+
+L’archive initiale contient 33 fichiers. Le présent compte rendu TXT est un complément créé ensuite.
+
+2. POURQUOI IL N’Y A PAS DE CODE D’APPLICATION
+
+La mission contenait une condition explicite : ne préparer du code, des configurations Docker, des scripts de déploiement, des jeux de données synthétiques et des tests automatisés que si le développement avant l’événement était explicitement autorisé. Sinon, rester au niveau recherche et spécifications.
+
+Codex a consulté les pages publiques de l’événement et n’y a pas trouvé d’autorisation explicite de développement préalable. Il a donc appliqué cette condition et limité le travail au dossier préparatoire.
+
+Cela ne prouve pas que le code préalable est interdit. Cela signifie seulement que son autorisation n’a pas été établie à partir des informations consultées. La question reste à confirmer auprès des organisateurs.
+
+Des commandes et calculs ponctuels ont servi à lire le classeur, récupérer des métadonnées publiques et vérifier les livrables. Ce travail d’analyse ne constitue pas une implémentation de LedgerFlow.
+
+3. RECHERCHES RÉELLEMENT EFFECTUÉES
+
+Codex a lu la mission jointe dans son intégralité et consulté notamment :
+- La page du hackathon sur Vultr Community.
+- La page d’inscription et son programme sur Luma.
+- La documentation Vultr Serverless Inference.
+- Le catalogue public des modèles VSI.
+- Les catalogues publics des offres de VM et des régions Vultr.
+- Les documentations officielles Docker, gVisor, OpenSandbox, E2B et Microsandbox.
+- Les documentations openpyxl, XlsxWriter, OOXML, LibreOffice, SQLite et d’autres dépendances retenues.
+
+Trois requêtes HTTP GET publiques ont effectivement réussi avec un statut 200 pour les modèles, les offres et les régions Vultr. Les réponses JSON ont été enregistrées avec URL, date de récupération et empreinte SHA-256.
+
+Le catalogue VSI consulté contenait 31 modèles. Les identifiants proposés dans l’architecture proviennent de ce catalogue, notamment glm-5.3-flash et glm-5.3. Leurs capacités image/JSON sont des capacités annoncées par le catalogue, pas des capacités testées par Codex.
+
+Les métadonnées de versions de dépendances ont également été récupérées auprès de PyPI et npm. Les dépendances n’ont pas été installées ni testées ensemble.
+
+Un point de vigilance a été identifié : une page de documentation Vultr indique une tarification générique différente des tarifs propres aux modèles dans le catalogue. Les estimations distinguent cette incertitude. Les prix réellement facturés restent à confirmer dans le compte Vultr.
+
+Les pages consultées indiquent un début du développement à 10:00 et une soumission à 19:00, heure de Stockholm. Le planning a donc été construit sur environ neuf heures de développement avant soumission, malgré la présentation de l’événement comme une journée de douze heures. L’horaire exact reste à confirmer sur place.
+
+Sources principales :
+https://community.vultr.com/e/vultr-agent-runtime-hackathon
+https://luma.com/stockholm-nn3n
+https://docs.vultr.com/products/compute/serverless-inference/provisioning
+https://api.vultrinference.com/v1/models
+https://api.vultr.com/v2/plans?per_page=500
+https://api.vultr.com/v2/regions?per_page=500
+
+4. ANALYSE DIRECTE DU CLASSEUR EXCEL
+
+Après que l’utilisateur a précisé que le fichier se trouvait dans Downloads, Codex a trouvé et inspecté :
+Copy of Assignment_1_Common_transactions_2026.xlsx
+
+Sa structure correspond au classeur de comptabilité demandé. Son appartenance institutionnelle à SSE n’a pas été démontrée par un identifiant explicite dans les champs examinés.
+
+L’inspection a porté sur le contenu ZIP/XML du fichier, les cellules, les chaînes partagées, les styles, les formules, les relations, les validations, les cellules fusionnées et les protections. Le classeur n’a pas été ouvert dans Excel pour recalcul natif.
+
+Constats :
+- 3 feuilles : Instructions, T-Accounts et Chart of accounts.
+- 32 comptes, disposés horizontalement et verticalement.
+- 6 cellules contenant des formules.
+- 37 plages fusionnées au total.
+- 27 éléments dans le package ZIP.
+- Des validations de données stockées dans des extensions Excel x14.
+- Une protection de la structure du classeur, même si le texte des instructions indique que la feuille n’est pas verrouillée.
+- Des soldes d’ouverture et de nombreuses écritures déjà présentes.
+
+Le format des comptes est composé de quatre colonnes : référence de contrepartie au débit, montant au débit, référence de contrepartie au crédit, montant au crédit. Les références doivent utiliser des crochets, par exemple [1940]. Il ne faut pas remplir ces colonnes avec des descriptions libres.
+
+Codex a documenté les positions des 32 comptes, les zones d’écriture candidates, les formules à préserver et les soldes d’ouverture. Il a aussi produit un mapping JSON proposé. Ce mapping n’est pas confirmé et n’a jamais été utilisé pour modifier un fichier.
+
+5. ANOMALIE COMPTABLE IMPORTANTE DÉCOUVERTE
+
+Le total de tous les montants des côtés débit/crédit des comptes cartographiés donne :
+- Débits : 1 908 465 SEK.
+- Crédits : 1 820 489 SEK.
+- Excédent de débit : 87 976 SEK.
+
+Pourtant, le contrôle visible du classeur donne :
+- W22 : 1 632 399.
+- X22 : 1 632 399.
+- W24 : 0.
+
+La raison est que les formules de contrôle additionnent seulement certaines plages, pas l’intégralité des zones comptables. Un zéro dans W24 n’est donc pas une preuve que tout le classeur est équilibré.
+
+Deux écritures au débit, G48 et B76, valent chacune 43 988 SEK. Leur somme correspond à l’écart de 87 976 SEK. C’est une piste d’investigation, pas une preuve de la correction à effectuer.
+
+Les soldes d’ouverture sont, eux, équilibrés : 1 220 000 SEK au débit et au crédit.
+
+Les six formules observées ont été recalculées indépendamment pour les expressions simples présentes et leurs résultats correspondaient aux valeurs enregistrées. Cela ne remplace pas une vérification native dans Excel.
+
+Aucune correction comptable n’a été faite. L’empreinte du classeur original est restée inchangée :
+3be1ead9bff5f0ce078ba64a6aa58f71acf5d587b798f6ac9c6cdacafdf051f0
+
+La conception distingue donc trois vérifications :
+- L’équilibre de la nouvelle écriture proposée.
+- La conformité exacte des modifications de cellules au plan autorisé.
+- Les anomalies déjà présentes dans le classeur historique.
+
+6. ARCHITECTURE PROPOSÉE
+
+Frontend : React, TypeScript, Tailwind, interface web adaptée au téléphone et au bureau.
+Backend : Python, FastAPI, Pydantic et SQLite pour le MVP.
+Infrastructure : une VM Vultr, Caddy pour HTTPS, un worker d’orchestration persistant et un superviseur d’exécution séparé.
+Modèles : tous les appels de raisonnement de l’application doivent passer par Vultr Serverless Inference.
+Exécution : des conteneurs Docker éphémères avec gVisor runsc, sous réserve de tests sur la VM réellement utilisée.
+
+Workflow spécifié :
+1. Réception et normalisation de la photo.
+2. Extraction structurée via VSI.
+3. Chargement du mapping et des règles confirmées.
+4. Proposition des écritures, du plan et du Python.
+5. Contrôles déterministes et réservation de cellules réellement disponibles.
+6. Exécution du code dans une sandbox sur une copie.
+7. Collecte des sorties, erreurs, durées et fichiers.
+8. Vérification indépendante du résultat.
+9. Une seule tentative de réparation du code pour les erreurs ordinaires admissibles.
+10. Affichage du diff et de l’explication.
+11. Approbation humaine liée aux empreintes exactes.
+12. Enregistrement de l’artefact approuvé comme nouvelle version.
+13. Destruction des environnements et conservation de l’historique.
+
+Le commit ne doit jamais régénérer le fichier après l’approbation. Il doit enregistrer exactement les octets déjà vérifiés et approuvés. Une approbation devenue obsolète après une autre modification doit être refusée.
+
+Pour Excel, la proposition privilégie des modifications OOXML ciblées, afin de préserver les extensions et les éléments qu’un enregistrement classique avec openpyxl pourrait altérer. Cette stratégie reste à implémenter et à valider. La compatibilité universelle n’est pas revendiquée.
+
+Deux familles de structures sont spécifiées : les comptes en T et un journal comptable classique. Aucun moteur fonctionnel supportant ces deux familles n’a encore été construit.
+
+7. SÉCURITÉ, LIMITES ET TESTS PRÉPARÉS
+
+Les spécifications prévoient notamment : utilisateur non-root, réseau désactivé, aucune clé ni socket Docker dans la sandbox, système de fichiers majoritairement en lecture seule, limites CPU/mémoire/processus, timeout, quotas de sortie, destruction après exécution et vérification indépendante.
+
+Deux démonstrations de confinement sont décrites :
+- Une tentative de lecture d’un fichier factice réellement présent sur l’hôte mais inaccessible depuis la sandbox, accompagnée d’un contrôle lisible.
+- Une boucle infinie interrompue par le superviseur, avec vérification que l’application reste disponible et qu’une exécution normale fonctionne ensuite.
+
+Ces démonstrations n’ont pas été exécutées. Ce sont des procédures à implémenter et à filmer pendant l’événement.
+
+Le plan de tests couvre aussi les doublons, les approbations concurrentes, les empreintes incorrectes, les crashs, les validations Excel supprimées, les cellules modifiées hors périmètre, les archives malveillantes et les injections de formules.
+
+8. ESTIMATIONS — À NE PAS CONFONDRE AVEC DES MESURES
+
+Le dossier estime les coûts pour 10, 100 et 1 000 transactions par jour. Une hypothèse de deux appels VSI et de 10 % de réparations avec un modèle plus coûteux donne environ 0,00219 USD par reçu, selon les tarifs spécifiques annoncés dans le catalogue consulté.
+
+La VM candidate vc2-4c-8gb était annoncée à 40 USD par mois et 0,055 USD par heure dans le catalogue public. La disponibilité réelle et la facturation ne sont pas vérifiées par un provisionnement.
+
+Une durée de 15 à 60 secondes avant revue humaine est utilisée comme ordre de grandeur de conception. Aucun benchmark de LedgerFlow ne l’a mesurée. La validation humaine peut devenir le principal goulot d’étranglement à fort volume.
+
+9. LISTE DES DOCUMENTS PRODUITS
+
+MASTER_PLAN.md : priorités, critères de réussite, périmètre et fonctionnalités à exclure.
+ARCHITECTURE.md : composants, frontières de confiance, workflow et commit atomique.
+API_CONTRACT.md : endpoints, sessions, droits, événements SSE et idempotence.
+AGENT_RUNTIME.md : états, budgets, prompts, erreurs, reprises et cycle de vie.
+EXCEL_ENGINE.md : onboarding, mapping, allocation de cellules, préservation et vérification.
+DATA_SCHEMAS.md : transactions, écritures, plans, événements, diffs et approbations.
+SECURITY.md : menaces, protections et démonstrations de confinement.
+VULTR_DEPLOYMENT.md : procédure de déploiement et variables d’environnement.
+TEST_PLAN.md : cas de tests et preuves attendues.
+COST_ANALYSIS.md : coûts, hypothèses, incertitudes et latence.
+HACKATHON_EXECUTION.md : répartition pour 2, 3 ou 4 personnes et planning horaire.
+DECISIONS.md : choix techniques et comparaison des alternatives.
+DATABASE.md : modèle de données, contraintes, concurrence et reprise.
+SSE_WORKBOOK_AUDIT.md : inspection détaillée et anomalie du fichier réel.
+REPOSITORY.md : structure cible, interfaces entre modules et dépendances.
+DEMO.md : scénario de démonstration, vidéo et dossier de soumission.
+RESEARCH.md : sources, observations et questions non résolues.
+RED_TEAM.md : les dix risques techniques principaux et leurs contrôles.
+VERIFICATION.md : séparation entre vérifications effectuées et tests non réalisés.
+
+Les quatre JSON documentent le mapping proposé, les entrées de son empreinte de structure, le manifeste des éléments du fichier et le bilan comptable observé.
+
+10. VÉRIFICATIONS EFFECTIVEMENT RÉALISÉES SUR LES LIVRABLES
+
+- Vérification des liens locaux entre documents.
+- Vérification des blocs Markdown et lecture des exemples JSON.
+- Vérification des empreintes des catalogues sauvegardés.
+- Vérification des empreintes du mapping et de ses éléments de preuve.
+- Vérification de la couverture des 32 identifiants de comptes.
+- Recalcul des principales estimations de coûts.
+- Vérification que le classeur original est inchangé.
+- Vérification du ZIP par contrôle d’intégrité et comparaison des fichiers relus.
+- Exclusion de l’inspection privée, du classeur original et de ses champs d’identité de l’archive partageable.
+
+Ces vérifications portent sur les documents et l’analyse. Elles ne prouvent pas le fonctionnement de la future application.
+
+11. CE QUI N’A PAS ÉTÉ FAIT
+
+- Pas de frontend ni de backend fonctionnel.
+- Pas de moteur comptable ou Excel implémenté.
+- Pas de VM ni de souscription VSI créées.
+- Pas d’appel d’inférence authentifié.
+- Pas de benchmark des modèles.
+- Pas d’exécution de Python généré dans une sandbox.
+- Pas de test réel de confinement.
+- Pas de classeur modifié produit.
+- Pas de validation de l’ouverture d’un résultat dans Excel ou LibreOffice.
+- Pas de dépôt GitHub public créé ou publié.
+- Pas d’URL publique de démonstration.
+- Pas de vidéo enregistrée.
+
+12. SUITE LOGIQUE POUR L’ÉQUIPE
+
+Confirmer les règles de développement préalable et l’horaire de soumission. Ensuite, développer en priorité un chemin complet : photo réelle, VSI réel, Python réellement exécuté sur Vultr, fichier réellement modifié, validation indépendante, approbation et téléchargement exact.
+
+Tester le confinement et la conservation du classeur avant d’élargir les fonctionnalités. Ajouter le second format de classeur après le premier chemin fonctionnel. Réserver du temps pour la vidéo et la soumission.
+
+Pour la démonstration publique, privilégier un classeur de test équilibré et sans données personnelles. Ne pas présenter le classeur historique comme équilibré et ne pas corriger ses écritures silencieusement.
+
+NOTE POUR CHATGPT QUI REÇOIT CE DOCUMENT
+
+Utilise ce compte rendu comme état réel du projet. Ne suppose pas que le code, le déploiement, les tests de sécurité ou les capacités des modèles ont été validés. Distingue observations, propositions et estimations. Les chemins locaux mentionnés ne te donnent pas automatiquement accès aux fichiers : il faut joindre l’archive ZIP pour examiner le contenu complet des spécifications.

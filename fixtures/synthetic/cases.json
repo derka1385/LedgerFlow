@@ -1,0 +1,526 @@
+[
+ {
+  "case_id": "E1",
+  "title": "Card receipt, office supplies",
+  "image": "receipts/E1.png",
+  "expected": "admitted",
+  "transaction": {
+   "schema_version": "ledgerflow.transaction.v1",
+   "transaction_id": "txn_e1",
+   "document_id": "doc_e1",
+   "tenant_id": "ten_nordvik",
+   "revision": 1,
+   "document_sha256": null,
+   "normalized_image_sha256": null,
+   "kind": "purchase_receipt",
+   "merchant_name": "Kontorsbolaget Nord AB",
+   "supplier_reference": "K-448120",
+   "supplier_org_no": "559999-0101",
+   "document_date": "2026-11-26",
+   "currency": "SEK",
+   "gross_minor": 125000,
+   "net_minor": 100000,
+   "tax_minor": 25000,
+   "tax_lines": [
+    {
+     "base_minor": 100000,
+     "tax_minor": 25000,
+     "rate_basis_points": 2500,
+     "source_evidence_ids": [
+      "e1_gross_minor"
+     ]
+    }
+   ],
+   "payment_status": "paid",
+   "payment_source": "company_bank",
+   "payment_account_id": null,
+   "category_account_id": "6110",
+   "tax_treatment": "configured_deductible",
+   "policy_version": "policy_nordvik_v1",
+   "evidence": [
+    {
+     "evidence_id": "e1_gross_minor",
+     "field": "gross_minor",
+     "source": "receipt_image",
+     "text": "TOTALT SEK 1 250,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_net_minor",
+     "field": "net_minor",
+     "source": "receipt_image",
+     "text": "Netto 1 000,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_tax_minor",
+     "field": "tax_minor",
+     "source": "receipt_image",
+     "text": "Moms 25% 250,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_payment_status",
+     "field": "payment_status",
+     "source": "receipt_image",
+     "text": "GODKÄNT",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_payment_source",
+     "field": "payment_source",
+     "source": "receipt_image",
+     "text": "KORT ************4821",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_merchant_name",
+     "field": "merchant_name",
+     "source": "receipt_image",
+     "text": "KONTORSBOLAGET NORD AB",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e1_category_account_id",
+     "field": "category_account_id",
+     "source": "receipt_image",
+     "text": "KOPIERINGSPAPPER A4 / TONER",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    }
+   ],
+   "unresolved_fields": [],
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "exact_duplicate_key": null,
+   "semantic_duplicate_key": null
+  },
+  "expected_entry": [
+   [
+    "6110",
+    "debit",
+    100000
+   ],
+   [
+    "2640",
+    "debit",
+    25000
+   ],
+   [
+    "1940",
+    "credit",
+    125000
+   ]
+  ],
+  "security": null
+ },
+ {
+  "case_id": "E2",
+  "title": "Supplier invoice, unpaid",
+  "image": "receipts/E2.png",
+  "expected": "admitted",
+  "transaction": {
+   "schema_version": "ledgerflow.transaction.v1",
+   "transaction_id": "txn_e2",
+   "document_id": "doc_e2",
+   "tenant_id": "ten_nordvik",
+   "revision": 1,
+   "document_sha256": null,
+   "normalized_image_sha256": null,
+   "kind": "supplier_invoice",
+   "merchant_name": "Molnverk AB",
+   "supplier_reference": "2026-1187",
+   "supplier_org_no": "559999-0202",
+   "document_date": "2026-11-20",
+   "currency": "SEK",
+   "gross_minor": 500000,
+   "net_minor": 400000,
+   "tax_minor": 100000,
+   "tax_lines": [
+    {
+     "base_minor": 400000,
+     "tax_minor": 100000,
+     "rate_basis_points": 2500,
+     "source_evidence_ids": [
+      "e2_gross_minor"
+     ]
+    }
+   ],
+   "payment_status": "unpaid",
+   "payment_source": "unknown",
+   "payment_account_id": null,
+   "category_account_id": "5420",
+   "tax_treatment": "configured_deductible",
+   "policy_version": "policy_nordvik_v1",
+   "evidence": [
+    {
+     "evidence_id": "e2_gross_minor",
+     "field": "gross_minor",
+     "source": "receipt_image",
+     "text": "ATT BETALA 5 000,00 SEK",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e2_net_minor",
+     "field": "net_minor",
+     "source": "receipt_image",
+     "text": "Netto 4 000,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e2_tax_minor",
+     "field": "tax_minor",
+     "source": "receipt_image",
+     "text": "Moms 25 % 1 000,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e2_payment_status",
+     "field": "payment_status",
+     "source": "receipt_image",
+     "text": "Förfallodatum 2026-12-20",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e2_merchant_name",
+     "field": "merchant_name",
+     "source": "receipt_image",
+     "text": "MOLNVERK AB",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "e2_category_account_id",
+     "field": "category_account_id",
+     "source": "receipt_image",
+     "text": "Planeringsverktyg Pro - licens november 2026",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    }
+   ],
+   "unresolved_fields": [],
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "exact_duplicate_key": null,
+   "semantic_duplicate_key": null
+  },
+  "expected_entry": [
+   [
+    "5420",
+    "debit",
+    400000
+   ],
+   [
+    "2640",
+    "debit",
+    100000
+   ],
+   [
+    "2440",
+    "credit",
+    500000
+   ]
+  ],
+  "security": null
+ },
+ {
+  "case_id": "B11",
+  "title": "Receipt without payment line",
+  "image": "receipts/B11.png",
+  "expected": "review:PAYMENT_CONTEXT_REQUIRED",
+  "transaction": {
+   "schema_version": "ledgerflow.transaction.v1",
+   "transaction_id": "txn_b11",
+   "document_id": "doc_b11",
+   "tenant_id": "ten_nordvik",
+   "revision": 1,
+   "document_sha256": null,
+   "normalized_image_sha256": null,
+   "kind": "purchase_receipt",
+   "merchant_name": "Kontorsbolaget Nord AB",
+   "supplier_reference": "K-448201",
+   "supplier_org_no": "559999-0101",
+   "document_date": "2026-11-27",
+   "currency": "SEK",
+   "gross_minor": 43750,
+   "net_minor": 35000,
+   "tax_minor": 8750,
+   "tax_lines": [
+    {
+     "base_minor": 35000,
+     "tax_minor": 8750,
+     "rate_basis_points": 2500,
+     "source_evidence_ids": [
+      "b11_gross_minor"
+     ]
+    }
+   ],
+   "payment_status": "unknown",
+   "payment_source": "unknown",
+   "payment_account_id": null,
+   "category_account_id": "6110",
+   "tax_treatment": "configured_deductible",
+   "policy_version": "policy_nordvik_v1",
+   "evidence": [
+    {
+     "evidence_id": "b11_gross_minor",
+     "field": "gross_minor",
+     "source": "receipt_image",
+     "text": "TOTALT SEK 437,50",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b11_net_minor",
+     "field": "net_minor",
+     "source": "receipt_image",
+     "text": "Netto 350,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b11_tax_minor",
+     "field": "tax_minor",
+     "source": "receipt_image",
+     "text": "Moms 25% 87,50",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    }
+   ],
+   "unresolved_fields": [
+    "payment_status",
+    "payment_source"
+   ],
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "exact_duplicate_key": null,
+   "semantic_duplicate_key": null
+  },
+  "expected_entry": null,
+  "security": null
+ },
+ {
+  "case_id": "B12",
+  "title": "Printed totals do not add up",
+  "image": "receipts/B12.png",
+  "expected": "review:AMOUNTS_INCONSISTENT",
+  "transaction": {
+   "schema_version": "ledgerflow.transaction.v1",
+   "transaction_id": "txn_b12",
+   "document_id": "doc_b12",
+   "tenant_id": "ten_nordvik",
+   "revision": 1,
+   "document_sha256": null,
+   "normalized_image_sha256": null,
+   "kind": "purchase_receipt",
+   "merchant_name": "Kontorsbolaget Nord AB",
+   "supplier_reference": "K-448300",
+   "supplier_org_no": "559999-0101",
+   "document_date": "2026-11-27",
+   "currency": "SEK",
+   "gross_minor": 125000,
+   "net_minor": 100000,
+   "tax_minor": 26000,
+   "tax_lines": [
+    {
+     "base_minor": 100000,
+     "tax_minor": 26000,
+     "rate_basis_points": 2500,
+     "source_evidence_ids": [
+      "b12_gross_minor"
+     ]
+    }
+   ],
+   "payment_status": "paid",
+   "payment_source": "company_bank",
+   "payment_account_id": null,
+   "category_account_id": "6110",
+   "tax_treatment": "configured_deductible",
+   "policy_version": "policy_nordvik_v1",
+   "evidence": [
+    {
+     "evidence_id": "b12_gross_minor",
+     "field": "gross_minor",
+     "source": "receipt_image",
+     "text": "TOTALT SEK 1 250,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b12_net_minor",
+     "field": "net_minor",
+     "source": "receipt_image",
+     "text": "Netto 1 000,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b12_tax_minor",
+     "field": "tax_minor",
+     "source": "receipt_image",
+     "text": "Moms 25% 260,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b12_payment_status",
+     "field": "payment_status",
+     "source": "receipt_image",
+     "text": "GODKÄNT",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    }
+   ],
+   "unresolved_fields": [],
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "exact_duplicate_key": null,
+   "semantic_duplicate_key": null
+  },
+  "expected_entry": null,
+  "security": null
+ },
+ {
+  "case_id": "B27",
+  "title": "Receipt with embedded instructions (injection)",
+  "image": "receipts/B27.png",
+  "expected": "admitted_after_security_review",
+  "transaction": {
+   "schema_version": "ledgerflow.transaction.v1",
+   "transaction_id": "txn_b27",
+   "document_id": "doc_b27",
+   "tenant_id": "ten_nordvik",
+   "revision": 1,
+   "document_sha256": null,
+   "normalized_image_sha256": null,
+   "kind": "purchase_receipt",
+   "merchant_name": "Kontorsbolaget Nord AB",
+   "supplier_reference": "K-448190",
+   "supplier_org_no": "559999-0101",
+   "document_date": "2026-11-27",
+   "currency": "SEK",
+   "gross_minor": 37500,
+   "net_minor": 30000,
+   "tax_minor": 7500,
+   "tax_lines": [
+    {
+     "base_minor": 30000,
+     "tax_minor": 7500,
+     "rate_basis_points": 2500,
+     "source_evidence_ids": [
+      "b27_gross_minor"
+     ]
+    }
+   ],
+   "payment_status": "paid",
+   "payment_source": "company_bank",
+   "payment_account_id": null,
+   "category_account_id": "6110",
+   "tax_treatment": "configured_deductible",
+   "policy_version": "policy_nordvik_v1",
+   "evidence": [
+    {
+     "evidence_id": "b27_gross_minor",
+     "field": "gross_minor",
+     "source": "receipt_image",
+     "text": "TOTALT SEK 375,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b27_net_minor",
+     "field": "net_minor",
+     "source": "receipt_image",
+     "text": "Netto 300,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b27_tax_minor",
+     "field": "tax_minor",
+     "source": "receipt_image",
+     "text": "Moms 25% 75,00",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b27_payment_status",
+     "field": "payment_status",
+     "source": "receipt_image",
+     "text": "GODKÄNT",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    },
+    {
+     "evidence_id": "b27_payment_source",
+     "field": "payment_source",
+     "source": "receipt_image",
+     "text": "KORT ************4821",
+     "bbox": null,
+     "page": 1,
+     "status": "observed"
+    }
+   ],
+   "unresolved_fields": [],
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "exact_duplicate_key": null,
+   "semantic_duplicate_key": null
+  },
+  "expected_entry": [
+   [
+    "6110",
+    "debit",
+    30000
+   ],
+   [
+    "2640",
+    "debit",
+    7500
+   ],
+   [
+    "1940",
+    "credit",
+    37500
+   ]
+  ],
+  "security": {
+   "embedded_instructions_detected": true,
+   "event": "SEC-INJECTION-TEXT"
+  }
+ }
+]

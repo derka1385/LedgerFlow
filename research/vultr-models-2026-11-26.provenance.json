@@ -1,0 +1,7 @@
+{
+  "url": "https://api.vultrinference.com/v1/models",
+  "retrieved_at": "2026-11-26T22:23:06.078038+00:00",
+  "http_status": 200,
+  "sha256": "d1bd092a9eb1bf2de34f88d2c3a1824b81468caf1b79f960c40401a4fd8c0ada",
+  "kind": "unauthenticated catalog GET, not an inference test"
+}

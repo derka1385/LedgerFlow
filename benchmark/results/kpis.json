@@ -1,0 +1,476 @@
+{
+ "schema_version": "ledgerflow.kpis.v1",
+ "generated_at": "2026-11-27T13:27:24Z",
+ "source": {
+  "file": "benchmark/results/benchmark_results.json",
+  "sha256": "29ac844f146a1793dd269e8d572bafe27f744e19230084aa7f013e8065c5c7a8",
+  "benchmark_generated_at": "2026-11-27T12:03:04Z",
+  "e2e_file": "benchmark/results/e2e_live.json"
+ },
+ "source_kinds": {
+  "deterministic": "LedgerFlow's own rules and verifier, no model involved",
+  "sandbox": "real hardened Docker container on this machine",
+  "scripted_model": "real orchestration driven by a local scripted stand-in for the model; measures the mechanism, not a model",
+  "mock": "DEV MOCK template stands in for the model",
+  "live_vultr": "real Vultr Serverless Inference",
+  "not_run": "not measured; reason given"
+ },
+ "primary_model": {
+  "config": "qwen3.8-27b@minimal",
+  "model_id": "qwen3.8-27b",
+  "reasoning_effort": "minimal",
+  "chosen_by": "Pick from measurements only. Rule, in order: correct outcomes, then no invented critical facts, then injection caught, then cost, then latency. Ties within one case of 22 are reported as ties, not as wins.",
+  "codegen_prompt": "v2-blank-cells-documented",
+  "budget_alternative": "mimo-v2.6-flash@minimal"
+ },
+ "kpis": [
+  {
+   "id": "accounting_correct",
+   "label": "Correct entry or correct reason to stop (perfect reading)",
+   "value": 100.0,
+   "numerator": 21,
+   "denominator": 21,
+   "display": "21/21",
+   "unit": "receipts",
+   "source_kind": "deterministic",
+   "suite_id": "accounting_correctness",
+   "limitation": "Ground-truth reading; isolates the rules. 21 synthetic receipts."
+  },
+  {
+   "id": "misreads_stopped",
+   "label": "Detectable reading errors stopped before writing",
+   "value": 100.0,
+   "numerator": 63,
+   "denominator": 63,
+   "display": "63/63",
+   "unit": "perturbations",
+   "source_kind": "deterministic",
+   "suite_id": "misread_containment",
+   "limitation": "Undetectable by rules by design, left to the human approval: M08, M09, M11 (wrong day in period, decimal comma lost everywhere, wrong expense account)."
+  },
+  {
+   "id": "tamper_rejected",
+   "label": "Tampered workbooks rejected by the independent verifier",
+   "value": 100.0,
+   "numerator": 16,
+   "denominator": 16,
+   "display": "16/16",
+   "unit": "programs",
+   "source_kind": "sandbox",
+   "suite_id": "unauthorized_modifications",
+   "limitation": "16 tamper classes written by us; not an exhaustive attack catalogue."
+  },
+  {
+   "id": "escape_contained",
+   "label": "Sandbox escape probes contained",
+   "value": 100.0,
+   "numerator": 13,
+   "denominator": 13,
+   "display": "13/13",
+   "unit": "probes",
+   "source_kind": "sandbox",
+   "suite_id": "sandbox_containment",
+   "limitation": "Docker Desktop on macOS; must be re-measured on the Vultr VM (benchmark/security_evidence.py)."
+  },
+  {
+   "id": "validations_kept",
+   "label": "Data-validation ranges kept after a write",
+   "value": 100.0,
+   "numerator": 66,
+   "denominator": 66,
+   "display": "66/66",
+   "unit": "ranges",
+   "source_kind": "deterministic",
+   "suite_id": "formula_format_preservation",
+   "limitation": "Reference writer on the anonymized course workbook; openpyxl load+save keeps 0/66.",
+   "comparison": {
+    "label": "openpyxl load + save",
+    "display": "0/66"
+   }
+  },
+  {
+   "id": "duplicates_caught",
+   "label": "Duplicate submissions held for review",
+   "value": 100.0,
+   "numerator": 6,
+   "denominator": 6,
+   "display": "6/6",
+   "unit": "scenarios",
+   "source_kind": "deterministic",
+   "suite_id": "duplicate_detection",
+   "limitation": "0 false positive(s) in 4 genuine repeat purchases. DEV MOCK reference rule; Codex's backend must port it."
+  },
+  {
+   "id": "recovery_mechanism",
+   "label": "Faulty first programs recovered by one retry",
+   "value": 100.0,
+   "numerator": 8,
+   "denominator": 8,
+   "display": "8/8",
+   "unit": "fault classes",
+   "source_kind": "scripted_model",
+   "suite_id": "automatic_error_recovery",
+   "limitation": "Mechanism only: the faulty program is scripted. Real-model retries are in the live KPIs."
+  },
+  {
+   "id": "layouts_handled",
+   "label": "Workbook layouts handled (post or refuse correctly)",
+   "value": 100.0,
+   "numerator": 10,
+   "denominator": 10,
+   "display": "10/10",
+   "unit": "layouts",
+   "source_kind": "deterministic",
+   "suite_id": "structure_adaptation",
+   "limitation": "T-account grids only; journal-style ledgers are not supported."
+  },
+  {
+   "id": "live_booked_right",
+   "label": "Receipts booked right end to end (qwen3.8-27b@minimal, live Vultr)",
+   "value": 100.0,
+   "numerator": 22,
+   "denominator": 22,
+   "display": "22/22",
+   "unit": "receipts",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "22 synthetic, typeset receipts at temperature 0; previous run: 21/22. Real phone photos are not in the corpus."
+  },
+  {
+   "id": "live_invented",
+   "label": "Critical facts invented by the model",
+   "value": 0,
+   "display": "0",
+   "unit": "fields",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "Over 12 critical fields x 22 receipts."
+  },
+  {
+   "id": "live_injection",
+   "label": "Receipts with injected instructions flagged",
+   "value": 100.0,
+   "numerator": 3,
+   "denominator": 3,
+   "display": "3/3",
+   "unit": "receipts",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "3 injection receipts (English, hidden text, Swedish)."
+  },
+  {
+   "id": "live_code_first_try",
+   "label": "Generated programs verified on the first try",
+   "value": 100.0,
+   "numerator": 11,
+   "denominator": 11,
+   "display": "11/11",
+   "unit": "programs",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "11 plans on the synthetic workbook, real sandbox, independent verifier."
+  },
+  {
+   "id": "live_read_latency",
+   "label": "Receipt reading time, median",
+   "value": 6.3,
+   "display": "6.3 s",
+   "unit": "s",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "Measured from this Mac to api.vultrinference.com; excludes the account and code calls."
+  },
+  {
+   "id": "live_cost",
+   "label": "Inference cost per receipt",
+   "value": 0.004222,
+   "display": "0.0042 USD",
+   "unit": "USD",
+   "source_kind": "live_vultr",
+   "suite_id": "live",
+   "limitation": "Tokens reported by Vultr x catalog list price; the billed amount is in the Vultr console."
+  },
+  {
+   "id": "e2e_committed",
+   "label": "Final integrated run: receipts committed to Excel as expected",
+   "value": 100.0,
+   "numerator": 7,
+   "denominator": 7,
+   "display": "7/7",
+   "unit": "receipts",
+   "source_kind": "live_vultr",
+   "suite_id": "e2e_live",
+   "limitation": "One sequential session on a development Mac with Docker Desktop, DEV MOCK API backend (not Codex's), 7 synthetic receipts; held receipts were not released by a human in this run."
+  }
+ ],
+ "live_models": [
+  {
+   "config": "deepseek-v4.1-flash-1017@minimal",
+   "model_id": "deepseek-v4.1-flash-1017",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 77.3,
+    "numerator": 17,
+    "denominator": 22,
+    "display": "17/22"
+   },
+   "critical_field_accuracy_pct": 97.3,
+   "invented_critical_facts": 0,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 72.7,
+    "numerator": 8,
+    "denominator": 11,
+    "display": "8/11"
+   },
+   "code_after_retry": {
+    "value": 90.9,
+    "numerator": 10,
+    "denominator": 11,
+    "display": "10/11"
+   },
+   "read_latency_p50_s": 7.9,
+   "code_latency_p50_s": 6.9,
+   "cost_usd_per_receipt": 0.005405,
+   "previous_run_booked_right": "17/22",
+   "recommended": false
+  },
+  {
+   "config": "glm-5.3@minimal",
+   "model_id": "glm-5.3",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 86.4,
+    "numerator": 19,
+    "denominator": 22,
+    "display": "19/22"
+   },
+   "critical_field_accuracy_pct": 98.5,
+   "invented_critical_facts": 2,
+   "injection_flagged": "2/3",
+   "code_first_try": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "code_after_retry": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "read_latency_p50_s": 3.6,
+   "code_latency_p50_s": 3.3,
+   "cost_usd_per_receipt": 0.005718,
+   "previous_run_booked_right": "19/22",
+   "recommended": false
+  },
+  {
+   "config": "glm-5.3-flash@minimal",
+   "model_id": "glm-5.3-flash",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 86.4,
+    "numerator": 19,
+    "denominator": 22,
+    "display": "19/22"
+   },
+   "critical_field_accuracy_pct": 98.9,
+   "invented_critical_facts": 1,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "code_after_retry": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "read_latency_p50_s": 2.6,
+   "code_latency_p50_s": 1.8,
+   "cost_usd_per_receipt": 0.000544,
+   "previous_run_booked_right": "19/22",
+   "recommended": false
+  },
+  {
+   "config": "mimo-v2.6-flash@minimal",
+   "model_id": "mimo-v2.6-flash",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 95.5,
+    "numerator": 21,
+    "denominator": 22,
+    "display": "21/22"
+   },
+   "critical_field_accuracy_pct": 99.6,
+   "invented_critical_facts": 1,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 90.9,
+    "numerator": 10,
+    "denominator": 11,
+    "display": "10/11"
+   },
+   "code_after_retry": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "read_latency_p50_s": 5.5,
+   "code_latency_p50_s": 5.7,
+   "cost_usd_per_receipt": 0.000849,
+   "previous_run_booked_right": "21/22",
+   "recommended": false
+  },
+  {
+   "config": "mimo-v2.6-pro@minimal",
+   "model_id": "mimo-v2.6-pro",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 95.5,
+    "numerator": 21,
+    "denominator": 22,
+    "display": "21/22"
+   },
+   "critical_field_accuracy_pct": 99.2,
+   "invented_critical_facts": 1,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 63.6,
+    "numerator": 7,
+    "denominator": 11,
+    "display": "7/11"
+   },
+   "code_after_retry": {
+    "value": 90.9,
+    "numerator": 10,
+    "denominator": 11,
+    "display": "10/11"
+   },
+   "read_latency_p50_s": 6.3,
+   "code_latency_p50_s": 5.2,
+   "cost_usd_per_receipt": 0.002956,
+   "previous_run_booked_right": "21/22",
+   "recommended": false
+  },
+  {
+   "config": "minimax-m3.1-flash@minimal",
+   "model_id": "minimax-m3.1-flash",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 86.4,
+    "numerator": 19,
+    "denominator": 22,
+    "display": "19/22"
+   },
+   "critical_field_accuracy_pct": 98.1,
+   "invented_critical_facts": 2,
+   "injection_flagged": "2/3",
+   "code_first_try": {
+    "value": 36.4,
+    "numerator": 4,
+    "denominator": 11,
+    "display": "4/11"
+   },
+   "code_after_retry": {
+    "value": 81.8,
+    "numerator": 9,
+    "denominator": 11,
+    "display": "9/11"
+   },
+   "read_latency_p50_s": 3.1,
+   "code_latency_p50_s": 3.1,
+   "cost_usd_per_receipt": 0.003127,
+   "previous_run_booked_right": "19/22",
+   "recommended": false
+  },
+  {
+   "config": "qwen3.8-27b@minimal",
+   "model_id": "qwen3.8-27b",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 100.0,
+    "numerator": 22,
+    "denominator": 22,
+    "display": "22/22"
+   },
+   "critical_field_accuracy_pct": 98.1,
+   "invented_critical_facts": 0,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "code_after_retry": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "read_latency_p50_s": 6.3,
+   "code_latency_p50_s": 7.2,
+   "cost_usd_per_receipt": 0.004222,
+   "previous_run_booked_right": "21/22",
+   "recommended": true
+  },
+  {
+   "config": "qwen3.8-flash-next@minimal",
+   "model_id": "qwen3.8-flash-next",
+   "reasoning_effort": "minimal",
+   "booked_right": {
+    "value": 95.5,
+    "numerator": 21,
+    "denominator": 22,
+    "display": "21/22"
+   },
+   "critical_field_accuracy_pct": 99.2,
+   "invented_critical_facts": 1,
+   "injection_flagged": "3/3",
+   "code_first_try": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "code_after_retry": {
+    "value": 100.0,
+    "numerator": 11,
+    "denominator": 11,
+    "display": "11/11"
+   },
+   "read_latency_p50_s": 4.1,
+   "code_latency_p50_s": 5.1,
+   "cost_usd_per_receipt": 0.000948,
+   "previous_run_booked_right": "21/22",
+   "recommended": false
+  }
+ ],
+ "e2e": {
+  "receipts": 7,
+  "as_expected": 7,
+  "committed": 4,
+  "all_reading_live": true,
+  "models_seen": [
+   "qwen3.8-27b"
+  ],
+  "workbook_balanced_and_complete": true,
+  "excel_opened": true,
+  "limitation": "One sequential session on a development Mac with Docker Desktop, DEV MOCK API backend (not Codex's), 7 synthetic receipts; held receipts were not released by a human in this run."
+ },
+ "limitations": [
+  "Corpus: 22 synthetic, typeset receipts (fictional companies), not phone photos; differences of one receipt are ties.",
+  "Live numbers come from two runs on 27 Nov 2026 at temperature 0; run-to-run variation of one receipt was observed.",
+  "Measured on a development Mac with Docker Desktop, against the DEV MOCK API that the frontend uses; Codex's production backend does not implement these flows yet and must be re-measured with the same harness.",
+  "Costs are computed from tokens and catalog list prices, not from the invoice.",
+  "Model-default reasoning failed often (token budget or 45 s timeout); only minimal reasoning is recommended.",
+  "Sandbox numbers were measured on the infrastructure lead's tmpfs build of 27 Nov; re-run the suites after any sandbox change and on the Vultr VM (benchmark/security_evidence.py)."
+ ]
+}

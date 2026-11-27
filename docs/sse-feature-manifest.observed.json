@@ -1,0 +1,167 @@
+{
+  "source_sha256": "3be1ead9bff5f0ce078ba64a6aa58f71acf5d587b798f6ac9c6cdacafdf051f0",
+  "members": [
+    {
+      "name": "[Content_Types].xml",
+      "bytes": 2205,
+      "compressed": 435,
+      "sha256": "fce7d19dfc5f29026886ebdabc0ba0dda69e31b450f56b331577e40c9e8d97e1"
+    },
+    {
+      "name": "_rels/.rels",
+      "bytes": 735,
+      "compressed": 258,
+      "sha256": "ad78dfe44ec71f967f96e95bdf6baf2545c39e1a5e4413e7b8e9413eb95fd922"
+    },
+    {
+      "name": "xl/_rels/workbook.xml.rels",
+      "bytes": 1540,
+      "compressed": 311,
+      "sha256": "8628cc0b2a60281d111e727bdad78eb244fb6d26671b2c794dc59a862e03cb45"
+    },
+    {
+      "name": "xl/workbook.xml",
+      "bytes": 4264,
+      "compressed": 1348,
+      "sha256": "9bb64e1e6b4ab22c4f89ee4457e3903c8db326ca5f0fc1517154d69dc1023224"
+    },
+    {
+      "name": "xl/theme/theme1.xml",
+      "bytes": 8389,
+      "compressed": 1874,
+      "sha256": "66976e673801acfeb94ade51c5e9d63f1c68154e68cf97062babde0b54f3cd65"
+    },
+    {
+      "name": "xl/styles.xml",
+      "bytes": 8436,
+      "compressed": 1326,
+      "sha256": "37c8fc870fe54ccc9ba3e70d2a0b5aaf4049f35473527d75687d10bfd94251a6"
+    },
+    {
+      "name": "xl/sharedStrings.xml",
+      "bytes": 4446,
+      "compressed": 1492,
+      "sha256": "cb8af6ccc900ec2f866bda63fb529519d375da76459c7d8b0adc0dc70866cee3"
+    },
+    {
+      "name": "xl/worksheets/sheet2.xml",
+      "bytes": 29290,
+      "compressed": 5985,
+      "sha256": "95d762228f4219e3a6eb4387934492c83814d16b267423db569352cccbfa939a"
+    },
+    {
+      "name": "xl/worksheets/sheet1.xml",
+      "bytes": 5555,
+      "compressed": 1519,
+      "sha256": "4939b433b4fd343ec1e987f2cca11eedbdc2b807a364208e64562b9721347dd2"
+    },
+    {
+      "name": "xl/worksheets/_rels/sheet1.xml.rels",
+      "bytes": 322,
+      "compressed": 193,
+      "sha256": "65cefb6727e21f882eb83bb6c10370afa59aafda7f007f531df0c30026dc4684"
+    },
+    {
+      "name": "xl/worksheets/_rels/sheet2.xml.rels",
+      "bytes": 322,
+      "compressed": 194,
+      "sha256": "fe0fffb5ec78558e2b46557177888c220c2b7d2389c24965089ed5618d66be54"
+    },
+    {
+      "name": "xl/worksheets/sheet3.xml",
+      "bytes": 5259,
+      "compressed": 1158,
+      "sha256": "c2e993ad3cb4d05555060c2d1488517269e314448133a180e791851c30a3603d"
+    },
+    {
+      "name": "xl/printerSettings/printerSettings1.bin",
+      "bytes": 5420,
+      "compressed": 443,
+      "sha256": "4da03a297fd24563e99a26ac4bc286091148fe6153a50946aa2334ecb6e26c6f"
+    },
+    {
+      "name": "xl/printerSettings/printerSettings2.bin",
+      "bytes": 5420,
+      "compressed": 445,
+      "sha256": "b3a97cd22ae50535beb8593b9d1e5ced671a0dada34a1dcc3c1825d088da0ced"
+    },
+    {
+      "name": "xl/calcChain.xml",
+      "bytes": 266,
+      "compressed": 177,
+      "sha256": "32cb03cbf54eb041a7f903f7e471443c271d00db728a2d798edfc883def52a8a"
+    },
+    {
+      "name": "customXml/item1.xml",
+      "bytes": 12648,
+      "compressed": 2242,
+      "sha256": "f4fd7b06f3be791c6446d2b0c07701b2ed6da19e109a00558757bd10a3ef94ba"
+    },
+    {
+      "name": "customXml/itemProps1.xml",
+      "bytes": 1149,
+      "compressed": 442,
+      "sha256": "05d2593b7acb4c547476a0007e80871011a2f953ce2c8b8f6fd1d7b9b1bcbf92"
+    },
+    {
+      "name": "customXml/item2.xml",
+      "bytes": 290,
+      "compressed": 192,
+      "sha256": "b21b9cc9ff7d68daa06bcedaff78dd324bc614fe6c7d930ff92d2fd4a04a1106"
+    },
+    {
+      "name": "customXml/itemProps2.xml",
+      "bytes": 954,
+      "compressed": 424,
+      "sha256": "e9f04ee47b72f11cd404f9ee5c61bb02da70a7ce47abb188b7736c759892a77c"
+    },
+    {
+      "name": "customXml/item3.xml",
+      "bytes": 219,
+      "compressed": 144,
+      "sha256": "5efcaf9ad70d9c29f406ee438f8f428b021a881d2c5afff0e53b00b1f67ae51e"
+    },
+    {
+      "name": "customXml/itemProps3.xml",
+      "bytes": 335,
+      "compressed": 243,
+      "sha256": "3d2c71564dd6bacd495d551f402d33bc3819afbaa9e84f1b823a62ade3f398c0"
+    },
+    {
+      "name": "docProps/core.xml",
+      "bytes": 616,
+      "compressed": 344,
+      "sha256": "7824b09221924a3362f5b2345d5d24266cad6de4c0ed1a3a0cc2150d477df2c1"
+    },
+    {
+      "name": "docProps/app.xml",
+      "bytes": 894,
+      "compressed": 432,
+      "sha256": "3f2d5904a1724514e71c8cba909adda690662f12150bd86eae2c1ffcd6af0b4f"
+    },
+    {
+      "name": "docProps/custom.xml",
+      "bytes": 402,
+      "compressed": 270,
+      "sha256": "69aed0236f08ad1e27ac23db3fc16533ba6b21d1d7e32204ada384bebf709381"
+    },
+    {
+      "name": "customXml/_rels/item1.xml.rels",
+      "bytes": 296,
+      "compressed": 194,
+      "sha256": "80482f86e196171d66001e0e74d1900408a3aaf2463e54005d251b5f2db9a0b0"
+    },
+    {
+      "name": "customXml/_rels/item2.xml.rels",
+      "bytes": 296,
+      "compressed": 195,
+      "sha256": "2a6aee4c8a9714223a3568077411a0c82d11b484b1c9ab93a19d50b99c57baa5"
+    },
+    {
+      "name": "customXml/_rels/item3.xml.rels",
+      "bytes": 296,
+      "compressed": 195,
+      "sha256": "3aa4054f7f463c6d441102c960783aa7f937d6945a0a885b624a66aafaeedb6c"
+    }
+  ]
+}

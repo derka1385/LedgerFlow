@@ -1,0 +1,613 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-27T14:49:15.064108+00:00",
+  "title": "Design System: LedgerFlow",
+  "extensions": {
+    "colorMeta": {
+      "forest": {
+        "role": "primary",
+        "displayName": "Ledger Forest",
+        "canonical": "#0B5A45",
+        "tonalRamp": [
+          "oklch(15% 0.0794 169.18)",
+          "oklch(26% 0.0794 169.18)",
+          "oklch(38% 0.0794 169.18)",
+          "oklch(49% 0.0794 169.18)",
+          "oklch(61% 0.0794 169.18)",
+          "oklch(72% 0.0794 169.18)",
+          "oklch(84% 0.0794 169.18)",
+          "oklch(95% 0.0794 169.18)"
+        ]
+      },
+      "forest-hover": {
+        "role": "primary",
+        "displayName": "Forest Hover",
+        "canonical": "#084839",
+        "tonalRamp": [
+          "oklch(15% 0.0659 172.01)",
+          "oklch(26% 0.0659 172.01)",
+          "oklch(38% 0.0659 172.01)",
+          "oklch(49% 0.0659 172.01)",
+          "oklch(61% 0.0659 172.01)",
+          "oklch(72% 0.0659 172.01)",
+          "oklch(84% 0.0659 172.01)",
+          "oklch(95% 0.0659 172.01)"
+        ]
+      },
+      "forest-wash": {
+        "role": "primary",
+        "displayName": "Forest Wash",
+        "canonical": "#E2EFE8",
+        "tonalRamp": [
+          "oklch(15% 0.0166 162.74)",
+          "oklch(26% 0.0166 162.74)",
+          "oklch(38% 0.0166 162.74)",
+          "oklch(49% 0.0166 162.74)",
+          "oklch(61% 0.0166 162.74)",
+          "oklch(72% 0.0166 162.74)",
+          "oklch(84% 0.0166 162.74)",
+          "oklch(95% 0.0166 162.74)"
+        ]
+      },
+      "mint": {
+        "role": "primary",
+        "displayName": "Fill-Handle Mint",
+        "canonical": "#8FE3B8",
+        "tonalRamp": [
+          "oklch(15% 0.1024 160.86)",
+          "oklch(26% 0.1024 160.86)",
+          "oklch(38% 0.1024 160.86)",
+          "oklch(49% 0.1024 160.86)",
+          "oklch(61% 0.1024 160.86)",
+          "oklch(72% 0.1024 160.86)",
+          "oklch(84% 0.1024 160.86)",
+          "oklch(95% 0.1024 160.86)"
+        ]
+      },
+      "mint-tint": {
+        "role": "primary",
+        "displayName": "Mint Tint",
+        "canonical": "#BFEBD3",
+        "tonalRamp": [
+          "oklch(15% 0.0561 161.19)",
+          "oklch(26% 0.0561 161.19)",
+          "oklch(38% 0.0561 161.19)",
+          "oklch(49% 0.0561 161.19)",
+          "oklch(61% 0.0561 161.19)",
+          "oklch(72% 0.0561 161.19)",
+          "oklch(84% 0.0561 161.19)",
+          "oklch(95% 0.0561 161.19)"
+        ]
+      },
+      "deep": {
+        "role": "neutral",
+        "displayName": "Deep Forest",
+        "canonical": "#06291F",
+        "tonalRamp": [
+          "oklch(15% 0.0441 170.06)",
+          "oklch(26% 0.0441 170.06)",
+          "oklch(38% 0.0441 170.06)",
+          "oklch(49% 0.0441 170.06)",
+          "oklch(61% 0.0441 170.06)",
+          "oklch(72% 0.0441 170.06)",
+          "oklch(84% 0.0441 170.06)",
+          "oklch(95% 0.0441 170.06)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Cool Canvas",
+        "canonical": "#F2F5F3",
+        "tonalRamp": [
+          "oklch(15% 0.0041 157.18)",
+          "oklch(26% 0.0041 157.18)",
+          "oklch(38% 0.0041 157.18)",
+          "oklch(49% 0.0041 157.18)",
+          "oklch(61% 0.0041 157.18)",
+          "oklch(72% 0.0041 157.18)",
+          "oklch(84% 0.0041 157.18)",
+          "oklch(95% 0.0041 157.18)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Header Rail",
+        "canonical": "#E9EEEA",
+        "tonalRamp": [
+          "oklch(15% 0.0075 151.89)",
+          "oklch(26% 0.0075 151.89)",
+          "oklch(38% 0.0075 151.89)",
+          "oklch(49% 0.0075 151.89)",
+          "oklch(61% 0.0075 151.89)",
+          "oklch(72% 0.0075 151.89)",
+          "oklch(84% 0.0075 151.89)",
+          "oklch(95% 0.0075 151.89)"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "grid": {
+        "role": "neutral",
+        "displayName": "Hairline Grid",
+        "canonical": "#DCE2DC",
+        "tonalRamp": [
+          "oklch(15% 0.0103 145.49)",
+          "oklch(26% 0.0103 145.49)",
+          "oklch(38% 0.0103 145.49)",
+          "oklch(49% 0.0103 145.49)",
+          "oklch(61% 0.0103 145.49)",
+          "oklch(72% 0.0103 145.49)",
+          "oklch(84% 0.0103 145.49)",
+          "oklch(95% 0.0103 145.49)"
+        ]
+      },
+      "grid-strong": {
+        "role": "neutral",
+        "displayName": "Grid Strong",
+        "canonical": "#B5C0B8",
+        "tonalRamp": [
+          "oklch(15% 0.0164 154.39)",
+          "oklch(26% 0.0164 154.39)",
+          "oklch(38% 0.0164 154.39)",
+          "oklch(49% 0.0164 154.39)",
+          "oklch(61% 0.0164 154.39)",
+          "oklch(72% 0.0164 154.39)",
+          "oklch(84% 0.0164 154.39)",
+          "oklch(95% 0.0164 154.39)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Verified Ink",
+        "canonical": "#121614",
+        "tonalRamp": [
+          "oklch(15% 0.0074 164.12)",
+          "oklch(26% 0.0074 164.12)",
+          "oklch(38% 0.0074 164.12)",
+          "oklch(49% 0.0074 164.12)",
+          "oklch(61% 0.0074 164.12)",
+          "oklch(72% 0.0074 164.12)",
+          "oklch(84% 0.0074 164.12)",
+          "oklch(95% 0.0074 164.12)"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#47514B",
+        "tonalRamp": [
+          "oklch(15% 0.0161 159.33)",
+          "oklch(26% 0.0161 159.33)",
+          "oklch(38% 0.0161 159.33)",
+          "oklch(49% 0.0161 159.33)",
+          "oklch(61% 0.0161 159.33)",
+          "oklch(72% 0.0161 159.33)",
+          "oklch(84% 0.0161 159.33)",
+          "oklch(95% 0.0161 159.33)"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#5F6A64",
+        "tonalRamp": [
+          "oklch(15% 0.0164 162.03)",
+          "oklch(26% 0.0164 162.03)",
+          "oklch(38% 0.0164 162.03)",
+          "oklch(49% 0.0164 162.03)",
+          "oklch(61% 0.0164 162.03)",
+          "oklch(72% 0.0164 162.03)",
+          "oklch(84% 0.0164 162.03)",
+          "oklch(95% 0.0164 162.03)"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Unverified Grey",
+        "canonical": "#8C968F",
+        "tonalRamp": [
+          "oklch(15% 0.0154 155.42)",
+          "oklch(26% 0.0154 155.42)",
+          "oklch(38% 0.0154 155.42)",
+          "oklch(49% 0.0154 155.42)",
+          "oklch(61% 0.0154 155.42)",
+          "oklch(72% 0.0154 155.42)",
+          "oklch(84% 0.0154 155.42)",
+          "oklch(95% 0.0154 155.42)"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Hold Amber",
+        "canonical": "#8F5E07",
+        "tonalRamp": [
+          "oklch(15% 0.1089 73.04)",
+          "oklch(26% 0.1089 73.04)",
+          "oklch(38% 0.1089 73.04)",
+          "oklch(49% 0.1089 73.04)",
+          "oklch(61% 0.1089 73.04)",
+          "oklch(72% 0.1089 73.04)",
+          "oklch(84% 0.1089 73.04)",
+          "oklch(95% 0.1089 73.04)"
+        ]
+      },
+      "amber-wash": {
+        "role": "secondary",
+        "displayName": "Amber Wash",
+        "canonical": "#F6EDD6",
+        "tonalRamp": [
+          "oklch(15% 0.0318 89.14)",
+          "oklch(26% 0.0318 89.14)",
+          "oklch(38% 0.0318 89.14)",
+          "oklch(49% 0.0318 89.14)",
+          "oklch(61% 0.0318 89.14)",
+          "oklch(72% 0.0318 89.14)",
+          "oklch(84% 0.0318 89.14)",
+          "oklch(95% 0.0318 89.14)"
+        ]
+      },
+      "error": {
+        "role": "error",
+        "displayName": "Error Red",
+        "canonical": "#B42318",
+        "tonalRamp": [
+          "oklch(15% 0.1200 29.51)",
+          "oklch(26% 0.1200 29.51)",
+          "oklch(38% 0.1200 29.51)",
+          "oklch(49% 0.1200 29.51)",
+          "oklch(61% 0.1200 29.51)",
+          "oklch(72% 0.1200 29.51)",
+          "oklch(84% 0.1200 29.51)",
+          "oklch(95% 0.1200 29.51)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#0C1210",
+        "tonalRamp": [
+          "oklch(15% 0.0102 172.76)",
+          "oklch(26% 0.0102 172.76)",
+          "oklch(38% 0.0102 172.76)",
+          "oklch(49% 0.0102 172.76)",
+          "oklch(61% 0.0102 172.76)",
+          "oklch(72% 0.0102 172.76)",
+          "oklch(84% 0.0102 172.76)",
+          "oklch(95% 0.0102 172.76)"
+        ]
+      },
+      "dark-sheet": {
+        "role": "neutral",
+        "displayName": "Dark Sheet",
+        "canonical": "#16201B",
+        "tonalRamp": [
+          "oklch(15% 0.0173 163.01)",
+          "oklch(26% 0.0173 163.01)",
+          "oklch(38% 0.0173 163.01)",
+          "oklch(49% 0.0173 163.01)",
+          "oklch(61% 0.0173 163.01)",
+          "oklch(72% 0.0173 163.01)",
+          "oklch(84% 0.0173 163.01)",
+          "oklch(95% 0.0173 163.01)"
+        ]
+      },
+      "dark-grid": {
+        "role": "neutral",
+        "displayName": "Dark Grid",
+        "canonical": "#24302A",
+        "tonalRamp": [
+          "oklch(15% 0.0196 163.27)",
+          "oklch(26% 0.0196 163.27)",
+          "oklch(38% 0.0196 163.27)",
+          "oklch(49% 0.0196 163.27)",
+          "oklch(61% 0.0196 163.27)",
+          "oklch(72% 0.0196 163.27)",
+          "oklch(84% 0.0196 163.27)",
+          "oklch(95% 0.0196 163.27)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Dark Ink",
+        "canonical": "#EEF3EF",
+        "tonalRamp": [
+          "oklch(15% 0.0075 151.89)",
+          "oklch(26% 0.0075 151.89)",
+          "oklch(38% 0.0075 151.89)",
+          "oklch(49% 0.0075 151.89)",
+          "oklch(61% 0.0075 151.89)",
+          "oklch(72% 0.0075 151.89)",
+          "oklch(84% 0.0075 151.89)",
+          "oklch(95% 0.0075 151.89)"
+        ]
+      },
+      "dark-amber": {
+        "role": "secondary",
+        "displayName": "Dark Amber",
+        "canonical": "#E5C27A",
+        "tonalRamp": [
+          "oklch(15% 0.0990 84.43)",
+          "oklch(26% 0.0990 84.43)",
+          "oklch(38% 0.0990 84.43)",
+          "oklch(49% 0.0990 84.43)",
+          "oklch(61% 0.0990 84.43)",
+          "oklch(72% 0.0990 84.43)",
+          "oklch(84% 0.0990 84.43)",
+          "oklch(95% 0.0990 84.43)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Explainer step headings and the phone home greeting."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "App text, system UI face."
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "Landing and explainer copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Status words, captions, table heads; sentence case."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Cell values, amounts, dates, hashes; Martian Mono only."
+      },
+      "data-strong": {
+        "displayName": "Data Strong",
+        "purpose": "Column letters, row numbers, ordinals, language codes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "paper-drop",
+        "value": "0 24px 40px -22px rgba(0,0,0,.6)",
+        "purpose": "Receipts lying on a sheet."
+      },
+      {
+        "name": "selected-lift",
+        "value": "inset 0 0 0 1.5px var(--accent), 0 10px 22px -16px rgba(10,40,30,.45)",
+        "purpose": "The run under review; the rest dims to .62."
+      },
+      {
+        "name": "primary-press",
+        "value": "0 1px 0 rgba(0,0,0,.06), 0 6px 14px -10px color-mix(in srgb, var(--accent) 70%, transparent)",
+        "purpose": "Primary buttons."
+      },
+      {
+        "name": "shutter",
+        "value": "0 12px 28px -14px rgba(10,40,30,.55)",
+        "purpose": "Camera shutter lens."
+      },
+      {
+        "name": "hero-sheet",
+        "value": "0 40px 80px -40px rgba(0,0,0,.6)",
+        "purpose": "Landing sheet on deep forest."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Entrances, writes, presses."
+      },
+      {
+        "name": "ease-sel",
+        "value": "cubic-bezier(.2, .8, .2, 1)",
+        "purpose": "Selection easing: frames, nav cell, queue lift, landing frame glide (.5s)."
+      },
+      {
+        "name": "lf-rise",
+        "value": "opacity .35 -> 1, translateY(6px) -> 0; .32-.5s ease-out; 30-45ms stagger",
+        "purpose": "Views, rows and list items arriving."
+      },
+      {
+        "name": "lf-write",
+        "value": "clip-path inset(0 100% 0 0) -> inset(0); .42-.5s ease-out",
+        "purpose": "A value typing into its cell."
+      },
+      {
+        "name": "lf-select",
+        "value": "opacity 0 -> 1, scale(.96) -> 1; .36-.5s ease-sel",
+        "purpose": "The selection frame landing on its range."
+      },
+      {
+        "name": "lf-ink",
+        "value": "color ink-faint -> ink; .5-.6s ease",
+        "purpose": "Unverified grey turning verified black, real state only."
+      },
+      {
+        "name": "lf-pulse",
+        "value": "opacity -> .35 at 50%; 1.2s ease-in-out infinite",
+        "purpose": "Status squares while reading or writing."
+      },
+      {
+        "name": "explainer-dwell",
+        "value": "5200ms",
+        "purpose": "Web explainer auto-advance; stops on step 04; pause toggle freezes scenes."
+      },
+      {
+        "name": "native-dwell",
+        "value": "3.4s, spring(response .5, damping .86)",
+        "purpose": "iOS WelcomeView loop with a 44pt pause button."
+      },
+      {
+        "name": "landing-hero-loop",
+        "value": "2600ms",
+        "purpose": "Landing hero read, write, verify, approve loop; global pause control."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "durations .001ms, delays 0, one iteration",
+        "purpose": "Landing and iOS hold the final step, paused. Web explainer starts paused with each scene in its end state."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "760px"
+      },
+      {
+        "name": "landing-narrow",
+        "value": "560px"
+      },
+      {
+        "name": "landing-tablet",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Forest-filled primary action; one per view.",
+      "html": "<button class=\"ds-btn-primary\">Approve 8 cells</button>",
+      "css": ".ds-btn-primary{background:#0B5A45;color:#fff;border:1px solid #0B5A45;border-radius:6px;min-height:34px;padding:8px 12px;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.06),0 6px 14px -10px rgba(11,90,69,.7);transition:background-color .15s,transform .12s cubic-bezier(.16,1,.3,1)} .ds-btn-primary:hover{background:#084839} .ds-btn-primary:focus-visible{outline:2px solid #0B5A45;outline-offset:2px} .ds-btn-primary:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined secondary action.",
+      "html": "<button class=\"ds-btn-secondary\">Back</button>",
+      "css": ".ds-btn-secondary{background:#fff;color:#121614;border:1px solid #B5C0B8;border-radius:6px;min-height:34px;padding:8px 12px;font:500 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;cursor:pointer;transition:border-color .15s,transform .12s cubic-bezier(.16,1,.3,1)} .ds-btn-secondary:hover{border-color:#0B5A45} .ds-btn-secondary:focus-visible{outline:2px solid #0B5A45;outline-offset:2px} .ds-btn-secondary:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Language Switch",
+      "kind": "nav",
+      "refersTo": "language-switch-active",
+      "description": "EN/FR/SV segmented control; active code is ink-filled.",
+      "html": "<div class=\"ds-lang\"><button aria-pressed=\"true\">EN</button><button aria-pressed=\"false\">FR</button><button aria-pressed=\"false\">SV</button></div>",
+      "css": ".ds-lang{display:inline-flex;gap:2px;padding:2px;border:1px solid #B5C0B8;border-radius:6px;background:#fff} .ds-lang button{font:600 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,monospace;color:#5F6A64;background:none;border:0;border-radius:4px;padding:7px 8px;min-width:34px;cursor:pointer} .ds-lang button[aria-pressed=true]{background:#121614;color:#F2F5F3} .ds-lang button:hover:not([aria-pressed=true]){color:#121614} .ds-lang button:focus-visible{outline:2px solid #0B5A45;outline-offset:2px}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "description": "Sheet-white field with forest focus.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search receipts\">",
+      "css": ".ds-input{font:400 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:#121614;background:#fff;border:1px solid #B5C0B8;border-radius:6px;padding:9px 10px;min-height:40px;caret-color:#0B5A45} .ds-input:focus{outline:2px solid #0B5A45;outline-offset:0;border-color:#0B5A45}"
+    },
+    {
+      "name": "Live Sheet with Selection",
+      "kind": "custom",
+      "refersTo": "sheet",
+      "description": "The signature: a hairline sheet, grey unverified and ink verified values, one selection frame with a fill handle on the newest row.",
+      "html": "<div class=\"ds-sheet\"><div class=\"ds-cols\"><i></i><b>A</b><b>B</b><b>C</b></div><div class=\"ds-row ds-proven\"><i>2</i><span>Kontorsbolaget</span><span class=\"ds-num\">1,250.00</span><span class=\"ds-st\"><em style=\"background:#121614\"></em>Booked</span><span class=\"ds-frame\"><i></i></span></div><div class=\"ds-row ds-pending\"><i>3</i><span>Molnverk AB</span><span class=\"ds-num\">5,000.00</span><span class=\"ds-st\" style=\"color:#8F5E07\"><em style=\"background:#8F5E07\"></em>Held</span></div></div>",
+      "css": ".ds-sheet{background:#fff;border:1px solid #B5C0B8;border-radius:10px;overflow:visible;font:400 13.5px -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;width:340px} .ds-cols,.ds-row{display:grid;grid-template-columns:26px 1fr 84px 82px;align-items:center} .ds-cols{background:#E9EEEA;border-bottom:1px solid #DCE2DC;font:600 11px/24px 'Martian Mono',ui-monospace,'SF Mono',Menlo,monospace;color:#5F6A64;text-align:center;border-radius:10px 10px 0 0} .ds-cols b{font-weight:600;border-left:1px solid #DCE2DC} .ds-row{position:relative;min-height:46px;border-bottom:1px solid #DCE2DC;color:#121614} .ds-row:last-child{border-bottom:0} .ds-row>i{font:500 11px 'Martian Mono',ui-monospace,'SF Mono',Menlo,monospace;color:#5F6A64;background:#E9EEEA;height:100%;display:grid;place-items:center;font-style:normal;border-right:1px solid #DCE2DC} .ds-row>span{padding:0 8px;border-right:1px solid #DCE2DC;height:100%;display:flex;align-items:center} .ds-num{font:400 11px 'Martian Mono',ui-monospace,'SF Mono',Menlo,monospace;justify-content:flex-end;font-variant-numeric:tabular-nums} .ds-pending span:nth-of-type(1),.ds-pending .ds-num{color:#8C968F} .ds-st{gap:6px;font-size:11px;font-weight:600} .ds-st em{width:8px;height:8px;border-radius:1px} .ds-frame{position:absolute!important;inset:-1px;border:2px solid #0B5A45!important;border-radius:3px;padding:0!important;animation:ds-select .36s .2s cubic-bezier(.2,.8,.2,1) both} .ds-frame i{position:absolute;right:-5px;bottom:-5px;width:8px;height:8px;background:#0B5A45;border:2px solid #fff;border-radius:1px} @keyframes ds-select{from{opacity:0;transform:scale(.96)}} @media (prefers-reduced-motion:reduce){.ds-frame{animation:none}}"
+    },
+    {
+      "name": "Shutter",
+      "kind": "button",
+      "refersTo": "shutter",
+      "description": "Round camera action, bottom centre on phones.",
+      "html": "<a class=\"ds-shutter\" href=\"#\"><span class=\"ds-lens\"><span><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M4 8h3l2-3h6l2 3h3v11H4z\"/><circle cx=\"12\" cy=\"13\" r=\"3.5\"/></svg></span></span><span class=\"ds-sl\">Scan a receipt</span></a>",
+      "css": ".ds-shutter{display:inline-grid;justify-items:center;gap:6px;text-decoration:none;color:#121614;font:650 12.5px -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif} .ds-lens{width:76px;height:76px;border-radius:50%;border:3px solid #0B5A45;background:#F2F5F3;display:grid;place-items:center;box-shadow:0 12px 28px -14px rgba(10,40,30,.55)} .ds-lens>span{width:62px;height:62px;border-radius:50%;background:#0B5A45;color:#fff;display:grid;place-items:center;transition:transform .14s cubic-bezier(.16,1,.3,1)} .ds-shutter:active .ds-lens>span{transform:scale(.92)} .ds-shutter:focus-visible{outline:2px solid #0B5A45;outline-offset:4px;border-radius:8px}"
+    },
+    {
+      "name": "Active Nav Cell",
+      "kind": "nav",
+      "description": "Sidebar destination drawn as the selected cell.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Transactions</a><a href=\"#\">Expenses</a></nav>",
+      "css": ".ds-nav{display:grid;gap:4px;width:200px;background:#E6ECE8;padding:8px;font:500 13px -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif} .ds-nav a{position:relative;color:#47514B;text-decoration:none;padding:9px 10px;border-radius:6px;transition:background-color .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s cubic-bezier(.2,.8,.2,1)} .ds-nav a:hover{color:#121614} .ds-nav a[aria-current=page]{background:#fff;color:#121614;box-shadow:inset 0 0 0 1.5px #0B5A45} .ds-nav a[aria-current=page]::after{content:'';position:absolute;right:-3px;bottom:-3px;width:7px;height:7px;background:#0B5A45;border:2px solid #E6ECE8;border-radius:1px} .ds-nav a:focus-visible{outline:2px solid #0B5A45;outline-offset:2px}"
+    },
+    {
+      "name": "Brand Mark",
+      "kind": "custom",
+      "description": "LF monogram as a selected cell with the mint fill handle.",
+      "html": "<svg width=\"48\" height=\"48\" viewBox=\"0 0 64 64\"><rect x=\"1\" y=\"1\" width=\"56\" height=\"56\" rx=\"12\" fill=\"#0B5A45\"/><g transform=\"translate(1.2 1.2) scale(.875)\"><path d=\"M16 14H24V41H34V49H16Z\" fill=\"#fff\"/><path d=\"M32 14H49V22H40V29H47V37H40V49H32Z\" fill=\"#BFEBD3\"/></g><rect x=\"47\" y=\"47\" width=\"15\" height=\"15\" rx=\"3\" fill=\"#8FE3B8\" stroke=\"#F2F5F3\" stroke-width=\"3\"/></svg>",
+      "css": ""
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ledger Grid",
+    "overview": "**Creative North Star: \"The Ledger Grid\"**\n\nLedgerFlow speaks in cell addresses and selection rectangles. A white sheet with hairline rules sits on a cool grey-green canvas; the forest selection rectangle with its square fill handle marks what a receipt will change. Values arrive grey while unverified and turn ink-black once the verifier has re-read the real file. The world is a spreadsheet seen up close, not a fintech dashboard: no soft KPI cards, no big floating numbers, no gradients.\n\nDensity is close to a working spreadsheet: 46px rows, column letters and row numbers on a pale header rail, tabular numerals. Display type is a tight, heavy grotesk that sits on top of that grid; everything else is plain system UI so the data layer stays the loudest thing on screen. The landing drenches its hero and download sections in deep forest with mint accents; the product stays on the light canvas, with a full dark mode in which mint becomes the selection colour.\n\nMotion follows one grammar on every surface: select, write, verify. The rectangle glides to the target cells, values type in grey, then ink in black. Every looping sequence has a pause control, and reduced motion settles on a still, final state.",
+    "keyCharacteristics": [
+      "One device: a selection rectangle (2px forest stroke, 3px corners) with a square fill handle at its bottom-right corner.",
+      "Grey means unverified, ink means verified, and colour state follows real run state only.",
+      "Visible hairline grids, column letters, row numbers, tabular numerals.",
+      "Schibsted Grotesk for display, system UI for text, Martian Mono only for data.",
+      "Flat sheets. Shadows appear only under paper (receipts) and the lifted, selected item.",
+      "EN, FR and SV on every surface, switched by a three-code segmented control."
+    ],
+    "rules": [
+      {
+        "name": "The Grey Is A State Rule",
+        "body": "Grey (ink-faint) on a value means \"written, not yet verified\"; ink means \"verified\". The switch follows real state only. Never fake it for decoration or as a loading flourish.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Accent Rule",
+        "body": "Forest (mint on dark) is the only accent. It marks selection, the primary action and progress. Amber and red are state colours, never accents.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Is Data Rule",
+        "body": "Martian Mono sets only what would sit in a cell or a log: addresses, amounts, dates, hashes, identifiers, ordinals and language codes. Labels, buttons, captions and table headings are set in the system face. The landing's own review pass moved its captions, pause control and table heads off mono for this reason.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Eyebrow Rule",
+        "body": "No small uppercase or tracked label above a heading. A step number sits on the heading line, inline, at half size.",
+        "section": "typography"
+      },
+      {
+        "name": "The 11px Floor Rule",
+        "body": "No rendered text below 11px (11pt native). Data that needs to be small is set at 11px with tabular numerals, not shrunk further.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Casts, Sheets Don't Rule",
+        "body": "Only receipts, the selected item, the shutter and the primary action may cast a shadow. Sheets, panels and cards stay flat on hairlines.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do mark every changed range with exactly one selection rectangle and its fill handle (2px forest, 3px corners).",
+      "Do print unverified values in ink-faint and switch them to ink only when the real run state is verified.",
+      "Do set addresses, amounts, dates, hashes, identifiers, ordinals and language codes in Martian Mono with tabular numerals, and everything else in Schibsted Grotesk (headings) or the system face.",
+      "Do keep every rendered text at 11px (11pt) or above.",
+      "Do make every touch target at least 44 by 44pt on phones.",
+      "Do give every looping or auto-advancing sequence a visible pause control, and settle reduced motion on a still final state.",
+      "Do use SVG icons from the shared icon set (web) and SF Symbols (native).",
+      "Do ship EN, FR and SV for every user-facing string."
+    ],
+    "donts": [
+      "Don't add eyebrows or kickers: no small uppercase labels above headings.",
+      "Don't use unicode glyphs (arrows, check marks, bullets, stars) as icons.",
+      "Don't draw a frame per cell or stack several rectangles on one range.",
+      "Don't use mono for labels, buttons, captions or prose.",
+      "Don't build soft KPI cards or big floating metric numbers; show figures in a ledger or sheet.",
+      "Don't add a second accent colour, or use amber or red decoratively.",
+      "Don't put shadows on sheets, panels or cards.",
+      "Don't animate progress or verification that is not happening; explainer figures are labelled as sample values."
+    ]
+  }
+}

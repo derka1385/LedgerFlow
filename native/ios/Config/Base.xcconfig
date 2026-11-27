@@ -1,0 +1,5 @@
+// Set this origin for a deployed workspace. Never put an invite or API key here.
+// URL syntax in xcconfig: https:/$()/your-workspace.example
+LEDGERFLOW_ORIGIN =
+LEDGERFLOW_BUNDLE_IDENTIFIER = app.ledgerflow.ios
+DEVELOPMENT_TEAM =

@@ -1,0 +1,1474 @@
+{
+  "schema_version": "ledgerflow.mapping.v1",
+  "mapping_id": "map_sse_preparation_proposal",
+  "workbook_id": "wb_sse_source_specification",
+  "mapping_version": 1,
+  "source_sha256": "3be1ead9bff5f0ce078ba64a6aa58f71acf5d587b798f6ac9c6cdacafdf051f0",
+  "layout_sha256": "473b23eb62caf6c3480d36279a62f5ffc3dd0aa5cd7980501cef8a0d5be02d8e",
+  "inspector_version": "preparation-readonly-zipxml-2026-11-26",
+  "adapter_version": "design-t-accounts-v1",
+  "status": "proposed",
+  "currency": "SEK",
+  "money_exponent": 2,
+  "amount_unit": "major_units",
+  "date_system": "excel_1900",
+  "layout": "t_accounts",
+  "sheets": [
+    {
+      "name": "Instructions",
+      "sheet_id": "1",
+      "part": "xl/worksheets/sheet1.xml",
+      "state": "visible"
+    },
+    {
+      "name": "T-Accounts",
+      "sheet_id": "2",
+      "part": "xl/worksheets/sheet2.xml",
+      "state": "visible"
+    },
+    {
+      "name": "Chart of accounts",
+      "sheet_id": "3",
+      "part": "xl/worksheets/sheet3.xml",
+      "state": "visible"
+    }
+  ],
+  "instructions": [
+    {
+      "sheet": "Instructions",
+      "range": "A3:H11",
+      "text_sha256": "ad374f418fddf38bb4707139a0f574123e657db813954a36f7f569d494c1e39e",
+      "text": "Please note that all accounts take up four columns; two columns for the debit side and two columns for the credit side. Use the light grey column on each side for the reference to the contra entry. Use the white cells on each side for the recorded amounts. Also, use square brackets for the contra entry reference to avoid Excel transforming the information into a negative value. The cell references can either be written in, or selected using the droplist. No other information than the references can be added here. See example below:",
+      "evidence_id": "instructions_A3"
+    },
+    {
+      "sheet": "Instructions",
+      "range": "A21:H24",
+      "text_sha256": "ebed204192bd69decab5e0725b7ed51c7b03e9204a26e139d6c97717bf67b674",
+      "text": "Please  note that this spreadsheet is not locked.  Try not to change the structure of the Excel sheet. Don't forget to add your information on the assigned space!",
+      "evidence_id": "instructions_A21"
+    }
+  ],
+  "accounts": [
+    {
+      "account_id": "1110",
+      "name": "Buildings",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A7:D7",
+      "evidence_ids": [
+        "chart_1110",
+        "header_1110"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 8,
+        "last_row": 10,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A8:B10"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 8,
+        "last_row": 10,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C8:D10"
+        ]
+      }
+    },
+    {
+      "account_id": "1220",
+      "name": "Equipment and tools",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A12:D12",
+      "evidence_ids": [
+        "chart_1220",
+        "header_1220"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 13,
+        "last_row": 15,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A13:B15"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 13,
+        "last_row": 15,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C13:D15"
+        ]
+      }
+    },
+    {
+      "account_id": "1510",
+      "name": "Accounts receivable",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F7:I7",
+      "evidence_ids": [
+        "chart_1510",
+        "header_1510"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F8:G20"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H8:I20"
+        ]
+      }
+    },
+    {
+      "account_id": "1690",
+      "name": "Subscribed capital unpaid",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A17:D17",
+      "evidence_ids": [
+        "chart_1690",
+        "header_1690"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 18,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A18:B20"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 18,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C18:D20"
+        ]
+      }
+    },
+    {
+      "account_id": "1910",
+      "name": "Cash",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K7:N7",
+      "evidence_ids": [
+        "chart_1910",
+        "header_1910"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K8:L20"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M8:N20"
+        ]
+      }
+    },
+    {
+      "account_id": "1940",
+      "name": "Bank account",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P7:S7",
+      "evidence_ids": [
+        "chart_1940",
+        "header_1940"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P8:Q20"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 8,
+        "last_row": 20,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R8:S20"
+        ]
+      }
+    },
+    {
+      "account_id": "2081",
+      "name": "Share capital",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A23:D23",
+      "evidence_ids": [
+        "chart_2081",
+        "header_2081"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A24:B27"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C24:D27"
+        ]
+      }
+    },
+    {
+      "account_id": "2082",
+      "name": "Unregistered share capital",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F23:I23",
+      "evidence_ids": [
+        "chart_2082",
+        "header_2082"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F24:G27"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H24:I27"
+        ]
+      }
+    },
+    {
+      "account_id": "2091",
+      "name": "Profit/loss brought forward",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K23:N23",
+      "evidence_ids": [
+        "chart_2091",
+        "header_2091"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K24:L27"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M24:N27"
+        ]
+      }
+    },
+    {
+      "account_id": "2350",
+      "name": "Bank loans",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P23:S23",
+      "evidence_ids": [
+        "chart_2350",
+        "header_2350"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P24:Q27"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 24,
+        "last_row": 27,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R24:S27"
+        ]
+      }
+    },
+    {
+      "account_id": "2440",
+      "name": "Accounts payable",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A29:D29",
+      "evidence_ids": [
+        "chart_2440",
+        "header_2440"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A30:B45"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C30:D45"
+        ]
+      }
+    },
+    {
+      "account_id": "2610",
+      "name": "Output VAT 25%",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F29:I29",
+      "evidence_ids": [
+        "chart_2610",
+        "header_2610"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F30:G45"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H30:I45"
+        ]
+      }
+    },
+    {
+      "account_id": "2640",
+      "name": "Input VAT",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K29:N29",
+      "evidence_ids": [
+        "chart_2640",
+        "header_2640"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K30:L45"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 30,
+        "last_row": 45,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M30:N45"
+        ]
+      }
+    },
+    {
+      "account_id": "2650",
+      "name": "VAT payable",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P29:S29",
+      "evidence_ids": [
+        "chart_2650",
+        "header_2650"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 30,
+        "last_row": 34,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P30:Q34"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 30,
+        "last_row": 34,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R30:S34"
+        ]
+      }
+    },
+    {
+      "account_id": "2710",
+      "name": "Staff tax",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A47:D47",
+      "evidence_ids": [
+        "chart_2710",
+        "header_2710"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A48:B51"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C48:D51"
+        ]
+      }
+    },
+    {
+      "account_id": "2730",
+      "name": "Employer social charges",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F47:I47",
+      "evidence_ids": [
+        "chart_2730",
+        "header_2730"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F48:G51"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H48:I51"
+        ]
+      }
+    },
+    {
+      "account_id": "2898",
+      "name": "Unclaimed dividends",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K47:N47",
+      "evidence_ids": [
+        "chart_2898",
+        "header_2898"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K48:L51"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 48,
+        "last_row": 51,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M48:N51"
+        ]
+      }
+    },
+    {
+      "account_id": "3001",
+      "name": "Sales 25% VAT",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A55:D55",
+      "evidence_ids": [
+        "chart_3001",
+        "header_3001"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A56:B59"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C56:D59"
+        ]
+      }
+    },
+    {
+      "account_id": "3973",
+      "name": "Capital gains on machinery/equipment",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F54:I55",
+      "evidence_ids": [
+        "chart_3973",
+        "header_3973"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F56:G59"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H56:I59"
+        ]
+      }
+    },
+    {
+      "account_id": "4010",
+      "name": "Purchases of goods",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K55:N55",
+      "evidence_ids": [
+        "chart_4010",
+        "header_4010"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K56:L59"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M56:N59"
+        ]
+      }
+    },
+    {
+      "account_id": "5010",
+      "name": "Rent for premises",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P55:S55",
+      "evidence_ids": [
+        "chart_5010",
+        "header_5010"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P56:Q59"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 56,
+        "last_row": 59,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R56:S59"
+        ]
+      }
+    },
+    {
+      "account_id": "5170",
+      "name": "Repairs and maintenance on own property",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A61:D62",
+      "evidence_ids": [
+        "chart_5170",
+        "header_5170"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A63:B66"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C63:D66"
+        ]
+      }
+    },
+    {
+      "account_id": "5420",
+      "name": "Software",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F62:I62",
+      "evidence_ids": [
+        "chart_5420",
+        "header_5420"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F63:G66"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H63:I66"
+        ]
+      }
+    },
+    {
+      "account_id": "6110",
+      "name": "Office supplies",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K62:N62",
+      "evidence_ids": [
+        "chart_6110",
+        "header_6110"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K63:L66"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M63:N66"
+        ]
+      }
+    },
+    {
+      "account_id": "6210",
+      "name": "Telecommunications",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P62:S62",
+      "evidence_ids": [
+        "chart_6210",
+        "header_6210"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P63:Q66"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 63,
+        "last_row": 66,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R63:S66"
+        ]
+      }
+    },
+    {
+      "account_id": "6540",
+      "name": "IT services",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A68:D68",
+      "evidence_ids": [
+        "chart_6540",
+        "header_6540"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A69:B72"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C69:D72"
+        ]
+      }
+    },
+    {
+      "account_id": "6570",
+      "name": "Banking costs",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F68:I68",
+      "evidence_ids": [
+        "chart_6570",
+        "header_6570"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F69:G72"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H69:I72"
+        ]
+      }
+    },
+    {
+      "account_id": "6810",
+      "name": "Travel tickets",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K68:N68",
+      "evidence_ids": [
+        "chart_6810",
+        "header_6810"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K69:L72"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M69:N72"
+        ]
+      }
+    },
+    {
+      "account_id": "7210",
+      "name": "Salaries to employees",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "P68:S68",
+      "evidence_ids": [
+        "chart_7210",
+        "header_7210"
+      ],
+      "debit": {
+        "reference_column": "P",
+        "amount_column": "Q",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "P69:Q72"
+        ]
+      },
+      "credit": {
+        "reference_column": "R",
+        "amount_column": "S",
+        "first_row": 69,
+        "last_row": 72,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "R69:S72"
+        ]
+      }
+    },
+    {
+      "account_id": "7510",
+      "name": "Employer social charges",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "A75:D75",
+      "evidence_ids": [
+        "chart_7510",
+        "header_7510"
+      ],
+      "debit": {
+        "reference_column": "A",
+        "amount_column": "B",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "A76:B79"
+        ]
+      },
+      "credit": {
+        "reference_column": "C",
+        "amount_column": "D",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "C76:D79"
+        ]
+      }
+    },
+    {
+      "account_id": "8310",
+      "name": "Interest income from current assets",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "F74:I75",
+      "evidence_ids": [
+        "chart_8310",
+        "header_8310"
+      ],
+      "debit": {
+        "reference_column": "F",
+        "amount_column": "G",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "F76:G79"
+        ]
+      },
+      "credit": {
+        "reference_column": "H",
+        "amount_column": "I",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "H76:I79"
+        ]
+      }
+    },
+    {
+      "account_id": "8410",
+      "name": "Interest expenses",
+      "role": "unclassified",
+      "sheet": "T-Accounts",
+      "header_range": "K75:N75",
+      "evidence_ids": [
+        "chart_8410",
+        "header_8410"
+      ],
+      "debit": {
+        "reference_column": "K",
+        "amount_column": "L",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "K76:L79"
+        ]
+      },
+      "credit": {
+        "reference_column": "M",
+        "amount_column": "N",
+        "first_row": 76,
+        "last_row": 79,
+        "reference_format": "bracketed_account_id",
+        "candidate_ranges": [
+          "M76:N79"
+        ]
+      }
+    }
+  ],
+  "journal": null,
+  "forbidden_regions": [
+    {
+      "sheet": "Instructions",
+      "range": "A1:H24",
+      "reason": "instructions and illustrative example"
+    },
+    {
+      "sheet": "Chart of accounts",
+      "range": "A1:B33",
+      "reason": "chart of accounts"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A1:AA5",
+      "reason": "student identity and annotations"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A7:D7",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A8:B8",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A12:D12",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A13:B13",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F7:I7",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F8:G8",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A17:D17",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K7:N7",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K8:L8",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P7:S7",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P8:Q8",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A23:D23",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "C24:D24",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F23:I23",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K23:N23",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "M24:N24",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P23:S23",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "R24:S24",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A29:D29",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "C30:D30",
+      "reason": "opening balance"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F29:I29",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K29:N29",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P29:S29",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A47:D47",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F47:I47",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K47:N47",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A55:D55",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F54:I55",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K55:N55",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P55:S55",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A61:D62",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F62:I62",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K62:N62",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P62:S62",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A68:D68",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F68:I68",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K68:N68",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "P68:S68",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "A75:D75",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "F74:I75",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "K75:N75",
+      "reason": "account header"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "W22",
+      "reason": "existing formula"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "X22",
+      "reason": "existing formula"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "W24",
+      "reason": "existing formula"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "G30",
+      "reason": "existing formula"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "N30",
+      "reason": "existing formula"
+    },
+    {
+      "sheet": "T-Accounts",
+      "range": "S30",
+      "reason": "existing formula"
+    }
+  ],
+  "formulas": [
+    {
+      "sheet": "T-Accounts",
+      "cell": "W22",
+      "formula": "SUM(B8:B10)+SUM(G8:G12)+SUM(B13)+SUM(L8:L11)+SUM(Q8:Q10)+SUM(B30)+SUM(B63)+B69+G63+G30+L69+L63+Q56+Q63+SUM(L56:L57)+SUM(L30:L37)+SUM(Q30:Q31)",
+      "cached_value": "1632399",
+      "role": "display_check",
+      "precedent_ranges": [
+        "B8:B10",
+        "G8:G12",
+        "B13",
+        "L8:L11",
+        "Q8:Q10",
+        "B30",
+        "B63",
+        "B69",
+        "G63",
+        "G30",
+        "L69",
+        "L63",
+        "Q56",
+        "Q63",
+        "L56:L57",
+        "L30:L37",
+        "Q30:Q31"
+      ],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "X22",
+      "formula": "SUM(D30:D39)+D24+SUM(D56:D58)+I8+SUM(I30:I32)+SUM(N8:N16)+N24+N30+S24+S30+SUM(S8:S9)",
+      "cached_value": "1632399",
+      "role": "display_check",
+      "precedent_ranges": [
+        "D30:D39",
+        "D24",
+        "D56:D58",
+        "I8",
+        "I30:I32",
+        "N8:N16",
+        "N24",
+        "N30",
+        "S24",
+        "S30",
+        "S8:S9"
+      ],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "W24",
+      "formula": "W22-X22",
+      "cached_value": "0",
+      "role": "display_check",
+      "precedent_ranges": [
+        "W22",
+        "X22"
+      ],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "G30",
+      "formula": "SUM(I30:I32)",
+      "cached_value": "28250",
+      "role": "historical_posting",
+      "precedent_ranges": [
+        "I30:I32"
+      ],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "N30",
+      "formula": "SUM(L30:L37)",
+      "cached_value": "18749",
+      "role": "historical_posting",
+      "precedent_ranges": [
+        "L30:L37"
+      ],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "S30",
+      "formula": "28250",
+      "cached_value": "28250",
+      "role": "historical_posting",
+      "precedent_ranges": [],
+      "evaluation_status": "independently_reconciled_supported_expression"
+    }
+  ],
+  "opening_balances": [
+    {
+      "account_id": "1110",
+      "side": "debit",
+      "reference_cell": "A8",
+      "amount_cell": "B8",
+      "amount_minor": 36000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "1220",
+      "side": "debit",
+      "reference_cell": "A13",
+      "amount_cell": "B13",
+      "amount_minor": 53000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "1510",
+      "side": "debit",
+      "reference_cell": "F8",
+      "amount_cell": "G8",
+      "amount_minor": 8500000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "1910",
+      "side": "debit",
+      "reference_cell": "K8",
+      "amount_cell": "L8",
+      "amount_minor": 5000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "1940",
+      "side": "debit",
+      "reference_cell": "P8",
+      "amount_cell": "Q8",
+      "amount_minor": 19500000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "2081",
+      "side": "credit",
+      "reference_cell": "C24",
+      "amount_cell": "D24",
+      "amount_minor": 40000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "2091",
+      "side": "credit",
+      "reference_cell": "M24",
+      "amount_cell": "N24",
+      "amount_minor": 23000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "2350",
+      "side": "credit",
+      "reference_cell": "R24",
+      "amount_cell": "S24",
+      "amount_minor": 57000000,
+      "sheet": "T-Accounts"
+    },
+    {
+      "account_id": "2440",
+      "side": "credit",
+      "reference_cell": "C30",
+      "amount_cell": "D30",
+      "amount_minor": 2000000,
+      "sheet": "T-Accounts"
+    }
+  ],
+  "feature_manifest_sha256": "46594028103e0e4e13fd063fd9989d9359ef84511b3fd74987d01482c382f030",
+  "preservation_policy": "ooxml_cell_spans_v1",
+  "policy_version": null,
+  "baseline_report_sha256": "bccd07000ace307d105fa0d9294da1c03c5a228163035caf676522b0685b9c97",
+  "baseline_acknowledgement": null,
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "mapping_sha256": "573143fa421dd055f045839515ee9489d327cd3cad4565e03d66a0dd35a2f69a"
+}

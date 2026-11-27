@@ -1,0 +1,51 @@
+{
+  "schema_version": "ledgerflow.preparation_baseline.v1",
+  "source_sha256": "3be1ead9bff5f0ce078ba64a6aa58f71acf5d587b798f6ac9c6cdacafdf051f0",
+  "method": "Read-only direct ZIP/XML inspection and independent evaluation of the six supported formulas; not native Excel recalculation.",
+  "debits_minor": 190846500,
+  "credits_minor": 182048900,
+  "difference_minor": 8797600,
+  "opening_debits_minor": 122000000,
+  "opening_credits_minor": 122000000,
+  "formula_results": [
+    {
+      "sheet": "T-Accounts",
+      "cell": "W22",
+      "computed_major": "1632399",
+      "cached_major": "1632399"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "X22",
+      "computed_major": "1632399",
+      "cached_major": "1632399"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "W24",
+      "computed_major": "0",
+      "cached_major": "0"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "G30",
+      "computed_major": "28250",
+      "cached_major": "28250"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "N30",
+      "computed_major": "18749",
+      "cached_major": "18749"
+    },
+    {
+      "sheet": "T-Accounts",
+      "cell": "S30",
+      "computed_major": "28250",
+      "cached_major": "28250"
+    }
+  ],
+  "evaluation_status": "complete_supported",
+  "acknowledgement_required": true,
+  "acknowledgement_sha256": null
+}

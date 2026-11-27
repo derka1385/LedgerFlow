@@ -1,0 +1,65 @@
+// Finish a previously captured synthetic receipt when its real sandbox run is already verified.
+// Refuses production backends and any document other than the repository's synthetic E1 image.
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright';
+const runId = process.env.LEDGERFLOW_APPROVE_EXISTING_RUN;
+assert(runId && /^run_[a-zA-Z0-9_-]+$/.test(runId), 'Set the exact synthetic run ID');
+const base = process.env.LEDGERFLOW_TEST_URL || 'http://127.0.0.1:5174';
+assert(['localhost', '127.0.0.1'].includes(new URL(base).hostname), 'This synthetic test only runs on loopback');
+const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const out = path.join(repo, 'artifacts/apple-platform'); await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ channel: 'chrome', headless: true });
+try {
+  const desktop = await browser.newContext({ viewport: { width: 1512, height: 982 } });
+  const page = await desktop.newPage();
+  await page.goto(base);
+  await page.getByLabel('Invite code').fill('owner-demo');
+  const login = page.waitForResponse(r => r.url().endsWith('/api/v1/auth/session') && r.request().method() === 'POST');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  assert.equal((await (await login).json()).backend, 'DEV-MOCK');
+  const get = url => page.evaluate(async path => (await fetch(`/api/v1${path}`)).json(), url);
+  const snapshot = await get(`/runs/${runId}`);
+  assert.equal(snapshot.state, 'AWAITING_APPROVAL');
+  const document = await get(`/documents/${snapshot.document_id}`);
+  const fixtureHash = createHash('sha256').update(await readFile(path.join(repo, 'fixtures/synthetic/receipts/E1.png'))).digest('hex');
+  assert.equal(document.sha256, fixtureHash, 'Only synthetic E1 can be approved');
+  const diff = await get(`/runs/${runId}/diff`);
+  assert.equal(diff.validation.result, 'pass');
+  assert(diff.validation.checks.filter(c => c.status === 'pass').length >= 12);
+  console.log('PASS synthetic receipt has passed independent verification');
+  await page.goto(`${base}/#/transactions/${runId}`);
+  await page.getByRole('button', { name: /^Approve and write \d+ cells$/ }).click();
+  await page.getByRole('region', { name: 'Committed', exact: true }).waitFor();
+  const downloadEvent = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download .xlsx', exact: true }).click();
+  const download = await downloadEvent;
+  const file = path.join(out, 'verified-synthetic-workbook.xlsx'); await download.saveAs(file);
+  const committed = await get(`/runs/${runId}`);
+  assert.equal(committed.state, 'COMMITTED');
+  const bytes = await readFile(file);
+  assert.equal(bytes.subarray(0, 2).toString(), 'PK');
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), committed.commit.artifact_sha256);
+  console.log('PASS hash-bound approval commits and downloads the exact verified XLSX');
+  await page.screenshot({ path: path.join(out, 'macos-committed.png'), fullPage: true });
+  const mobile = await browser.newContext({ viewport: { width: 393, height: 852 }, isMobile: true, hasTouch: true });
+  const phone = await mobile.newPage(); await phone.goto(base);
+  await phone.getByLabel('Invite code').fill('employee-demo');
+  await phone.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await phone.goto(`${base}/#/expenses/${runId}`);
+  await phone.getByText('Booked', { exact: true }).waitFor();
+  console.log('PASS employee sees the same receipt as Booked');
+  await page.goto(`${base}/#/versions`);
+  await page.getByRole('heading', { name: 'Workbook versions', exact: true }).waitFor();
+  // The run's own commit carries the exact version ID even when multiple workbooks exist.
+  const versions = await get(`/workbooks/${snapshot.workbook_id}/versions`);
+  assert(versions.items.some(v => v.version_id === committed.commit.version_id));
+  assert(versions.items.some(v => v.source === 'upload'));
+  console.log('PASS original and committed workbook versions both remain available');
+  const report = { status: 'passed', checks: 4, run_id: runId, document_sha256: document.sha256, artifact_sha256: committed.commit.artifact_sha256, version_id: committed.commit.version_id, validation_checks: diff.validation.checks, inference: snapshot.mock_labels, runtime: 'Real isolated Docker (backend verification records)', file };
+  await writeFile(path.join(out, 'approval-test-results.json'), JSON.stringify(report, null, 2));
+  console.log(JSON.stringify({ status: 'passed', run_id: runId, version_id: committed.commit.version_id, file }, null, 2));
+} finally { await browser.close(); }

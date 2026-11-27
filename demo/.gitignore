@@ -1,0 +1,6 @@
+# demo assets are fictional and must be versioned (the root .gitignore excludes *.xlsx and *.png)
+!*.xlsx
+!*.png
+!*.pdf
+.run/
+out/

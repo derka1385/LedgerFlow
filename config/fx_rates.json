@@ -1,0 +1,19 @@
+{
+  "source": "Sveriges Riksbank, mid rates (SWEA group 130)",
+  "as_of": "2026-11-27",
+  "sek_per_unit": {
+    "SEK": 1.0,
+    "AUD": 6.82125,
+    "CAD": 7.18093,
+    "CHF": 12.23982,
+    "CNY": 1.5372,
+    "CZK": 0.45869,
+    "DKK": 1.49966,
+    "EUR": 11.208,
+    "GBP": 13.42211,
+    "NOK": 1.04895,
+    "NZD": 5.6068,
+    "PLN": 2.50862,
+    "USD": 10.22908
+  }
+}

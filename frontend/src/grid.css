@@ -308,3 +308,17 @@ a.live-sheet-row:hover { background: color-mix(in srgb, var(--accent-wash) 55%, 
   .code-card code { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 .sandbox-box { min-height: max-content; flex-shrink: 0; }
+
+/* Mac first-launch staged loading */
+.setup-progress { display: grid; gap: 18px; width: min(420px, 100%); }
+.setup-bar { height: 4px; border-radius: 4px; background: var(--grid); overflow: hidden; }
+.setup-bar i { display: block; height: 100%; background: var(--accent); transition: width .55s var(--ease-out); }
+.setup-progress ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.setup-progress li { display: flex; gap: 10px; align-items: center; color: var(--ink-faint); font-size: 14px; transition: color .3s ease; }
+.setup-progress li span { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--grid-strong); display: grid; place-items: center; flex: none; }
+.setup-progress li.now { color: var(--ink); }
+.setup-progress li.now span { border-color: var(--accent); animation: lf-pulse 1s ease-in-out infinite; }
+.setup-progress li.done { color: var(--ink); }
+.setup-progress li.done span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
+.setup-progress li.done span svg { width: 13px; height: 13px; }
+@media (prefers-reduced-motion: reduce) { .setup-progress li.now span { animation: none; } .setup-bar i { transition: none; } }

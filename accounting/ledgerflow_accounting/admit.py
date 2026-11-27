@@ -10,6 +10,8 @@ listed in REVIEW_CODES and in FRONTEND_HANDOFF.md.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from datetime import date
 
 REVIEW_CODES = {
@@ -58,6 +60,9 @@ def admit(txn: dict, policy: dict | None = None, today: str | None = None) -> di
     p = {**DEFAULT_POLICY, **(policy or {})}
     review: list[dict] = []
     advisories: list[str] = []
+    txn, fx_note = _to_home_currency(txn, p)
+    if fx_note:
+        advisories.append(fx_note)
 
     for f in txn.get("unresolved_fields", []):
         code = ("PAYMENT_CONTEXT_REQUIRED" if f.startswith("payment") else
@@ -252,3 +257,29 @@ def _valid_iso(d: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+_FX_PATH = Path(__file__).resolve().parents[2] / "config" / "fx_rates.json"
+
+
+def _to_home_currency(txn: dict, p: dict) -> tuple[dict, str | None]:
+    """A receipt paid in EUR/USD/GBP… is converted to SEK at the Riksbank mid rate in config/fx_rates.json.
+    Foreign VAT is not deductible in the Swedish VAT return, so the whole converted amount becomes cost.
+    Unknown currencies are left as they are and still go to review (CURRENCY_UNSUPPORTED)."""
+    cur = txn.get("currency")
+    if not cur or cur == p["currency"] or not _FX_PATH.exists():
+        return txn, None
+    table = json.loads(_FX_PATH.read_text())
+    rate = table.get("sek_per_unit", {}).get(cur)
+    gross = txn.get("gross_minor")
+    if rate is None or gross is None:
+        return txn, None
+    sek = round(gross * rate)
+    out = {**txn, "currency": p["currency"], "gross_minor": sek, "net_minor": sek, "tax_minor": 0, "tax_lines": [],
+           "tax_treatment": "tax_free", "fx": {"currency": cur, "original_gross_minor": gross, "sek_per_unit": rate,
+                                                "rate_date": table.get("as_of"), "source": table.get("source")}}
+    out["unresolved_fields"] = [f for f in txn.get("unresolved_fields", []) if not f.startswith("tax")]
+    note = (f"Paid in {cur}: {gross / 100:,.2f} {cur} × {rate:g} SEK (Riksbank mid rate {table.get('as_of')}) = SEK {sek / 100:,.2f}. "
+            "Foreign VAT is not deductible in Sweden, so the full amount is booked as cost. "
+            "If your card or bank statement shows a different SEK amount, use that one.")
+    return out, note

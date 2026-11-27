@@ -121,7 +121,7 @@ def test_inconsistent_totals_go_to_review():
 
 
 @pytest.mark.parametrize("change,code", [
-    ({"currency": "EUR"}, "CURRENCY_UNSUPPORTED"),
+    ({"currency": "XYZ"}, "CURRENCY_UNSUPPORTED"),
     ({"document_date": "2025-06-01"}, "PERIOD_CLOSED"),
     ({"supplier_org_no": None}, "TAX_REVIEW_REQUIRED"),
     ({"category_account_id": "3001"}, "ACCOUNT_REVIEW_REQUIRED"),
@@ -261,3 +261,19 @@ def test_above_4000_sek_warns_about_full_invoice_fields():
     assert res["admitted"] and any("Above SEK 4,000" in a for a in res["advisories"])
     small = admit(copy.deepcopy(CASES["E1"]["transaction"]))  # 1,250 SEK
     assert not any("Above SEK 4,000" in a for a in small["advisories"])
+
+
+def test_foreign_currency_converted_to_sek_without_vat():
+    import json
+    from pathlib import Path
+    from ledgerflow_accounting.admit import _to_home_currency, _FX_PATH
+    rate = json.loads(Path(_FX_PATH).read_text())["sek_per_unit"]["EUR"]
+    out, note = _to_home_currency({"currency": "EUR", "gross_minor": 2350, "net_minor": 1880, "tax_minor": 470,
+                                   "tax_lines": [{"rate_bp": 2500}], "tax_treatment": "configured_deductible"}, {"currency": "SEK"})
+    assert out["currency"] == "SEK" and out["gross_minor"] == round(2350 * rate) == out["net_minor"]
+    assert out["tax_minor"] == 0 and out["tax_treatment"] == "tax_free" and out["fx"]["currency"] == "EUR"
+    assert "EUR" in note and "not deductible" in note
+    same, none = _to_home_currency({"currency": "SEK", "gross_minor": 100}, {"currency": "SEK"})
+    assert none is None and same["gross_minor"] == 100
+    unknown, none = _to_home_currency({"currency": "XYZ", "gross_minor": 100}, {"currency": "SEK"})
+    assert none is None and unknown["currency"] == "XYZ"

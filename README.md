@@ -3,16 +3,16 @@
 **Snap the receipt. It's in your Excel.**
 An accounting agent for small businesses: photograph a receipt and LedgerFlow books it in the Excel workbook you already use, after you approve.
 
-### 🧪 Jury: [try the live web app — no account](https://70.34.203.216.sslip.io/welcome/)
+### [Try Live Application](https://70.34.203.216.sslip.io/?demo=owner)
 
 Opens the real LedgerFlow app with a shared demo workspace (fictional data): connect the sample workbook, send a sample receipt, ask the agent, approve, download the modified `.xlsx`. Works in any browser (Windows, Android, Mac). If a receipt was already sent by someone else, LedgerFlow flags it as a possible duplicate: choose **Different purchase: continue**.
 
-### 👉 [Open the landing page](https://derka1385.github.io/LedgerFlow/) · [Watch the demo film](https://derka1385.github.io/LedgerFlow/landing/#film) · [Download the demo video (MP4)](landing/assets/demo-film.mp4)
+### 👉 [Open the landing page](https://derka1385.github.io/LedgerFlow/) · [Watch Demo Film](https://derka1385.github.io/LedgerFlow/landing/#film) · [Download the demo video (MP4)](landing/assets/demo-film.mp4)
 
 | | |
 |---|---|
 | **Landing page** | https://derka1385.github.io/LedgerFlow/ |
-| **Demo film** | 4 min, real Mac + iPhone recordings, live Vultr inference and a real sandbox containment test |
+| **Demo film** | Recorded Mac and iPhone workflow with execution on the development Mac and model calls to Vultr |
 | **Status** | Beta, built for the Vultr Agent Runtime Hackathon (Stockholm, 27 Nov 2026) |
 | **Apps** | Mac app (local engine) · web agent · iPhone app (optional, pairs with the Mac over local Wi-Fi) |
 
@@ -24,9 +24,13 @@ Opens the real LedgerFlow app with a shared demo workspace (fictional data): con
 4. **A sealed box writes.** Generated Python edits the workbook inside a disposable Docker sandbox (no network, no keys, read-only input, 1 CPU, 512 MB), then the container is destroyed.
 5. **You approve.** An independent verifier re-opens the real file (21 checks); your approval is bound to that file's sha256. The previous version is kept.
 
-Measured on a synthetic benchmark (27 Nov 2026): 22/22 receipts booked right live on Vultr, 13/13 sandbox escape probes contained, 16/16 tampered workbooks rejected, about USD 0.004 of inference per receipt. Details: [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md), [film/VERIFICATION_REPORT.md](film/VERIFICATION_REPORT.md).
+Measured on a synthetic benchmark (27 Nov 2026): 22/22 receipts booked correctly using live Vultr Serverless Inference, 13/13 containment probes passed in local Docker, 16/16 tampered workbooks rejected, about USD 0.004 of inference per receipt. Details: [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md), [film/VERIFICATION_REPORT.md](film/VERIFICATION_REPORT.md).
 
-The public web demo runs on Vultr Cloud Compute in Stockholm with Docker and gVisor, and uses Vultr Serverless Inference. Both the desktop and Android browser-emulation walkthroughs passed. The film was recorded earlier on the development Mac. See [deployment evidence](demo/vultr_evidence/) for the cloud results.
+The recorded workflow runs the workspace and Docker sandbox on the development Mac. The live web app runs the API and its Docker/gVisor sandbox on Vultr Cloud Compute in Stockholm. Both use Vultr Serverless Inference for model calls.
+
+Existing cloud deployment evidence: [HTTPS response](demo/vultr_evidence/https.txt), [VM and runtime](demo/vultr_evidence/host.txt), [on-VM containment probe](demo/vultr_evidence/containment.txt), [desktop walkthrough](demo/vultr_evidence/jury-desktop.txt), and [Android browser-emulation walkthrough](demo/vultr_evidence/jury-android.txt).
+
+**Post-submission documentation note:** These clarifications explain the recorded workflow and the existing public deployment. They introduce no new functionality.
 
 ## Run it locally
 
@@ -81,7 +85,7 @@ A concrete [proposed mapping](docs/sse-mapping.proposed.json) and [observed base
 - API database: `DATABASE_URL` (PostgreSQL). Database tests need `LEDGERFLOW_TEST_DATABASE_URL` pointing at a disposable PostgreSQL database; without it they skip.
 - Frontend (`frontend/`): `npm ci`, then `npm test`, `npm run build`, `npm run test:browser`, `npm run test:pwa`, `npm run package:web`, `npm run icons`.
 
-## Current evidence status
+## Pre-event evidence snapshot
 
 | Claim | Status |
 |---|---|

@@ -12,7 +12,7 @@ export default function MacSignIn({ onSignedIn }: { onSignedIn: (s: Session) => 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   return <main className="mac-setup mac-setup-first mac-signin-page">
-    <section className="mac-setup-art"><MacWaves/><div><MacReceipt/><Wordmark/></div></section>
+    <section className="mac-setup-art"><div className="lf-clouds" aria-hidden="true"><i/><i/><i/><i/><i/></div><MacWaves/><div><MacReceipt/><Wordmark/></div></section>
     <form className="mac-setup-form mac-signin-form" onSubmit={async e => {
       e.preventDefault(); if (busy) return;
       setBusy(true); setError(null);

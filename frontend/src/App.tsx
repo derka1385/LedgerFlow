@@ -175,7 +175,7 @@ export default function App() {
   };
   const setAppearance = (value: Appearance) => { updateAppearance(value); try { localStorage.setItem("ledgerflow.appearance", value); } catch { /* preference still applies */ } };
   // The Mac opens on its own sign-in screen (accounts), not an automatic session.
-  if (page === "bootstrap") return session ? null : <MacSignIn onSignedIn={signedIn} />;
+  if (page === "bootstrap") return session ? null : <IntroThenSignIn onSignedIn={signedIn} />;
   if (["bootstrap", "associate"].includes(page) && route[1]) return <NativeConnectionGate token={route[1]} bootstrap={page === "bootstrap"} onSignedIn={signedIn} />;
   if (page === "pair" && route[1]) return <PairingGate token={route[1]} onSignedIn={signedIn} />;
   if (authError && session === undefined) return <main className="narrow stack-lg"><BrandMark size={48} /><h1>Connect to your workspace.</h1><ErrorNote error={authError} /><button className="btn" onClick={loadSession}>Try again</button></main>;
@@ -227,4 +227,13 @@ export default function App() {
     {!finance ? <nav className="employee-tabs" aria-label="Main">{nav.map(([p, , icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon} /><span>{t(`nav.${p}`)}</span></a>)}</nav> : session.backend === "LOCAL" && !mac ? <nav className="mobile-finance-tabs" aria-label="iPhone">{PHONE_OWNER_NAV.map(([p, key, icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon}/><span>{t(key)}</span></a>)}</nav> : null}
     {scan ? <ScanWithPhone session={session} onClose={() => setScan(false)} /> : null}
   </div>;
+}
+
+
+/** Mac launch: the brand intro (waves, receipt, wordmark) plays, then hands over to the sign-in screen. */
+function IntroThenSignIn({ onSignedIn }: { onSignedIn: (s: Session) => void }) {
+  const [phase, setPhase] = useState<"holding" | "leaving" | "signin">(() => matchMedia("(prefers-reduced-motion: reduce)").matches ? "signin" : "holding");
+  if (phase === "signin") return <MacSignIn onSignedIn={onSignedIn} />;
+  return <MacIntro leaving={phase === "leaving"} waiting={false}
+    onHoldEnd={() => setPhase("leaving")} onSkip={() => setPhase("signin")} onExit={() => setPhase("signin")} />;
 }

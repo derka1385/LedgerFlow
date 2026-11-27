@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BrandMark, Wordmark } from "./Brand";
+import { Wordmark } from "./Brand";
+import { MacReceipt, MacWaves } from "./MacWorkspace";
 import { adoptSession, req } from "./lib/api";
 import type { Session } from "./lib/types";
 import { ErrorNote, Icon } from "./ui";
@@ -10,8 +11,9 @@ export default function MacSignIn({ onSignedIn }: { onSignedIn: (s: Session) => 
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  return <main className="mac-signin">
-    <form className="mac-signin-card stack" onSubmit={async e => {
+  return <main className="mac-setup mac-setup-first mac-signin-page">
+    <section className="mac-setup-art"><MacWaves/><div><MacReceipt/><Wordmark/></div></section>
+    <form className="mac-setup-form mac-signin-form" onSubmit={async e => {
       e.preventDefault(); if (busy) return;
       setBusy(true); setError(null);
       const started = performance.now();
@@ -22,17 +24,17 @@ export default function MacSignIn({ onSignedIn }: { onSignedIn: (s: Session) => 
         adoptSession(s); onSignedIn(s); location.replace("#/agent");
       } catch (err) { setError(err); setBusy(false); }
     }}>
-      <BrandMark size={52}/>
-      <Wordmark/>
-      <h1>{busy ? "Opening your workspace…" : "Sign in"}</h1>
+      <div className="mac-setup-heading">
+        <h1>{busy ? "Opening your workspace…" : "Welcome back"}</h1>
+        <p className="muted">{busy ? "Loading your workbooks, receipts and agent." : "Sign in to your LedgerFlow account on this Mac."}</p>
+      </div>
       {busy ? <div className="setup-bar signin-bar" role="status" aria-label="Signing in"><i/></div> : <>
-        <p className="muted">Use your LedgerFlow account on this Mac.</p>
-        <label htmlFor="mac-email">Email</label>
-        <input id="mac-email" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required autoFocus/>
-        <label htmlFor="mac-password">Password</label>
-        <input id="mac-password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required/>
-        <ErrorNote error={error}/>
-        <button className="btn primary" disabled={!email || !password}>Sign in<Icon name="arrow"/></button>
+        <div className="mac-setup-name"><label htmlFor="mac-email">Email</label>
+          <input id="mac-email" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required autoFocus/></div>
+        <div className="mac-setup-name"><label htmlFor="mac-password">Password</label>
+          <input id="mac-password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required/></div>
+        <div className="mac-setup-actions"><ErrorNote error={error}/>
+          <button className="btn primary" disabled={!email || !password}>Sign in<Icon name="arrow"/></button></div>
       </>}
     </form>
   </main>;

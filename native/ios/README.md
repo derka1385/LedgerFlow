@@ -9,7 +9,16 @@ Open `LedgerFlow.xcodeproj` in Xcode and run the LedgerFlow scheme on an iPhone.
 3. Use **Workbooks** to see linked Excel files and share the latest version. Use **Scan** to capture a document or import a photo, then choose a workbook or assign it later in **History**. Each scanned page is queued as a separate receipt.
 4. Use **Agent** to ask about the connected workspace. The Mac’s existing model setup and permissions apply to the conversation.
 
-**Create an account or sign in** offers a local iPhone profile for scanning before pairing, and invitation sign-in for an existing HTTPS workspace. If you previously paired with an older LedgerFlow build, scan a new code to establish the native session. The previous address can serve as a sign-in hint.
+## Orvect account
+
+**Create an account or sign in** uses Orvect’s Firebase Authentication project for email sign-in, signup, verification and password reset. The phone reads the account profile directly from Firebase and stores the refresh token in the iOS Keychain. The password is never saved in LedgerFlow. The Mac QR grants access to its LedgerFlow workspace. Offline capture and invited HTTPS workspaces remain available from the same sheet.
+
+To enable **Continue with Google**, register the LedgerFlow iOS bundle in Orvect’s Firebase project and obtain its public iOS client ID and reversed URL scheme. Add those values to the ignored local file `Config/Orvect.local.xcconfig`, then rebuild. Use `CLIENT_ID` and `REVERSED_CLIENT_ID` from the LedgerFlow iOS configuration.
+
+```xcconfig
+LEDGERFLOW_GOOGLE_CLIENT_ID = <CLIENT_ID>
+LEDGERFLOW_GOOGLE_CALLBACK_SCHEME = <REVERSED_CLIENT_ID>
+```
 
 ## Review alerts
 

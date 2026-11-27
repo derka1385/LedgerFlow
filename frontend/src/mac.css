@@ -193,3 +193,24 @@
 .expense-insights { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 .expense-pace p { margin: 0; }
 @media (max-width: 850px) { .expense-insights { grid-template-columns: 1fr; } }
+
+.google-signin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  min-height: 40px;
+  padding: 8px 12px;
+  color: #1f1f1f;
+  background: #fff;
+  border: 1px solid #747775;
+  border-radius: 6px;
+  font: 500 14px/20px "Google Sans", system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+.google-signin-button:hover { background: #f4f8ff; }
+.google-signin-button:disabled { opacity: .55; cursor: default; }
+.google-signin-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.google-signin-button img { object-fit: contain; flex: none; }

@@ -216,7 +216,16 @@ struct PairingSheet: View {
 }
 
 struct AccountSheet: View {
+    private enum Mode: String, CaseIterable, Identifiable {
+        case signIn = "Sign in", signUp = "Create account"
+        var id: Self { self }
+    }
+
     let workspace: MobileWorkspace
+    let orvect: OrvectAccount
+    @State private var mode = Mode.signIn
+    @State private var email = ""
+    @State private var password = ""
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var address = ""
@@ -228,10 +237,50 @@ struct AccountSheet: View {
                 if workspace.connection != nil {
                     Section("Connected workspace") {
                         ConnectionBadge(workspace: workspace)
-                        Button("Sign out", role: .destructive) { Task { await workspace.signOut(); dismiss() } }
+                        Button("Disconnect workspace", role: .destructive) { Task { await workspace.signOut(); dismiss() } }
                     }
                 }
-                Section("Start on this iPhone") {
+                Section("Orvect account") {
+                    if let account = orvect.identity {
+                        LabeledContent("Email", value: account.email)
+                        if let displayName = account.displayName, !displayName.isEmpty { LabeledContent("Name", value: displayName) }
+                        Button("Sign out of Orvect", role: .destructive) { orvect.signOut() }
+                    } else {
+                        Text("Use the same account as Orvect. Pair your Mac to access its LedgerFlow workspace.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                        Button {
+                            Task { await orvect.signInWithGoogle() }
+                        } label: { Label("Continue with Google", systemImage: "person.crop.circle.badge.checkmark") }
+                        .disabled(orvect.busy || !orvect.googleAvailable)
+                        if !orvect.googleAvailable {
+                            Text("Google sign-in is unavailable in this build. You can use your Orvect email instead.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        Picker("Account action", selection: $mode) {
+                            ForEach(Mode.allCases) { option in Text(option.rawValue).tag(option) }
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: mode) { password = ""; orvect.notice = nil }
+                        TextField("Email", text: $email).textContentType(.username).keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled()
+                        SecureField("Password", text: $password).textContentType(mode == .signIn ? .password : .newPassword)
+                        Button(mode.rawValue) {
+                            let address = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                            Task {
+                                if mode == .signIn { await orvect.signIn(email: address, password: password) }
+                                else { await orvect.createAccount(email: address, password: password) }
+                                password = ""
+                            }
+                        }.disabled(orvect.busy || !email.contains("@") || password.isEmpty)
+                        if mode == .signIn {
+                            Button("Reset password") { Task { await orvect.resetPassword(email: email.trimmingCharacters(in: .whitespacesAndNewlines)) } }
+                                .disabled(orvect.busy || !email.contains("@"))
+                        }
+                        if orvect.busy { ProgressView("Connecting to Orvect…") }
+                        if let notice = orvect.notice { Text(notice).font(.footnote).accessibilityAddTraits(.updatesFrequently) }
+                    }
+                }
+                Section("Use LedgerFlow offline") {
                     Text("Create a local profile to scan and keep receipts until you connect a workspace.")
                         .font(.subheadline).foregroundStyle(.secondary)
                     TextField("Your name", text: $name).textContentType(.name)
@@ -258,6 +307,7 @@ struct AccountSheet: View {
             .navigationTitle("Your account")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }
             .onAppear { address = workspace.legacyOrigin ?? "" }
+            .onChange(of: orvect.identity?.localId) { if orvect.identity != nil { dismiss() } }
         }
         .tint(MobilePalette.forest)
     }

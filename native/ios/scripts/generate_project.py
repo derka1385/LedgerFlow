@@ -17,6 +17,7 @@ main_swift = add(1, "PBXFileReference", lastKnownFileType="sourcecode.swift", pa
 mobile_swift = add(2, "PBXFileReference", lastKnownFileType="sourcecode.swift", path="MobileRoot.swift", sourceTree="<group>")
 workspace_swift = add(96, "PBXFileReference", lastKnownFileType="sourcecode.swift", path="MobileWorkspace.swift", sourceTree="<group>")
 welcome_swift = add(97, "PBXFileReference", lastKnownFileType="sourcecode.swift", path="MobileWelcome.swift", sourceTree="<group>")
+orvect_swift = add(100, "PBXFileReference", lastKnownFileType="sourcecode.swift", path="OrvectAccount.swift", sourceTree="<group>")
 endpoint_swift = add(3, "PBXFileReference", lastKnownFileType="sourcecode.swift", path="WorkspaceEndpoint.swift", sourceTree="<group>")
 association_swift = add(90,"PBXFileReference",lastKnownFileType="sourcecode.swift",path="WorkspaceAssociation.swift",sourceTree="<group>")
 scanner_swift = add(91,"PBXFileReference",lastKnownFileType="sourcecode.swift",path="AssociationScanner.swift",sourceTree="<group>")
@@ -33,13 +34,13 @@ test_product = add(12, "PBXFileReference", explicitFileType="wrapper.cfbundle", 
 app_files = [add(20+i, "PBXBuildFile", fileRef=f) for i, f in enumerate([main_swift, mobile_swift, endpoint_swift])]
 asset_build = add(24, "PBXBuildFile", fileRef=assets)
 test_build = add(25, "PBXBuildFile", fileRef=tests_swift)
-extra_files = [add(index, "PBXBuildFile", fileRef=ref) for index, ref in zip((93, 94, 95, 98, 99), (association_swift, scanner_swift, trust_swift, workspace_swift, welcome_swift))]
+extra_files = [add(index, "PBXBuildFile", fileRef=ref) for index, ref in zip((93, 94, 95, 98, 99, 101), (association_swift, scanner_swift, trust_swift, workspace_swift, welcome_swift, orvect_swift))]
 app_sources = add(30, "PBXSourcesBuildPhase", buildActionMask=2147483647, files=app_files+extra_files, runOnlyForDeploymentPostprocessing=0)
 app_resources = add(31, "PBXResourcesBuildPhase", buildActionMask=2147483647, files=[asset_build], runOnlyForDeploymentPostprocessing=0)
 app_frameworks = add(32, "PBXFrameworksBuildPhase", buildActionMask=2147483647, files=[], runOnlyForDeploymentPostprocessing=0)
 test_sources = add(33, "PBXSourcesBuildPhase", buildActionMask=2147483647, files=[test_build], runOnlyForDeploymentPostprocessing=0)
 test_frameworks = add(34, "PBXFrameworksBuildPhase", buildActionMask=2147483647, files=[], runOnlyForDeploymentPostprocessing=0)
-app_group = add(40, "PBXGroup", children=[main_swift, mobile_swift, workspace_swift, welcome_swift, endpoint_swift, association_swift, scanner_swift, trust_swift, assets, debug_info, release_info], path="LedgerFlow", sourceTree="<group>")
+app_group = add(40, "PBXGroup", children=[main_swift, mobile_swift, workspace_swift, welcome_swift, orvect_swift, endpoint_swift, association_swift, scanner_swift, trust_swift, assets, debug_info, release_info], path="LedgerFlow", sourceTree="<group>")
 test_group = add(41, "PBXGroup", children=[tests_swift], path="LedgerFlowTests", sourceTree="<group>")
 config_group = add(42, "PBXGroup", children=[base_config, debug_config, release_config], path="Config", sourceTree="<group>")
 products_group = add(43, "PBXGroup", children=[app_product, test_product], name="Products", sourceTree="<group>")

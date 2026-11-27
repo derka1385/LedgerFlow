@@ -3,3 +3,4 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 !LedgerFlow/Assets.xcassets/**/*.png
+Config/Orvect.local.xcconfig

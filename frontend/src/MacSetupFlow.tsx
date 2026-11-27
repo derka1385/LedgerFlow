@@ -9,8 +9,8 @@ import Onboarding from "./pages/Onboarding";
 import { ErrorNote, Icon } from "./ui";
 
 const steps = [
-  ["workbook", "Workbook"],
   ["guide", "How it works"],
+  ["workbook", "Workbook"],
   ["iphone", "iPhone (optional)"],
 ] as const;
 
@@ -21,7 +21,7 @@ export default function MacSetupFlow({ session, profile, onChange }: {
   const [busy, setBusy] = useState(false);
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  const step = profile.setup_step === "guide" || profile.setup_step === "iphone" ? profile.setup_step : "workbook";
+  const step = profile.setup_step === "workbook" || profile.setup_step === "iphone" ? profile.setup_step : "guide";
   const advance = async (next: SetupStep) => {
     if (busy) return;
     setBusy(true); setError(null);
@@ -41,9 +41,9 @@ export default function MacSetupFlow({ session, profile, onChange }: {
     </header>
     <ErrorNote error={error}/>
     {finished ? <p role="status">Opening your agent…</p> : step === "workbook" ? <>
-      <Onboarding session={session} embedded onContinue={() => void advance("guide")} continuing={busy}/>
-      <div><button className="btn ghost" disabled={busy} onClick={() => void advance("guide")}>Continue without a workbook</button></div>
-    </> : step === "guide" ? <Explainer manual doneLabel="Continue to iPhone setup" onDone={() => void advance("iphone")}/>
+      <Onboarding session={session} embedded onContinue={() => void advance("iphone")} continuing={busy}/>
+      <div><button className="btn ghost" disabled={busy} onClick={() => void advance("iphone")}>Continue without a workbook</button></div>
+    </> : step === "guide" ? <Explainer manual doneLabel="Connect your workbook" onDone={() => void advance("workbook")}/>
       : <section className="panel stack-lg mac-setup-iphone">
         <div className="mac-setup-device"><Icon name="phone"/></div>
         <div className="stack"><h1>Connect your iPhone</h1><p className="muted">Scan receipts on your iPhone and see the same documents and expenses on your Mac.</p>

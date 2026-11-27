@@ -33,6 +33,7 @@ api = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = api
 _spec.loader.exec_module(api)  # reference rules, sandbox and independent verifier
 import assistant
+import orvect_auth
 from store import Store
 
 
@@ -117,27 +118,87 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             return session("owner", "usr_local_owner", "My workspace", "Mac")
 
     login_failures = []
+    google = orvect_auth.GoogleBroker()
+
+    def require_local_login(ctx):
+        if ctx["handler"].client_address[0] != "127.0.0.1":
+            raise api.ApiError(403, "LOGIN_LOCAL_ONLY", "Sign in on the Mac itself. On iPhone, pair from the Mac.")
+
+    def launch_proof(token):
+        return isinstance(token, str) and not consumed_bootstrap and secrets.compare_digest(token, bootstrap)
+
+    def login_identity(account, can_link):
+        nonlocal consumed_bootstrap
+        with api.LOCK:
+            linked = api.DB.get("orvect_owner_uid")
+            if linked and linked != account["uid"]:
+                raise api.ApiError(403, "OWNER_MISMATCH", "Use the Orvect account linked to this Mac.")
+            if not linked:
+                if not can_link or consumed_bootstrap:
+                    raise api.ApiError(403, "OWNER_LINK_REQUIRED", "Reopen LedgerFlow on this Mac to link your Orvect account.")
+                api.DB["orvect_owner_uid"] = account["uid"]
+                consumed_bootstrap = True
+            return session("owner", "usr_local_owner", account["name"], "Mac")
+
+    def external_login_error(error):
+        code = str(error)
+        if code == "EMAIL_UNVERIFIED":
+            return api.ApiError(403, code, "Verify your Orvect email, then sign in.")
+        if code == "AUTH_UNAVAILABLE":
+            return api.ApiError(503, code, "Orvect is temporarily unavailable. Try again or open your local workspace.")
+        if code == "LOGIN_THROTTLED":
+            return api.ApiError(429, code, "Too many sign-in attempts. Try again later.")
+        if code == "GOOGLE_EXPIRED":
+            return api.ApiError(410, code, "This Google sign-in expired. Start again.")
+        return api.ApiError(401, "LOGIN_INVALID", "Orvect didn’t accept this email and password. If you use Google, choose Continue with Google.")
 
     @api.route("POST", "/desktop/login", auth=False)
     def login(ctx):
-        """Email + password sign-in on this Mac, so a signed-out user can come back without relaunching the app.
-        Demo account from LEDGERFLOW_DEMO_EMAIL / LEDGERFLOW_DEMO_PASSWORD in the git-ignored .env. Loopback only."""
-        api.vsi.load_dotenv()
+        require_local_login(ctx)
         body = api.jbody(ctx)
         email, password = os.environ.get("LEDGERFLOW_DEMO_EMAIL", ""), os.environ.get("LEDGERFLOW_DEMO_PASSWORD", "")
-        if ctx["handler"].client_address[0] != "127.0.0.1":
-            raise api.ApiError(403, "LOGIN_LOCAL_ONLY", "Sign in on the Mac itself. On iPhone, pair from the Mac.")
+        candidate_email, candidate_password = body.get("email"), body.get("password")
+        if not isinstance(candidate_email, str) or not isinstance(candidate_password, str) or not 1 <= len(candidate_email) <= 254 or not 1 <= len(candidate_password) <= 4096:
+            raise external_login_error(orvect_auth.AuthError("LOGIN_INVALID"))
         with api.LOCK:
             now = time.time()
             login_failures[:] = [t for t in login_failures if now - t < 60]
             if len(login_failures) >= 5:
                 raise api.ApiError(429, "LOGIN_THROTTLED", "Too many attempts. Wait a minute and try again.", True)
-            ok = bool(email and password) and secrets.compare_digest(str(body.get("email", "")).strip().lower(), email.lower()) \
-                and secrets.compare_digest(str(body.get("password", "")), password)
-            if not ok:
-                login_failures.append(now)
-                raise api.ApiError(401, "LOGIN_INVALID", "Email or password is incorrect.")
-            return session("owner", "usr_local_owner", "My workspace", "Mac")
+            if email and password and secrets.compare_digest(candidate_email.strip().lower().encode(), email.lower().encode()) \
+                and secrets.compare_digest(candidate_password.encode(), password.encode()):
+                return session("owner", "usr_local_owner", "My workspace", "Mac")
+            login_failures.append(now)
+        try:
+            account = orvect_auth.password_account(candidate_email.strip(), candidate_password)
+        except orvect_auth.AuthError as error:
+            raise external_login_error(error) from None
+        return login_identity(account, launch_proof(body.get("launch_token")))
+
+    @api.route("POST", "/desktop/google/start", auth=False)
+    def google_start(ctx):
+        require_local_login(ctx)
+        body = api.jbody(ctx)
+        with api.LOCK:
+            can_link = launch_proof(body.get("launch_token"))
+            if not can_link and not api.DB.get("orvect_owner_uid"):
+                raise api.ApiError(403, "OWNER_LINK_REQUIRED", "Reopen LedgerFlow on this Mac to link your Orvect account.")
+        try:
+            return 201, google.begin(can_link)
+        except orvect_auth.AuthError as error:
+            raise external_login_error(error) from None
+
+    @api.route("POST", "/desktop/google/finish", auth=False)
+    def google_finish(ctx):
+        require_local_login(ctx)
+        token = api.jbody(ctx).get("poll")
+        if not isinstance(token, str) or len(token) != 43:
+            raise external_login_error(orvect_auth.AuthError("GOOGLE_EXPIRED"))
+        try:
+            result = google.poll(token)
+        except orvect_auth.AuthError as error:
+            raise external_login_error(error) from None
+        return login_identity(*result) if result else (202, {"pending": True})
 
     @api.route("GET", "/desktop/status")
     def status(ctx):
@@ -165,7 +226,7 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             profile = {"name": name.strip(), "source": source, "agent_name": agent_name.strip()}
             previous = api.DB.get("desktop_workspace_profile")
             if previous is None:
-                profile["setup_step"] = "workbook"
+                profile["setup_step"] = "guide"  # account created → loading → explanation first
             elif "setup_step" in previous:
                 profile["setup_step"] = previous["setup_step"]
             api.DB["desktop_workspace_profile"] = profile
@@ -315,7 +376,9 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
                 with api.LOCK:
                     profile = api.DB.get("desktop_workspace_profile") or {}
                 obj = {**obj, "agent_name": profile.get("agent_name")}
-            if self.command in ("POST","DELETE") and status<400: flush()
+            transient_google = self.path == "/api/v1/desktop/google/start" or (
+                self.path == "/api/v1/desktop/google/finish" and status == 202)
+            if self.command in ("POST","DELETE") and status<400 and not transient_google: flush()
             super()._json(status,obj,headers)
 
         def send_header(self,key,value):

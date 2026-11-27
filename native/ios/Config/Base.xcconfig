@@ -3,3 +3,9 @@
 LEDGERFLOW_ORIGIN =
 LEDGERFLOW_BUNDLE_IDENTIFIER = app.ledgerflow.ios
 DEVELOPMENT_TEAM =
+
+// Shared Orvect Firebase public client configuration. Never put an Admin SDK key here.
+LEDGERFLOW_ORVECT_API_KEY = AIzaSyBBfTulj6DYCzASBowYbmq4yVe-aACjJi8
+LEDGERFLOW_GOOGLE_CLIENT_ID =
+LEDGERFLOW_GOOGLE_CALLBACK_SCHEME = app.ledgerflow.google.unconfigured
+#include? "Orvect.local.xcconfig"

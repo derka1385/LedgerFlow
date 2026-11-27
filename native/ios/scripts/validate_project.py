@@ -71,7 +71,7 @@ assert images == 21
 
 sources = sorted((root / "LedgerFlow").glob("*.swift"))
 tests = root / "LedgerFlowTests/WorkspaceEndpointTests.swift"
-run("swiftc", "-frontend", "-parse", *map(str, [*sources, root.parent / "shared/WorkspaceTrust.swift", tests]))
+run("swiftc", "-frontend", "-swift-version", "6", "-parse", *map(str, [*sources, root.parent / "shared/WorkspaceTrust.swift", tests]))
 with tempfile.TemporaryDirectory(prefix="ledgerflow-ios-check-") as directory:
     output = str(Path(directory) / "endpoint-check")
     run("swiftc", "-swift-version", "6", "-parse-as-library", "-module-cache-path", "/tmp/ledgerflow-swift-module-cache", str(root / "LedgerFlow/WorkspaceEndpoint.swift"), str(root / "LedgerFlow/WorkspaceAssociation.swift"), str(root / "scripts/check_endpoint.swift"), "-o", output)

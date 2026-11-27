@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 import WebKit
 
 @MainActor
-final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate {
+final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate, WKScriptMessageHandler {
     private var window: NSWindow?
     private var webView: WKWebView?
     private var origin: URL?
@@ -135,10 +135,12 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
     }
 
     private func loadWorkspace(_ url: URL) {
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "openGoogleSignIn")
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.addUserScript(WKUserScript(
             source: "document.documentElement.classList.add('mac-shell')", injectionTime: .atDocumentStart, forMainFrameOnly: true))
         configuration.websiteDataStore = .default()
+        configuration.userContentController.add(self, name: "openGoogleSignIn")
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = self; view.uiDelegate = self
         view.allowsBackForwardNavigationGestures = true
@@ -182,6 +184,19 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
     }
     private func isDownload(_ url: URL) -> Bool { isApplicationURL(url) && url.path.hasPrefix("/api/v1/artifacts/") && url.path.hasSuffix("/download") }
 
+    private func isGoogleBridge(_ url: URL) -> Bool {
+        url.scheme == "http" && url.host == "localhost" && url.port != nil &&
+            url.user == nil && url.password == nil && url.query == nil && url.fragment == nil &&
+            url.path.range(of: #"^/ledgerflow-google/[A-Za-z0-9_-]{43}$"#, options: .regularExpression) != nil
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.name == "openGoogleSignIn", message.frameInfo.isMainFrame,
+              message.frameInfo.request.url.map(isApplicationURL) == true,
+              let value = message.body as? String, let url = URL(string: value), isGoogleBridge(url) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping @MainActor @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         guard fingerprint != nil else { completionHandler(.performDefaultHandling, nil); return }
         if let credential = WorkspaceTrust.credential(for: challenge, host: origin?.host, fingerprint: fingerprint) { completionHandler(.useCredential, credential) }
@@ -190,7 +205,11 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
         guard let url = action.request.url else { decisionHandler(.cancel); return }
         if isApplicationURL(url) { decisionHandler(action.shouldPerformDownload ? (isDownload(url) ? .download : .cancel) : .allow) }
-        else { if url.scheme == "https", action.navigationType == .linkActivated { NSWorkspace.shared.open(url) }; decisionHandler(.cancel) }
+        else {
+            let googleBridge = isGoogleBridge(url) && action.sourceFrame.isMainFrame && action.sourceFrame.request.url.map(isApplicationURL) == true
+            if action.navigationType == .linkActivated && (url.scheme == "https" || googleBridge) { NSWorkspace.shared.open(url) }
+            decisionHandler(.cancel)
+        }
     }
     func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse, decisionHandler: @escaping @MainActor @Sendable (WKNavigationResponsePolicy) -> Void) {
         guard let url = response.response.url, isApplicationURL(url) else { decisionHandler(.cancel); return }

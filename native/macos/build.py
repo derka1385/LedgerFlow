@@ -23,6 +23,7 @@ resources.mkdir(parents=True, exist_ok=True)
 info = {
     "CFBundleName": "LedgerFlow", "CFBundleDisplayName": "LedgerFlow", "CFBundleIdentifier": "app.ledgerflow.workspace",
     "CFBundleExecutable": "LedgerFlow", "CFBundlePackageType": "APPL", "CFBundleShortVersionString": "0.2.0", "CFBundleVersion": "2",
+    "CFBundleSupportedPlatforms": ["MacOSX"],
     "LSMinimumSystemVersion": "13.0", "NSHighResolutionCapable": True, "LedgerFlowRepository":str(here.parents[1]),
     "NSLocalNetworkUsageDescription":"Associer votre iPhone à LedgerFlow et synchroniser les pièces avec ce Mac.",
 }

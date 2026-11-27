@@ -14,6 +14,7 @@ struct MobileRoot: View {
     }
 
     @State private var workspace = MobileWorkspace()
+    @State private var orvect = OrvectAccount()
     @State private var sheet: Sheet?
     @State private var showingLaunch = true
     @Environment(\.scenePhase) private var scenePhase
@@ -23,7 +24,7 @@ struct MobileRoot: View {
         ZStack {
             if showingLaunch {
                 ReceiptLaunch(finish: finishLaunch).transition(.opacity)
-            } else if workspace.canEnter {
+            } else if workspace.canEnter || orvect.identity != nil {
                 MobileTabs(workspace: workspace, reviewAlerts: reviewAlerts, pair: { present(.pairing) }, account: { present(.account) },
                            selection: $activeTab, historyFilter: $historyFilter)
             } else {
@@ -34,7 +35,7 @@ struct MobileRoot: View {
         .sheet(item: $sheet) { view in
             switch view {
             case .pairing: PairingSheet(workspace: workspace)
-            case .account: AccountSheet(workspace: workspace)
+            case .account: AccountSheet(workspace: workspace, orvect: orvect)
             }
         }
         .alert("LedgerFlow", isPresented: Binding(
@@ -53,6 +54,7 @@ struct MobileRoot: View {
             activeTab = 2
             historyFilter = "To check"
         }
+        .task { await orvect.restore() }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             await reviewAlerts.updatePermission()
@@ -792,7 +794,7 @@ private struct UploadSpinner: View {
             Circle().trim(from: 0, to: 0.28).stroke(MobilePalette.forest, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                 .rotationEffect(.degrees(turning ? 360 : 0))
                 .animation(reduceMotion ? nil : .linear(duration: 0.9).repeatForever(autoreverses: false), value: turning)
-            Text("LF").font(.system(size: 9, weight: .heavy, design: .rounded)).foregroundStyle(MobilePalette.forest)
+            Image(systemName: "doc.text.fill").font(.system(size: 10)).foregroundStyle(MobilePalette.forest)
         }
         .frame(width: 28, height: 28)
         .onAppear { turning = true }

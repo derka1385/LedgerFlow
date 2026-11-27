@@ -14,6 +14,10 @@ Le Mac conserve le dossier : classeurs Excel, photos, propositions, versions val
 
 Le moteur comptable actuel applique les règles et formats déjà présents dans ce projet, notamment le classeur en comptes en T et la politique Nordvik. Ce n’est pas une promesse de compatibilité avec tout fichier comptable ni toutes les juridictions.
 
+## Se connecter sur le Mac
+
+Sur l’écran de connexion du Mac, **Sign in** utilise l’e-mail et le mot de passe Orvect. **Continue with Google** ouvre un onglet temporaire dans le navigateur système. Une fois la connexion validée, LedgerFlow rouvre le dossier. Le premier compte Orvect authentifié depuis le lancement natif est lié au dossier local. **Open local workspace** ouvre également le dossier avec l’autorisation de lancement de l’app Mac.
+
 ## Associer l’iPhone
 
 Dans la configuration initiale ou dans **Account & settings → iPhone**, cliquez sur **Connect iPhone**. Sur l’iPhone, choisissez **Connect to your Mac** et scannez le code.

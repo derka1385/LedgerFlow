@@ -28,7 +28,17 @@
 				<string>ledgerflow</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>app.ledgerflow.orvect-google</string>
+			<key>CFBundleURLSchemes</key>
+			<array><string>$(LEDGERFLOW_GOOGLE_CALLBACK_SCHEME)</string></array>
+		</dict>
 	</array>
+	<key>LedgerFlowOrvectAPIKey</key>
+	<string>$(LEDGERFLOW_ORVECT_API_KEY)</string>
+	<key>LedgerFlowGoogleClientID</key>
+	<string>$(LEDGERFLOW_GOOGLE_CLIENT_ID)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>

@@ -73,15 +73,13 @@ private struct MobileTabs: View {
         TabView(selection: $selection) {
             NavigationStack {
                 WorkbookScreen(workspace: workspace, pair: pair, account: account, openQueue: { selection = 2 })
-            }.tabItem { Label("Workbooks", systemImage: "tablecells") }.tag(0)
+            }.tabItem { Label("Home", systemImage: "house") }.tag(0)
             NavigationStack { CaptureScreen(workspace: workspace, openQueue: { selection = 2 }) }
                 .tabItem { Label("Scan", systemImage: "viewfinder") }.tag(1)
             NavigationStack { HistoryScreen(workspace: workspace) }
                 .tabItem { Label("History", systemImage: "clock") }.badge(workspace.pending.count).tag(2)
             NavigationStack { AgentScreen(workspace: workspace, pair: pair) }
                 .tabItem { Label("Agent", systemImage: "bubble.left.and.text.bubble.right") }.tag(3)
-            NavigationStack { ExpensesScreen(workspace: workspace) }
-                .tabItem { Label("Expenses", systemImage: "list.bullet.rectangle") }.tag(4)
         }
     }
 }
@@ -91,6 +89,23 @@ private struct WorkbookScreen: View {
     let pair: () -> Void
     let account: () -> Void
     let openQueue: () -> Void
+
+    private var summary: some View {
+        let month = String(Date.now.formatted(.iso8601.year().month()).prefix(7))
+        let items = workspace.snapshot.receipts.filter { ($0.document_date ?? $0.created_at).hasPrefix(month) }
+        let booked = items.filter { $0.state == "COMMITTED" }.compactMap(\.gross_minor).reduce(0, +)
+        let open = items.filter { $0.state != "COMMITTED" }
+        return VStack(alignment: .leading, spacing: 14) {
+            Text("This month").font(.subheadline.weight(.semibold)).foregroundStyle(.white.opacity(0.75))
+            Text(sek(booked)).font(.system(.largeTitle, design: .serif).weight(.semibold)).foregroundStyle(.white).monospacedDigit()
+            HStack(spacing: 18) {
+                Label("\(items.count) receipts", systemImage: "doc.text")
+                Label("\(open.count) to check", systemImage: "hourglass")
+            }.font(.footnote.weight(.medium)).foregroundStyle(.white.opacity(0.85))
+        }
+        .padding(20).frame(maxWidth: .infinity, alignment: .leading)
+        .background(MobilePalette.forest, in: .rect(cornerRadius: 20))
+    }
 
     var body: some View {
         ScrollView {
@@ -109,8 +124,25 @@ private struct WorkbookScreen: View {
                         }.padding(16).background(.white, in: .rect(cornerRadius: 16))
                     }.buttonStyle(.plain)
                 }
+                summary
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Linked workbooks").font(.headline).padding(.bottom, 12)
+                    HStack {
+                        Text("Recent expenses").font(.headline)
+                        Spacer()
+                        if !workspace.snapshot.receipts.isEmpty {
+                            NavigationLink("See all") { ExpensesScreen(workspace: workspace) }.font(.subheadline.weight(.semibold)).tint(MobilePalette.forest)
+                        }
+                    }.padding(.bottom, 8)
+                    if workspace.snapshot.receipts.isEmpty {
+                        Text("Scanned receipts appear here with supplier, amount and date.").font(.subheadline).foregroundStyle(.secondary).padding(.vertical, 12)
+                    }
+                    ForEach(workspace.snapshot.receipts.prefix(5)) { receipt in
+                        Divider().overlay(MobilePalette.rule)
+                        NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) }.buttonStyle(.plain)
+                    }
+                }
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Workbooks").font(.headline).padding(.bottom, 12)
                     if workspace.snapshot.workbooks.isEmpty {
                         Text(workspace.connection == nil ? "Connect a workspace to see its Excel files here." : "No workbooks are available yet. Link a workbook in LedgerFlow on your Mac.")
                             .font(.subheadline).foregroundStyle(.secondary).padding(.vertical, 12)
@@ -138,7 +170,7 @@ private struct WorkbookScreen: View {
             }.padding(22).frame(maxWidth: 650).frame(maxWidth: .infinity)
         }
         .background(MobilePalette.paper.ignoresSafeArea())
-        .navigationTitle("Workbooks")
+        .navigationTitle("LedgerFlow")
         .refreshable { await workspace.refresh() }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -685,7 +717,7 @@ private struct ExpensesScreen: View {
             }
             ForEach(months, id: \.0) { month, items in
                 let booked = items.filter { $0.state == "COMMITTED" }.compactMap(\.gross_minor).reduce(0, +)
-                let open = items.filter { $0.state != "COMMITTED" }.compactMap(\.gross_minor).reduce(0, +)
+                let open = items.filter { !["COMMITTED", "REJECTED", "CANCELLED", "FAILED", "EXPIRED"].contains($0.state) }.compactMap(\.gross_minor).reduce(0, +)
                 Section {
                     ForEach(items) { receipt in NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) } }
                 } header: {

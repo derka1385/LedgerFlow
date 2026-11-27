@@ -402,7 +402,10 @@ private struct HistoryScreen: View {
                                     Text(item.issue ?? (item.workbookID == nil ? "Choose a workbook" : "Waiting to sync")).font(.subheadline.weight(.medium))
                                     Text(item.created, format: .dateTime.month().day().hour().minute()).font(.footnote).foregroundStyle(.secondary)
                                 }
-                            } icon: { Image(systemName: "tray.and.arrow.up").foregroundStyle(MobilePalette.forest) }
+                            } icon: {
+                                if workspace.syncing && item.issue == nil { UploadSpinner() }
+                                else { Image(systemName: "tray.and.arrow.up").foregroundStyle(MobilePalette.forest) }
+                            }
                         }
                     }
                 }
@@ -489,6 +492,7 @@ private struct ReceiptRow: View {
     var body: some View {
         HStack(spacing: 12) {
             ReceiptThumb(receipt: receipt, workspace: workspace)
+                .overlay { if ["QUEUED", "EXTRACTING", "PLANNING", "GENERATING", "VALIDATING", "COMMITTING", "RUNNING"].contains(receipt.state) { UploadSpinner().padding(4).background(.ultraThinMaterial, in: .circle) } }
             VStack(alignment: .leading, spacing: 4) {
                 Text(receipt.merchant_name ?? "Reading…").font(.subheadline.weight(.semibold))
                 Text("\(stateTitle(receipt.state)) · from \(receipt.source)").font(.footnote).foregroundStyle(.secondary)
@@ -690,5 +694,24 @@ private struct ExpensesScreen: View {
             }
         }
         .navigationTitle("Expenses").refreshable { await workspace.refresh() }
+    }
+}
+
+
+/// Brand loading mark: the LF tile with a mint arc turning around it.
+private struct UploadSpinner: View {
+    @State private var turning = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    var body: some View {
+        ZStack {
+            Circle().stroke(MobilePalette.forest.opacity(0.15), lineWidth: 3)
+            Circle().trim(from: 0, to: 0.28).stroke(MobilePalette.forest, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                .rotationEffect(.degrees(turning ? 360 : 0))
+                .animation(reduceMotion ? nil : .linear(duration: 0.9).repeatForever(autoreverses: false), value: turning)
+            Text("LF").font(.system(size: 9, weight: .heavy, design: .rounded)).foregroundStyle(MobilePalette.forest)
+        }
+        .frame(width: 28, height: 28)
+        .onAppear { turning = true }
+        .accessibilityLabel("Uploading")
     }
 }

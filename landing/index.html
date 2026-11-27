@@ -9,7 +9,9 @@
 <link rel="icon" href="assets/apple-touch-icon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preload" href="fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css">
+<!-- Public web app for the jury: set to the HTTPS origin of the demo server (e.g. https://demo.example.com). Empty = same server when served at /welcome/. -->
+<meta name="ledgerflow-app" content="">
+<link rel="stylesheet" href="home.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -24,7 +26,7 @@
 <header class="nav">
   <a class="brand" href="#top" aria-label="LedgerFlow home"><svg class="mark" width="22" height="25"><use href="#mark"/></svg><svg class="wordmark" viewBox="0 0 207 32" role="img" aria-label="LedgerFlow"><use href="assets/wordmark.svg#wordmark" width="207" height="32"/></svg></a>
   <nav aria-label="Sections"><a href="#use">How you use it</a><a href="#who">Who it's for</a><a href="#trust">Why it's safe</a><a href="#film">Demo</a></nav>
-  <a class="btn btn-mint small" href="#start">Get the beta</a>
+  <a class="btn btn-mint small" data-app-link data-role="owner" href="#film">Open the web app</a>
 </header>
 
 <main id="top">
@@ -33,8 +35,10 @@
     <div class="hero-copy">
       <h1>Snap the receipt.<br><span>It's in your Excel.</span></h1>
       <p class="lede">LedgerFlow is an accounting agent for small businesses. Photograph a receipt, and it books it in the workbook you already use. It asks before it writes a single cell.</p>
+      <p class="try-note" data-app-note hidden>No account needed. Opens a shared demo workspace with fictional data, on any browser: Windows, Android, Mac.</p>
       <div class="cta-row">
-        <a class="btn btn-mint" href="#start"><svg width="18" height="18"><use href="#i-mac"/></svg>Download for Mac · beta</a>
+        <a class="btn btn-mint" data-app-link data-role="owner" href="#film"><svg width="18" height="18"><use href="#i-arrow"/></svg>Open the web app</a>
+        <a class="btn btn-ghost" data-app-link data-role="employee" data-hash="#/capture" href="#film"><svg width="18" height="18"><use href="#i-phone"/></svg>Try the phone camera</a>
         <a class="btn btn-ghost" href="#film"><svg width="16" height="16"><use href="#i-play"/></svg>Watch the 4-minute demo</a>
       </div>
     </div>
@@ -149,7 +153,9 @@
   <section class="start" id="start">
     <h2>Your Excel.<br>Your business.<br>Our agent.</h2>
     <div class="start-actions">
-      <a class="btn btn-ink" href="https://github.com/derka1385/LedgerFlow/releases/latest"><svg width="18" height="18"><use href="#i-mac"/></svg>Download for Mac · beta</a>
+      <a class="btn btn-ink" data-app-link data-role="owner" href="#film"><svg width="18" height="18"><use href="#i-arrow"/></svg>Open the web app</a>
+      <a class="start-link" href="https://github.com/derka1385/LedgerFlow/releases/latest"><svg width="16" height="16"><use href="#i-mac"/></svg>Download for Mac · beta</a>
+      <p class="start-note">Recorded walkthroughs: <a href="mac.html">the Mac app</a> · <a href="iphone.html">the iPhone app</a></p>
       <p class="start-note"><svg width="16" height="16"><use href="#i-phone"/></svg>iPhone app is optional: TestFlight on request during the beta.</p>
       <p class="start-note">The Mac build is unsigned in the beta: right-click, then Open.</p>
     </div>
@@ -161,6 +167,6 @@
   <p>Built in Stockholm for the Vultr Agent Runtime Hackathon, 2026. Demo data is fictional.</p>
   <a href="#top">Back to top</a>
 </footer>
-<script src="app.js"></script>
+<script src="home.js"></script>
 </body>
 </html>

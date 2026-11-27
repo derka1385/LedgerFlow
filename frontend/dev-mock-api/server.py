@@ -39,6 +39,8 @@ sys.path.insert(0, str(HERE))
 
 from ledgerflow_accounting import (DEFAULT_POLICY, Workbook, WorkbookError, admit, allocate, baseline,  # noqa: E402
                                    detect_mapping, verify)
+from ledgerflow_accounting.ooxml import col_to_num, num_to_col, split_cell
+import assistant
 import codescreen  # noqa: E402
 import programs  # noqa: E402
 import vsi  # noqa: E402
@@ -49,6 +51,7 @@ import sandbox  # noqa: E402
 
 PORT = int(os.environ.get("PORT", "8787"))
 DIST = HERE.parent / "dist"
+LANDING = REPO / "landing"
 FIXTURES = REPO / "fixtures" / "synthetic"
 MAX_UPLOAD = 10 * 1024 * 1024
 MOCK = "MOCK (no Vultr credentials): "
@@ -219,18 +222,22 @@ def real_extraction(run: dict, doc: dict) -> bool:
                 emit(rid, "extraction.recheck_unavailable", "EXTRACTING",
                      "The additional reading was unavailable. The original evidence and unresolved fields were kept.")
         txn, flags = vsi.to_transaction(obj, blank_transaction(doc, run), COMPANY)
-        if txn.get("category_account_id") is None and txn.get("gross_minor") is not None:
+        if not flags and txn.get("category_account_id") is None and txn.get("gross_minor") is not None:
             with LOCK:
                 mp = DB["mappings"][run["mapping_id"]]["detected"]["accounts"]
             allowed = {c: mp[c]["name"] for c in DEFAULT_POLICY["allowed_category_accounts"] if c in mp}
-            prop, meta2 = vsi.propose_account(txn, allowed)
-            meta["calls"] += meta2["calls"]
+            prop = {"proposed_account": "NONE_SUITABLE"}
+            if allowed:
+                try:
+                    prop, meta2 = vsi.propose_account(txn, allowed)
+                    meta["calls"] += meta2["calls"]
+                except vsi.VsiError:
+                    emit(rid, "extraction.account_unavailable", "EXTRACTING",
+                         "Expense classification was unavailable. Receipt details were kept for review.")
             if prop["proposed_account"] != "NONE_SUITABLE":
                 txn["category_account_id"] = prop["proposed_account"]
                 txn["evidence"].append({"evidence_id": "vsi_category", "field": "category_account_id", "source": "receipt_image",
                                         "text": prop["rationale"][:300], "bbox": None, "page": 1, "status": "observed"})
-            else:
-                txn["unresolved_fields"] = sorted(set(txn["unresolved_fields"]) | {"category_account_id"})
             run["account_alternatives"] = prop.get("alternatives", [])
     except vsi.VsiError as exc:
         with LOCK:
@@ -479,6 +486,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-LedgerFlow-Backend", "DEV-MOCK")
+        if type(self) is Handler and os.environ.get("LEDGERFLOW_BROWSER_DEMO") == "1" and not STRICT:
+            self.send_header("X-LedgerFlow-Browser-Demo", "1")
         for k, v in (headers or {}).items():
             self.send_header(k, v)
         self.end_headers()
@@ -547,14 +556,28 @@ class Handler(BaseHTTPRequestHandler):
         return self._err(ApiError(404, "NOT_FOUND", "Unknown route."))
 
     def _static(self, path: str):
-        if not DIST.exists():
-            return self._json(404, {"error": {"code": "NO_FRONTEND_BUILD", "message": "Run `npm run build` in frontend/ or use the Vite dev server."}})
-        target = (DIST / path.lstrip("/")).resolve()
-        if not str(target).startswith(str(DIST.resolve())) or not target.is_file():
+        browser_demo = os.environ.get("LEDGERFLOW_BROWSER_DEMO") == "1"
+        if browser_demo and path == "/welcome":
+            self.send_response(308)
+            self.send_header("Location", "/welcome/")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        landing = browser_demo and path.startswith("/welcome/")
+        root = LANDING if landing else DIST
+        if not root.exists():
+            return self._err(ApiError(404, "NO_FRONTEND_BUILD", "Build the LedgerFlow frontend first."))
+        relative = path.removeprefix("/welcome/") if landing else path.lstrip("/")
+        target = (root / (relative or "index.html")).resolve()
+        if not target.is_relative_to(root.resolve()) or not target.is_file():
+            if landing:
+                return self._err(ApiError(404, "NOT_FOUND", "Unknown landing asset."))
             target = DIST / "index.html"
         data = target.read_bytes()
         ctype = {".js": "text/javascript", ".css": "text/css", ".html": "text/html; charset=utf-8", ".svg": "image/svg+xml",
-                 ".png": "image/png", ".json": "application/json"}.get(target.suffix, "application/octet-stream")
+                 ".png": "image/png", ".json": "application/json", ".woff2": "font/woff2",
+                 ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                 ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".mp4": "video/mp4", ".ico": "image/x-icon"}.get(target.suffix, "application/octet-stream")
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
@@ -612,7 +635,26 @@ def create_session(ctx):
     token = jbody(ctx).get("invite_token", "")
     if token not in INVITES:
         raise ApiError(401, "INVITE_INVALID", "Unknown invite. Dev mock invites: owner-demo, accountant-demo, employee-demo.")
-    uid, role, name = INVITES[token]
+    return create_demo_session(INVITES[token])
+
+
+@route("POST", "/demo/session", auth=False)
+def open_browser_demo(ctx):
+    if type(ctx["handler"]) is not Handler or os.environ.get("LEDGERFLOW_BROWSER_DEMO") != "1" or STRICT:
+        raise ApiError(404, "NOT_FOUND", "Browser demo is unavailable.")
+    origin = ctx["headers"].get("Origin")
+    host = ctx["headers"].get("Host")
+    if ctx["headers"].get("Sec-Fetch-Site") == "cross-site" or (origin and origin not in (f"http://{host}", f"https://{host}")):
+        raise ApiError(403, "ORIGIN_INVALID", "Open the demo from its own site.")
+    body = jbody(ctx)
+    role = body.get("role") if isinstance(body, dict) else None
+    if role not in ("owner", "employee", "accountant"):
+        raise ApiError(400, "DEMO_ROLE_INVALID", "Choose a demo role.")
+    return create_demo_session(INVITES[f"{role}-demo"])
+
+
+def create_demo_session(identity):
+    uid, role, name = identity
     sid, csrf = secrets.token_urlsafe(24), secrets.token_urlsafe(24)
     exp = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")
     sess = {"user_id": uid, "role": role, "display_name": name, "tenant_id": "ten_nordvik", "csrf_token": csrf, "expires_at": exp}
@@ -634,6 +676,7 @@ def delete_session(ctx):
     for sid, s in list(DB["sessions"].items()):
         if s is ctx["session"]:
             del DB["sessions"][sid]
+            DB.get("browser_assistant_messages", {}).pop(sha(s["csrf_token"].encode()), None)
     return 200, {"ok": True}, {"Set-Cookie": "ledgerflow_session=; Max-Age=0; Path=/"}
 
 
@@ -686,6 +729,38 @@ def list_workbooks(ctx):
 @route("GET", "/workbooks/([A-Za-z0-9_\\-]+)", roles=("accountant", "owner"))
 def get_workbook(ctx, wid):
     return 200, workbook_view(get_or_404("workbooks", wid))
+
+
+@route("GET", r"/workbooks/([A-Za-z0-9_\-]+)/sheet", roles=("accountant", "owner"))
+def workbook_sheet(ctx, wid):
+    with LOCK:
+        wb = get_or_404("workbooks", wid)
+        version = DB["versions"][wb["current_version_id"]]
+        data = DB["artifacts"][version["artifact_id"]]["bytes"]
+        preferred = (wb.get("detected") or {}).get("sheet")
+    book = Workbook(data)
+    sheet = ctx["query"].get("name", [preferred or next(iter(book.sheets))])[0]
+    if sheet not in book.sheets:
+        raise ApiError(404, "SHEET_NOT_FOUND", "Unknown worksheet.")
+    try:
+        first = int(ctx["query"].get("row", ["1"])[0])
+        left = int(ctx["query"].get("column", ["1"])[0])
+        if not 1 <= first <= 1048576 or not 1 <= left <= 16384:
+            raise ValueError
+    except ValueError:
+        raise ApiError(400, "INVALID_RANGE", "Enter a valid worksheet range.") from None
+    cells = {}
+    last_row, last_column = 1, 1
+    for address, cell in book.cells(sheet).items():
+        column, row = split_cell(address)
+        column = col_to_num(column)
+        last_row, last_column = max(last_row, row), max(last_column, column)
+        if first <= row < first + 50 and left <= column < left + 24 and cell.type != "blank":
+            cells[address] = cell.value if cell.value is not None else (f"={cell.formula}" if cell.formula else None)
+    return 200, {"name": sheet, "sheets": list(book.sheets), "workbook": wb["display_name"],
+                 "version": version["version_id"], "artifact_id": version["artifact_id"], "row": first, "column": left, "last_row": last_row,
+                 "last_column": last_column, "columns": [num_to_col(n) for n in range(left, min(left + 24, max(left, last_column) + 1))],
+                 "row_count": min(50, max(1, last_row - first + 1)), "cells": cells}
 
 
 @route("GET", "/workbooks/([A-Za-z0-9_\\-]+)/inspection", roles=("accountant", "owner"))
@@ -1150,6 +1225,65 @@ def benchmark_kpis(ctx):
 @route("GET", "/containment-tests/([A-Za-z0-9_\\-]+)", roles=("accountant", "owner"))
 def get_containment(ctx, tid):
     return 200, get_or_404("containment", tid)
+
+
+chat_busy = set()
+
+def assistant_scope(ctx):
+    session = ctx["session"]
+    if ctx["handler"].server_version.startswith("LedgerFlowLocal"):
+        return "assistant_messages", session["user_id"]
+    return "browser_assistant_messages", sha(session["csrf_token"].encode())
+
+
+def assistant_history(ctx):
+    table, scope = assistant_scope(ctx)
+    if table == "assistant_messages":
+        return [m for m in DB.get(table, []) if m["user_id"] == scope][-80:]
+    return DB.get(table, {}).get(scope, [])
+
+
+@route("GET", "/assistant/messages")
+def messages(ctx):
+    with LOCK: items=assistant_history(ctx)
+    return 200,{"items":items}
+
+@route("POST", "/assistant/messages",idem=True)
+def chat(ctx):
+    body=jbody(ctx)
+    text=body.get("text", "")
+    if not isinstance(text,str) or not 1<=len(text.strip())<=3000: raise ApiError(400,"MESSAGE_INVALID","Your message must be between 1 and 3,000 characters.")
+    if not vsi.enabled(): raise ApiError(503,"INFERENCE_UNAVAILABLE","Vultr inference is unavailable. Try again when the service is connected.",True)
+    local = ctx["handler"].server_version.startswith("LedgerFlowLocal")
+    uid, role=ctx["session"]["user_id"],ctx["session"]["role"]
+    table, scope = assistant_scope(ctx)
+    with LOCK:
+        if scope in chat_busy: raise ApiError(409,"ASSISTANT_BUSY","A reply is already in progress.",True)
+        chat_busy.add(scope)
+        runs=[snapshot(r,role) for r in DB["runs"].values() if role!="employee" or r.get("created_by")==uid][-25:]
+        workbooks=[workbook_view(w) for w in DB["workbooks"].values()]
+        history=assistant_history(ctx)[-12:]
+    user={"id":oid("msg"),"role":"user","text":text.strip(),"user_id":uid,"created_at":now(),"actions":[]}
+    try:
+        context={"role":role,"workbooks":[{"name":w["display_name"],"status":w["status"],"versions":w["version_count"]} for w in workbooks],
+                 "documents":[{"merchant":r.get("transaction",{}).get("merchant_name") if r.get("transaction") else None,"state":r["state"],"review_items":r.get("review_items",[]),"amount_minor":(r.get("transaction") or {}).get("gross_minor"),"currency":(r.get("transaction") or {}).get("currency")} for r in runs],
+                 "vision_model":vsi.MODEL,"storage": ("Mac-hosted workspace. The iPhone pairs by QR on the same network." if local else "Browser workspace. Open Capture on a phone or computer to take or upload a receipt. The demo runs on a shared server; use sample data.")}
+        result,meta=assistant.answer(vsi,context,[*history,user],body.get("language") if body.get("language") in assistant.LANGUAGES else "fr")
+        allowed={"capture","overview"} if role=="employee" else set(assistant.SCHEMA["properties"]["actions"]["items"]["enum"])
+        if not local:
+            allowed.discard("phone")
+        reply={"id":oid("msg"),"role":"assistant","text":result["answer"],"actions":[a for a in result["actions"] if a in allowed],"user_id":uid,"created_at":now(),"model":meta["model_id"]}
+        with LOCK:
+            if local:
+                DB.setdefault(table, []).extend([user, reply])
+            else:
+                records = DB.setdefault(table, {})
+                records[scope] = [*records.get(scope, []), user, reply][-80:]
+        return 201,{"items":[user,reply]}
+    except vsi.VsiError as exc:
+        raise ApiError(503,"ASSISTANT_UNAVAILABLE","The model is not responding right now. You can retry your message.",True) from exc
+    finally:
+        with LOCK: chat_busy.discard(scope)
 
 
 def main():

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 216 280" fill="none">
+  <defs>
+    <linearGradient id="paper" x1="15" y1="12" x2="200" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffdf4"/><stop offset="1" stop-color="#e5edd8"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="155" y1="49" x2="198" y2="13" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a6c398"/><stop offset="1" stop-color="#d9e6c9"/>
+    </linearGradient>
+  </defs>
+  <path d="M14 9H159L202 51V264l-18-11-20 11-20-11-20 11-20-11-20 11-20-11-20 11-20-11-10 6V9Z" fill="#1d4436" transform="translate(2 4)"/>
+  <path d="M14 9H159L202 51V264l-18-11-20 11-20-11-20 11-20-11-20 11-20-11-20 11-20-11-10 6V9Z" fill="url(#paper)" stroke="#c6d8bb"/>
+  <path d="M159 9v42h43L159 9Z" fill="url(#fold)"/>
+  <rect x="36" y="35" width="38" height="35" rx="8" fill="#153c30"/>
+  <path d="M46 44v15h10m3 0V44h8m-8 7h6" stroke="#dcecd4" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M37 96h85m-85 11h62" stroke="#28483c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M37 132h137m-137 54h137" stroke="#a1b69c" stroke-dasharray="4 5" stroke-linecap="round"/>
+  <path d="M37 151h57m53 0h27m-137 17h44m69 0h24" stroke="#466453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M37 210h43m60 0h34" stroke="#28483c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M145 233l7 6 14-15" stroke="#2e7759" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

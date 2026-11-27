@@ -34,7 +34,7 @@ export default function Capture({ session, mac = false }: { session: Session; ma
   const abort = useRef<AbortController | null>(null);
   const camera = useRef<HTMLInputElement>(null);
   const [samples, setSamples] = useState<{ case_id: string; title: string; file: string }[]>([]);
-  useEffect(() => { if (session.backend === "DEV-MOCK") listFixtures().then((f) => setSamples(f.receipts)).catch(() => undefined); }, []);
+  useEffect(() => { if (session.backend === "DEV-MOCK" || session.backend === "LOCAL") listFixtures().then((f) => setSamples(f.receipts)).catch(() => undefined); }, []);
   const picker = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

@@ -96,7 +96,7 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
             try FileManager.default.createDirectory(at: data, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
             let process = Process()
             process.executableURL = python
-            process.arguments = [script.path, "--data-dir", data.path, "--status-file", status.path, "--parent-pid", String(ProcessInfo.processInfo.processIdentifier)]
+            process.arguments = [script.path, "--data-dir", data.path, "--status-file", status.path, "--parent-pid", String(ProcessInfo.processInfo.processIdentifier), "--allow-samples"]
             process.currentDirectoryURL = root
             var environment = ProcessInfo.processInfo.environment
             environment["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"

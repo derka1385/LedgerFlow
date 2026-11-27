@@ -79,8 +79,8 @@ export default function Onboarding({ session, workbookId, embedded, onContinue, 
             <input aria-label="Display name" placeholder="Display name" value={name} onChange={(e) => setName(e.target.value)} style={{ maxWidth: 280 }} />
             <button className="btn primary" onClick={upload} disabled={!file || !!busy}><Icon name="upload" />{busy === "upload" ? "Reading…" : "Upload and inspect"}</button>
           </div>
-          {session.backend === "DEV-MOCK" ? (
-            <div className="row small">Development backend:
+          {session.backend === "DEV-MOCK" || session.backend === "LOCAL" ? (
+            <div className="row small">Examples:
               {["nordvik_t_accounts.xlsx", "nordvik_t_accounts_error.xlsx"].map((n) => (
                 <button key={n} className="btn ghost" onClick={() => fixtureFile(n).then((f) => { setFile(f); setName(n.includes("error") ? "Nordvik Trading AB (with a pre-existing error)" : "Nordvik Trading AB"); }).catch(setError)}>
                   Use sample {n.includes("error") ? "with a pre-existing error" : "workbook"}</button>))}

@@ -34,10 +34,10 @@ export function MacReceipt() {
   </svg>;
 }
 
-export function MacIntro({ onHoldEnd, onSkip, onExit, leaving }: {
-  onHoldEnd: () => void; onSkip: () => void; onExit: () => void; leaving: boolean;
+export function MacIntro({ onHoldEnd, onSkip, onExit, leaving, waiting }: {
+  onHoldEnd: () => void; onSkip: () => void; onExit: () => void; leaving: boolean; waiting: boolean;
 }) {
-  return <main className={`mac-intro${leaving ? " mac-intro-leaving" : ""}`} aria-label="Opening LedgerFlow"
+  return <main className={`mac-intro${leaving ? " mac-intro-leaving" : ""}${waiting ? " mac-intro-waiting" : ""}`} aria-label="Opening LedgerFlow"
     onAnimationEnd={event => { if (event.target === event.currentTarget && event.animationName === "mac-intro-exit") onExit(); }}>
     <MacWaves/>
     <div className="mac-intro-brand">
@@ -46,7 +46,7 @@ export function MacIntro({ onHoldEnd, onSkip, onExit, leaving }: {
         <Wordmark/>
       </span>
     </div>
-    <button className="mac-intro-skip" type="button" onClick={onSkip}>Skip introduction</button>
+    {waiting ? <p className="mac-intro-status" role="status">Opening your workspace…</p> : <button className="mac-intro-skip" type="button" onClick={onSkip}>Skip introduction</button>}
   </main>;
 }
 

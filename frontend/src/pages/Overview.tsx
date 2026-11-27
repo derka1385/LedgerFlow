@@ -35,18 +35,23 @@ function AgentPeek({ run }: { run: RunListItem | undefined }) {
   </section>;
 }
 
-export default function Overview({ mac = false, workspace }: { mac?: boolean; workspace?: string }) {
+export default function Overview({ mac = false, workspace, reveal = false }: { mac?: boolean; workspace?: string; reveal?: boolean }) {
   const { data, error } = usePolling(async () => { const [runs, workbooks] = await Promise.all([listRuns(), listWorkbooks()]); return { runs: runs.items, workbooks: workbooks.items }; });
   const [view, setView] = useState("all");
-  if (!data) return error ? <ErrorNote error={error} /> : <Skeleton lines={6} />;
+  const hero = mac ? <header className="mac-dashboard-hero"><MacWaves/><div><p>{workspace}</p><h1>Dashboard</h1><div className="row"><a className="btn primary" href="#/agent"><Icon name="message"/>Open agent</a><a className="btn" href="#/capture"><Icon name="upload"/>Add a receipt</a></div></div></header> : null;
+  const className = reveal ? "overview mac-dashboard-reveal" : "overview";
+  if (!data) {
+    const status = error ? <ErrorNote error={error} /> : <Skeleton lines={6} />;
+    return mac ? <div className={className}>{hero}{status}</div> : status;
+  }
   const { runs, workbooks } = data;
   const ready = runs.filter(r => r.state === "AWAITING_APPROVAL");
   const questions = runs.filter(r => ATTENTION_STATES.includes(r.state));
   const active = runs.filter(r => ACTIVE_STATES.includes(r.state));
   const rows = view === "approval" ? ready : view === "questions" ? questions : runs;
   const latest = active[0] ?? ready[0] ?? runs[0];
-  return <div className="overview">
-    {mac ? <header className="mac-dashboard-hero"><MacWaves/><div><p>{workspace}</p><h1>Dashboard</h1><div className="row"><a className="btn primary" href="#/agent"><Icon name="message"/>Open agent</a><a className="btn" href="#/capture"><Icon name="upload"/>Add a receipt</a></div></div></header> : <header className="page-heading"><div><h1>Overview</h1><p className="muted">Documents, agent executions and your next decisions.</p></div><a className="btn primary" href="#/capture"><Icon name="upload" />Submit a receipt</a></header>}
+  return <div className={className}>
+    {hero ?? <header className="page-heading"><div><h1>Overview</h1><p className="muted">Documents, agent executions and your next decisions.</p></div><a className="btn primary" href="#/capture"><Icon name="upload" />Submit a receipt</a></header>}
     <ErrorNote error={error} />
     <section className="workspace-counts" aria-label="Current workspace counts">
       {[[ready.length, "Awaiting approval", "transactions?filter=approval"], [questions.length, "Need attention", "transactions?filter=questions"], [active.length, "In progress", "activity?filter=active"], [workbooks.filter(w => w.status === "ready").length, "Connected workbooks", "workbook"]].map(([count, label, link]) => <a key={label} href={`#/${link}`}><strong>{count}</strong><span>{label}</span></a>)}

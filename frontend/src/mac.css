@@ -5,19 +5,36 @@
   isolation: isolate;
   position: relative;
 }
-.mac-intro { display: grid; place-items: center; min-height: 100dvh; }
-.mac-intro > div, .mac-setup-art > div { display: grid; justify-items: center; gap: 20px; }
-.mac-intro .brand-wordmark, .mac-setup-art .brand-wordmark { width: 174px; height: auto; color: #f0f4e5; }
-.mac-intro .brand-wordmark { animation: mac-reveal .55s .23s cubic-bezier(.23,1,.32,1) both; }
+.mac-intro { display: grid; place-items: center; min-height: 100dvh; max-width: none; margin: 0; padding: 0; }
+.mac-intro-brand, .mac-setup-art > div { display: grid; justify-items: center; gap: 20px; }
+.mac-intro .brand-wordmark, .mac-setup-art .brand-wordmark { width: 174px; height: 37px; color: #f0f4e5; }
+.mac-intro-name { display: flex; animation: mac-intro-name 3s both; }
 .mac-receipt { filter: drop-shadow(0 10px 18px #071b1359); }
-.mac-intro .mac-receipt { animation: mac-receipt-in .65s cubic-bezier(.23,1,.32,1) both; }
-.mac-waves { position: absolute; inset: -8%; width: 116%; height: 116%; z-index: -1; pointer-events: none; animation: mac-current 14s ease-in-out infinite alternate; }
-@keyframes mac-current { from { transform: translate3d(-1%, 0, 0); } to { transform: translate3d(2%, -3%, 0); } }
-@keyframes mac-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes mac-receipt-in { from { opacity: 0; transform: translateY(15px) rotate(-14deg); } to { opacity: 1; transform: rotate(-5deg); } }
+.mac-intro .mac-receipt { animation: mac-receipt-in 1.05s .15s var(--ease-out) both; }
+.mac-intro-leaving { animation: mac-intro-exit .28s ease-in-out forwards; }
+.mac-intro-skip, .mac-intro-status { position: absolute; bottom: 32px; margin: 0; color: #d7e7ce; font: inherit; font-size: 13px; }
+.mac-intro-skip { background: #ffffff0d; border: 1px solid #d7e7ce55; border-radius: 100px; padding: 9px 16px; cursor: pointer; }
+.mac-intro-skip:hover, .mac-intro-skip:focus-visible { background: #ffffff1f; color: #fff; }
+.mac-intro-waiting .mac-receipt, .mac-intro-waiting .mac-intro-name { animation: none; }
+.mac-waves { position: absolute; inset: -18px; width: calc(100% + 36px); height: calc(100% + 36px); z-index: -1; pointer-events: none; animation: mac-current 22s ease-in-out infinite alternate; }
+@keyframes mac-current { from { transform: translate3d(-7px, 5px, 0); } to { transform: translate3d(10px, -9px, 0); } }
+@keyframes mac-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mac-receipt-in { from { opacity: 0; transform: translateY(16px) rotate(-10deg); } to { opacity: 1; transform: translateY(0) rotate(-4deg); } }
+@keyframes mac-intro-name {
+  0%, 21% { opacity: 0; transform: translateY(7px); animation-timing-function: var(--ease-out); }
+  52%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes mac-intro-exit { to { opacity: 0; } }
+@keyframes mac-dissolve { from { opacity: 0; } to { opacity: 1; } }
 .mac-setup { max-width: 1160px; min-height: 100dvh; margin: auto; padding: clamp(18px, 4vw, 52px); display: grid; align-items: stretch; grid-template-columns: minmax(250px, .9fr) minmax(0, 1.1fr); gap: clamp(22px, 5vw, 68px); }
 .mac-setup-art { border-radius: 24px; display: grid; place-items: center; min-height: 210px; }
-.mac-setup-form { align-self: center; display: grid; gap: 13px; min-width: 0; animation: mac-reveal .35s cubic-bezier(.23,1,.32,1) both; }
+.mac-setup-form { align-self: center; display: grid; gap: 13px; min-width: 0; }
+.mac-setup-name { display: grid; gap: 9px; }
+.mac-setup-first .mac-setup-art { animation: mac-dissolve .64s ease-out both; }
+.mac-setup-first .mac-setup-form > * { animation: mac-reveal .55s var(--ease-out) both; }
+.mac-setup-first .mac-setup-name { animation-delay: .09s; }
+.mac-setup-first fieldset { animation-delay: .18s; }
+.mac-setup-first .mac-setup-actions { animation-delay: .26s; }
 .mac-setup-form h1, .mac-dashboard-hero h1 { font: 500 clamp(31px, 4vw, 53px)/1.07 Georgia, serif; margin: 0; letter-spacing: -.04em; }
 .mac-setup-form p { margin: 0 0 9px; }
 .mac-setup-form input:not([type=radio]) { min-height: 42px; }
@@ -43,6 +60,15 @@
 .mac-dashboard-hero .row { margin-top: 23px; flex-wrap: wrap; }
 .mac-dashboard-hero .btn { background: #274a3b; color: #eef4e6; border-color: #739580; }
 .mac-dashboard-hero .btn.primary { background: #d2e4bd; color: #163327; border-color: #d2e4bd; }
+.mac-dashboard-reveal .mac-dashboard-hero { animation: mac-dissolve .52s ease-out both; }
+.mac-dashboard-reveal .mac-dashboard-hero > div { animation: mac-reveal .56s .07s var(--ease-out) both; }
+.mac-dashboard-reveal .workspace-counts { animation: mac-reveal .48s .15s var(--ease-out) both; }
+.mac-dashboard-reveal .workbench-columns { animation: mac-reveal .48s .23s var(--ease-out) both; }
+.mac-setup-first .mac-setup-form > :focus-within,
+.mac-dashboard-reveal .mac-dashboard-hero:focus-within,
+.mac-dashboard-reveal .mac-dashboard-hero > div:focus-within,
+.mac-dashboard-reveal .workspace-counts:focus-within,
+.mac-dashboard-reveal .workbench-columns:focus-within { opacity: 1 !important; transform: none !important; }
 @media (max-width: 760px) {
   .mac-setup { grid-template-columns: minmax(0,1fr); gap: 24px; }
   .mac-setup-art { min-height: 165px; }
@@ -50,4 +76,9 @@
   .mac-setup-art > div { gap: 10px; }
 }
 @media (max-width: 390px) { .accounting-sources { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .mac-waves, .mac-intro .mac-receipt, .mac-intro .brand-wordmark, .mac-setup-form { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .mac-waves, .mac-intro .mac-receipt, .mac-intro-name, .mac-intro-leaving,
+  .mac-setup-first .mac-setup-art, .mac-setup-first .mac-setup-form > *,
+  .mac-dashboard-reveal .mac-dashboard-hero, .mac-dashboard-reveal .mac-dashboard-hero > div,
+  .mac-dashboard-reveal .workspace-counts, .mac-dashboard-reveal .workbench-columns { animation: none; }
+}

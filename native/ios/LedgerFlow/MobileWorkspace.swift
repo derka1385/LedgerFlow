@@ -37,7 +37,10 @@ nonisolated struct ReceiptRecord: Codable, Identifiable {
     let document_date: String?
     let created_at: String
     let state: String
+    var created_by: String? = nil
     var id: String { run_id }
+    /// Who sent it, as the Mac records it (paired iPhone vs. the Mac owner).
+    var source: String { (created_by ?? "").contains("phone") ? "iPhone" : "Mac" }
 }
 
 nonisolated struct AgentMessage: Codable, Identifiable {
@@ -391,7 +394,12 @@ final class MobileWorkspace {
         for receipt in pending where receipt.scope == connection.scope && receipt.issue == nil {
             if Task.isCancelled { break }
             var row = receipt
-            guard let workbook = snapshot.targets.first(where: { $0.id == row.workbookID }) else { continue }
+            // A receipt whose workbook is missing used to wait forever with no message.
+            guard let workbook = snapshot.targets.first(where: { $0.id == row.workbookID }) ?? snapshot.targets.first else {
+                row.issue = "No workbook on the Mac can receive receipts. Open LedgerFlow on the Mac and add a workbook, then retry."
+                do { try replace(row) } catch { notice = message(for: error) }
+                continue
+            }
             do {
                 try await submit(&row, to: workbook, with: api, csrf: identity.csrf_token)
                 try finish(row)

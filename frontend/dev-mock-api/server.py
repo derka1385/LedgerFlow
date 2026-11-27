@@ -845,7 +845,7 @@ def list_runs(ctx):
         items.append({"run_id": r["run_id"], "state": r["state"], "state_reason": r["state_reason"], "workbook_id": r["workbook_id"],
                       "document_id": r["document_id"], "merchant_name": t.get("merchant_name"), "gross_minor": t.get("gross_minor"),
                       "document_date": t.get("document_date"), "kind": t.get("kind"), "validation_summary": r["validation_summary"],
-                      "created_at": r["created_at"], "updated_at": r["updated_at"]})
+                      "created_at": r["created_at"], "updated_at": r["updated_at"], "created_by": r.get("created_by")})
     return 200, {"items": items[:100], "next_cursor": None}
 
 

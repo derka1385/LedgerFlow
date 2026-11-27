@@ -80,6 +80,8 @@ private struct MobileTabs: View {
                 .tabItem { Label("History", systemImage: "clock") }.badge(workspace.pending.count).tag(2)
             NavigationStack { AgentScreen(workspace: workspace, pair: pair) }
                 .tabItem { Label("Agent", systemImage: "bubble.left.and.text.bubble.right") }.tag(3)
+            NavigationStack { ExpensesScreen(workspace: workspace) }
+                .tabItem { Label("Expenses", systemImage: "list.bullet.rectangle") }.tag(4)
         }
     }
 }
@@ -215,7 +217,7 @@ private struct WorkbookDetail: View {
                 let items = workspace.snapshot.receipts.filter { $0.workbook_id == workbook.id }
                 if items.isEmpty { Text("No receipts yet.").foregroundStyle(.secondary) }
                 ForEach(items) { receipt in
-                    NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt) }
+                    NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) }
                 }
             }
         }.navigationTitle(workbook.display_name).navigationBarTitleDisplayMode(.inline)
@@ -411,7 +413,7 @@ private struct HistoryScreen: View {
                         Text(query.isEmpty ? "Submitted receipts will appear here." : "No receipts match your search.").foregroundStyle(.secondary)
                     }
                     ForEach(matching) { receipt in
-                        NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt) }
+                        NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) }
                     }
                 }
             }
@@ -482,17 +484,21 @@ private func stateTitle(_ value: String) -> String {
 
 private struct ReceiptRow: View {
     let receipt: ReceiptRecord
+    var workspace: MobileWorkspace? = nil
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "document").foregroundStyle(MobilePalette.forest)
+            ReceiptThumb(receipt: receipt, workspace: workspace)
             VStack(alignment: .leading, spacing: 4) {
-                Text(receipt.merchant_name ?? "Receipt").font(.subheadline.weight(.semibold))
-                Text(stateTitle(receipt.state)).font(.footnote).foregroundStyle(.secondary)
+                Text(receipt.merchant_name ?? "Reading…").font(.subheadline.weight(.semibold))
+                Text("\(stateTitle(receipt.state)) · from \(receipt.source)").font(.footnote).foregroundStyle(.secondary)
             }
             Spacer()
-            Text(receipt.document_date ?? String(receipt.created_at.prefix(10)))
-                .font(.footnote.monospacedDigit()).foregroundStyle(.secondary)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(sek(receipt.gross_minor)).font(.subheadline.monospacedDigit().weight(.semibold))
+                Text(receipt.document_date ?? String(receipt.created_at.prefix(10)))
+                    .font(.footnote.monospacedDigit()).foregroundStyle(.secondary)
+            }
         }.padding(.vertical, 5)
     }
 }
@@ -635,4 +641,54 @@ func recognizeText(_ jpeg: Data) async -> String {
         try? VNImageRequestHandler(cgImage: image).perform([request])
         return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }.value
+}
+
+
+func sek(_ minor: Int?) -> String {
+    guard let minor else { return "–" }
+    return (Double(minor) / 100).formatted(.currency(code: "SEK").presentation(.narrow))
+}
+
+/// Small image of the scanned receipt, fetched from the Mac.
+private struct ReceiptThumb: View {
+    let receipt: ReceiptRecord
+    let workspace: MobileWorkspace?
+    @State private var image: UIImage?
+    var body: some View {
+        Group {
+            if let image { Image(uiImage: image).resizable().scaledToFill() }
+            else { Image(systemName: "doc.text").foregroundStyle(MobilePalette.forest) }
+        }
+        .frame(width: 40, height: 52).clipShape(.rect(cornerRadius: 6))
+        .background(MobilePalette.paper, in: .rect(cornerRadius: 6))
+        .task(id: receipt.id) {
+            if image == nil, let workspace, let data = try? await workspace.receiptImage(receipt) { image = UIImage(data: data) }
+        }
+    }
+}
+
+/// The firm's expense tracker: every receipt the Mac knows, totals by month.
+private struct ExpensesScreen: View {
+    let workspace: MobileWorkspace
+    private var months: [(String, [ReceiptRecord])] {
+        Dictionary(grouping: workspace.snapshot.receipts) { String(($0.document_date ?? $0.created_at).prefix(7)) }
+            .sorted { $0.key > $1.key }
+    }
+    var body: some View {
+        List {
+            if workspace.snapshot.receipts.isEmpty {
+                Text("No expenses yet. Scan a receipt to start.").foregroundStyle(.secondary)
+            }
+            ForEach(months, id: \.0) { month, items in
+                let booked = items.filter { $0.state == "COMMITTED" }.compactMap(\.gross_minor).reduce(0, +)
+                let open = items.filter { $0.state != "COMMITTED" }.compactMap(\.gross_minor).reduce(0, +)
+                Section {
+                    ForEach(items) { receipt in NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) } }
+                } header: {
+                    HStack { Text(month); Spacer(); Text("Booked \(sek(booked)) · Open \(sek(open))").monospacedDigit() }
+                }
+            }
+        }
+        .navigationTitle("Expenses").refreshable { await workspace.refresh() }
+    }
 }

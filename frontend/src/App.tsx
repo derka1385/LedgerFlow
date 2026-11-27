@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { adoptSession, currentSession, isLocalBackend, isMockBackend, req, signOut } from "./lib/api";
 import type { Session } from "./lib/types";
 import { BrandMark, Wordmark } from "./Brand";
@@ -37,27 +37,51 @@ export function LangSwitch() {
   return <div className="lang-switch" role="group" aria-label={t("shell.language")}>{LANGS.map(l => <button key={l.id} type="button" lang={l.id} aria-pressed={lang === l.id} title={l.label} onClick={() => setLang(l.id)}>{l.short}</button>)}</div>;
 }
 
-const connectionPromises = new Map<string, Promise<Session>>();
-function NativeConnectionGate({ token, bootstrap, onSignedIn }: { token: string; bootstrap: boolean; onSignedIn: (s: Session) => void }) {
+type NativeConnection = { session: Session; profile?: WorkspaceProfile | null };
+const connectionPromises = new Map<string, Promise<NativeConnection>>();
+function NativeConnectionGate({ token, bootstrap, onSignedIn }: {
+  token: string; bootstrap: boolean; onSignedIn: (s: Session, profile?: WorkspaceProfile | null) => void;
+}) {
   const [error, setError] = useState<unknown>(null);
+  const [connection, setConnection] = useState<NativeConnection>();
+  const [intro, setIntro] = useState<"holding" | "ready" | "done">(bootstrap ? "holding" : "done");
+  const handedOff = useRef(false);
   useEffect(() => {
     let active = true;
     history.replaceState(null, "", "/");
     const key = `${bootstrap}:${token}`;
     let promise = connectionPromises.get(key);
     if (!promise) {
-      promise = req<Session>("POST", bootstrap ? "/desktop/bootstrap" : "/desktop/pairings/exchange", { body: { token: decodeURIComponent(token) } });
+      promise = req<Session>("POST", bootstrap ? "/desktop/bootstrap" : "/desktop/pairings/exchange", { body: { token: decodeURIComponent(token) } })
+        .then(async session => {
+          if (!bootstrap || window.location.hostname !== "127.0.0.1") return { session };
+          try {
+            const { profile } = await req<{ profile: WorkspaceProfile | null }>("GET", "/desktop/workspace-profile");
+            return { session, profile };
+          } catch { return { session }; }
+        });
       connectionPromises.set(key, promise);
     }
-    let timer = 0;
-    const reveal = new Promise<void>(resolve => {
-      if (!bootstrap || matchMedia("(prefers-reduced-motion: reduce)").matches) resolve();
-      else timer = window.setTimeout(resolve, 1550);
-    });
-    Promise.all([promise, reveal]).then(([s]) => { if (active) { adoptSession(s); onSignedIn(s); } }).catch(e => { if (active) setError(e); });
-    return () => { active = false; window.clearTimeout(timer); };
+    promise.then(result => { if (active) setConnection(result); }).catch(e => { if (active) setError(e); });
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    const useMotionPreference = () => { if (motion.matches) setIntro("done"); };
+    useMotionPreference();
+    motion.addEventListener("change", useMotionPreference);
+    return () => { active = false; motion.removeEventListener("change", useMotionPreference); };
   }, [token, bootstrap]);
-  if (bootstrap && !error) return <MacIntro/>;
+  useLayoutEffect(() => {
+    if (connection && intro === "done" && !handedOff.current) {
+      handedOff.current = true;
+      adoptSession(connection.session);
+      onSignedIn(connection.session, connection.profile);
+    }
+  }, [connection, intro, onSignedIn]);
+  if (bootstrap && !error) return <MacIntro
+    leaving={intro === "ready" && !!connection}
+    waiting={intro === "done"}
+    onHoldEnd={() => setIntro(phase => phase === "holding" ? "ready" : phase)}
+    onSkip={() => setIntro("done")}
+    onExit={() => setIntro("done")}/>;
   return <main className="native-connection"><BrandMark size={64} /><h1>{error ? "La connexion n’a pas abouti." : bootstrap ? "Votre agent arrive…" : "Association à votre Mac…"}</h1>{error ? <><ErrorNote error={error} /><p>Relancez l’application Mac ou scannez un nouveau code.</p></> : <p>Votre dossier s’ouvre automatiquement.</p>}</main>;
 }
 
@@ -75,6 +99,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [profile, setProfile] = useState<WorkspaceProfile | null | undefined>();
   const [profileError, setProfileError] = useState<unknown>(null);
+  const [revealDashboard, setRevealDashboard] = useState(false);
   const [authError, setAuthError] = useState<unknown>(null);
   const [scan, setScan] = useState(false), [menu, setMenu] = useState(false);
   const [online, setOnline] = useState(navigator.onLine);
@@ -87,7 +112,7 @@ export default function App() {
     setProfileError(null);
     req<{profile: WorkspaceProfile | null}>("GET", "/desktop/workspace-profile").then(result => setProfile(result.profile)).catch(setProfileError);
   };
-  useEffect(() => { if (mac) loadProfile(); }, [mac]);
+  useEffect(() => { if (mac && profile === undefined) loadProfile(); }, [mac, profile]);
   const aliases: Record<string, string> = { inbox: "transactions", runs: "transactions", versions: "workbook" };
   const page = route[0] ?? (mac ? "overview" : session?.backend === "LOCAL" ? "agent" : finance ? "overview" : "home");
   const activePage = aliases[page] ?? page;
@@ -109,6 +134,7 @@ export default function App() {
     sync(); media.addEventListener("change", sync); return () => media.removeEventListener("change", sync);
   }, [appearance]);
   useEffect(() => { setMenu(false); setScan(false); }, [page]);
+  useEffect(() => { if (page !== "overview" && page !== "bootstrap") setRevealDashboard(false); }, [page]);
   useEffect(() => {
     if (!session || mac || !isPhone() || page === "how" || page === "capture") return;
     let seen = "1"; try { seen = localStorage.getItem(HOW_SEEN) ?? ""; } catch { /* no storage: do not loop */ }
@@ -127,7 +153,12 @@ export default function App() {
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   }, [finance]);
   async function logout() { try { await signOut(); setSession(null); setScan(false); go(""); } catch (e) { setAuthError(e); } }
-  const signedIn = (s: Session) => { setSession(s); if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : page === "bootstrap" ? "overview" : "agent") : s.role === "employee" ? "home" : "overview"); };
+  const signedIn = (s: Session, preparedProfile?: WorkspaceProfile | null) => {
+    setSession(s);
+    if (preparedProfile !== undefined) setProfile(preparedProfile);
+    if (page === "bootstrap") setRevealDashboard(true);
+    if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : page === "bootstrap" ? "overview" : "agent") : s.role === "employee" ? "home" : "overview");
+  };
   const setAppearance = (value: Appearance) => { updateAppearance(value); try { localStorage.setItem("ledgerflow.appearance", value); } catch { /* preference still applies */ } };
   if (["bootstrap", "associate"].includes(page) && route[1]) return <NativeConnectionGate token={route[1]} bootstrap={page === "bootstrap"} onSignedIn={signedIn} />;
   if (page === "pair" && route[1]) return <PairingGate token={route[1]} onSignedIn={signedIn} />;
@@ -136,9 +167,9 @@ export default function App() {
   if (!session && isLocalBackend()) return <main className="native-connection"><BrandMark size={64}/><h1>Votre session est fermée.</h1><p>Sur le Mac, quittez puis rouvrez LedgerFlow pour retrouver votre espace. Sur iPhone, touchez l’engrenage et associez de nouveau votre Mac.</p><p className="muted">Vos dossiers et les écritures validées restent enregistrés sur le Mac.</p></main>;
   if (!session) return <Login onSignedIn={signedIn} />;
   if (mac && profileError) return <main className="narrow stack"><h1>Open your workspace</h1><ErrorNote error={profileError}/><button className="btn" onClick={loadProfile}>Try again</button></main>;
-  if (mac && profile === undefined) return <MacIntro/>;
+  if (mac && profile === undefined) return <main className="narrow"><Skeleton /></main>;
   if (mac && (!profile || page === "workspace-profile")) return <WorkspaceSetup key={profile ? "edit" : "create"} profile={profile ?? null}
-    onSave={next => { setProfile(next); go("overview"); }} onCancel={profile ? () => go("overview") : undefined}/>;
+    onSave={next => { if (!profile) setRevealDashboard(true); setProfile(next); go("overview"); }} onCancel={profile ? () => go("overview") : undefined}/>;
   const label = (path: string) => mac ? ({overview: "Dashboard", transactions: "Tasks", receipts: "Receipts", workbook: "Workbooks", activity: "Activity", audit: "Audit history", security: "Security", settings: "Settings", agent: "Agent"} as Record<string, string>)[path] ?? t(`nav.${path}`) : t(`nav.${path}`);
   let body;
   if (page === "how") body = <Explainer onDone={finishHow} />;
@@ -153,7 +184,7 @@ export default function App() {
   else if (page === "versions") body = <div className="stack-lg"><a href="#/workbook">Back to workbook structure</a><Versions key={route[1] ?? "latest"} workbookId={route[1]} /></div>;
   else if (page === "security") body = <Security />;
   else if (["transactions", "inbox", "runs", "receipts", "activity", "audit"].includes(page)) body = <Transactions session={session} selected={route[1]} mode={aliases[page] ?? page} />;
-  else body = <Overview mac={mac} workspace={profile?.name} />;
+  else body = <Overview mac={mac} workspace={profile?.name} reveal={mac && revealDashboard} />;
   const nav = finance ? FINANCE_NAV : EMPLOYEE_NAV;
   return <div className={`app-shell ${finance ? "finance-shell" : "employee-shell"} ${menu ? "sidebar-open" : ""} ${mac ? "mac-shell" : ""}`}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to content</a>

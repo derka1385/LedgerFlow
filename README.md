@@ -1,10 +1,39 @@
-# LedgerFlow — hackathon technical handoff
+# LedgerFlow
 
-Your employees take pictures. Your AI does the bookkeeping. Your company keeps its Excel files.
+**Snap the receipt. It's in your Excel.**
+An accounting agent for small businesses: photograph a receipt and LedgerFlow books it in the Excel workbook you already use, after you approve.
 
-This repository currently contains **research and implementation specifications**, not a working application. Preparation deadline: **27 November 2026, 08:00 Europe/Stockholm (07:00 UTC)**. Work may finish earlier. No work is to continue beyond that cutoff.
+### 👉 [Open the landing page](https://derka1385.github.io/LedgerFlow/) · [Watch the demo film](https://derka1385.github.io/LedgerFlow/landing/#film) · [Download the demo video (MP4)](landing/assets/demo-film.mp4)
 
-Public event material did not explicitly authorize pre-event development. The user's brief makes that permission a prerequisite for application code, Docker configuration, deployment scripts, synthetic fixtures, and automated application tests. Those are specified here for implementation during the event. No VM has been provisioned, no authenticated inference request has been made, and no sandbox or application test has been run.
+| | |
+|---|---|
+| **Landing page** | https://derka1385.github.io/LedgerFlow/ |
+| **Demo film** | 4 min, real Mac + iPhone recordings, live Vultr inference and a real sandbox containment test |
+| **Status** | Beta, built for the Vultr Agent Runtime Hackathon (Stockholm, 27 Nov 2026) |
+| **Apps** | Mac app (local engine) · web agent · iPhone app (optional, pairs with the Mac over local Wi-Fi) |
+
+## How it works, in one minute
+
+1. **Snap it.** Photograph a receipt on the iPhone, or drop a photo/PDF on the Mac.
+2. **It reads it.** Vultr Serverless Inference (qwen3.8-27b) reads supplier, date, total, VAT and payment; every value keeps the text it came from.
+3. **Rules decide.** Deterministic Swedish accounting rules, not the model, build a balanced entry and the exact cells to write.
+4. **A sealed box writes.** Generated Python edits the workbook inside a disposable Docker sandbox (no network, no keys, read-only input, 1 CPU, 512 MB), then the container is destroyed.
+5. **You approve.** An independent verifier re-opens the real file (21 checks); your approval is bound to that file's sha256. The previous version is kept.
+
+Measured on a synthetic benchmark (27 Nov 2026): 22/22 receipts booked right live on Vultr, 13/13 sandbox escape probes contained, 16/16 tampered workbooks rejected, about USD 0.004 of inference per receipt. Details: [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md), [film/VERIFICATION_REPORT.md](film/VERIFICATION_REPORT.md).
+
+**Honest limits:** in the recorded demo the backend and sandbox run on the Mac (Docker Desktop); the Vultr Cloud Compute runner is prepared with OpenTofu but not yet deployed. The Mac build is unsigned during the beta.
+
+## Run it locally
+
+```bash
+sh demo/start_demo.sh      # needs Docker Desktop and VULTR_INFERENCE_API_KEY in .env
+```
+Then open http://localhost:8790 (invites: `owner-demo`, `employee-demo`). Stop and clean with `sh demo/reset_demo.sh`.
+
+---
+
+## Original hackathon handoff (27 Nov 2026, before the event)
 
 ## Start here at 09:00
 

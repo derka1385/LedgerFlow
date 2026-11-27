@@ -87,17 +87,13 @@ export default function Onboarding({ session, workbookId, embedded, onContinue, 
               {file ? <span>Selected: <code>{file.name}</code></span> : null}
             </div>
           ) : null}
-          <p className="small">Drop an .xlsx file here or choose a file above. {file ? `Selected: ${file.name}. ` : ""}The original stays as version 1. Every approved change creates a new version.</p>
         </section>
       ) : !active ? <Callout tone="info" title="No workbook yet.">An owner connects the company workbook.</Callout> : null}
 
       <ErrorNote error={error} />
 
       {active && compat && !compat.supported ? (
-        <Callout tone="bad" title="LedgerFlow can't safely write to this workbook yet.">
-          <p>{compat.message}</p>
-          <p>Supported today: T-account workbooks (SSE style, with account dropdowns) and, next, journal tables with Date / Account / Debit / Credit columns.</p>
-        </Callout>
+        <p className="small muted">Saved as a reference file. Receipts are written into T-account workbooks; upload one when you want entries filled in.</p>
       ) : null}
 
       {active && compat?.supported ? (

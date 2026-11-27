@@ -29,12 +29,19 @@ try {
   await p.goto(BASE + `/#/sheet/${ready.workbook_id}`); await p.waitForTimeout(2500); await shot("03_excel_grid");
   ok("workbook opens in the Excel grid", (await p.locator("table td, [role=gridcell]").count()) > 50);
   // receipt
+  const before = new Set(((await api("/runs")).body.items || []).map(r => r.run_id));
   await p.goto(BASE + "/#/capture"); await p.waitForTimeout(2000);
-  await p.locator("#sample").selectOption({ index: 1 }); await p.waitForTimeout(1500);
+  await p.locator("#sample").selectOption({ index: +(process.env.SAMPLE || 1) }); await p.waitForTimeout(1500);
   await p.getByRole("button", { name: /Use this photo|Read receipt/ }).click(); await p.waitForTimeout(3000); await shot("04_receipt_sent");
   let run = null;
-  for (let i = 0; i < 40; i++) { const r = (await api("/runs")).body.items; run = r[0]; if (run && ["AWAITING_APPROVAL","NEEDS_REVIEW","FAILED","DUPLICATE_REVIEW","COMMITTED"].includes(run.state)) break; await p.waitForTimeout(2500); }
-  ok(`receipt processed (state=${run?.state}, ${run?.merchant_name})`, run?.state === "AWAITING_APPROVAL");
+  for (let i = 0; i < 40; i++) { const r = (await api("/runs")).body.items; run = r.find(x => !before.has(x.run_id)); if (run && ["AWAITING_APPROVAL","NEEDS_REVIEW","FAILED","DUPLICATE_REVIEW","COMMITTED"].includes(run.state)) break; await p.waitForTimeout(2500); }
+  if (run?.state === "DUPLICATE_REVIEW") {  // another tester already sent this sample: release it the way a judge would
+    ok(`duplicate detected and shown (${run.merchant_name})`, true);
+    await p.goto(BASE + `/#/transactions/${run.run_id}`); await p.waitForTimeout(2500); await shot("05b_duplicate");
+    await p.getByRole("button", { name: /Different purchase: continue/ }).click();
+    for (let i = 0; i < 40; i++) { run = (await api(`/runs/${run.run_id}`)).body; if (["AWAITING_APPROVAL","NEEDS_REVIEW","FAILED"].includes(run.state)) break; await p.waitForTimeout(2500); }
+  }
+  ok(`receipt processed (state=${run?.state}, ${run?.merchant_name || run?.transaction?.merchant_name})`, run?.state === "AWAITING_APPROVAL");
   // agent
   await p.goto(BASE + "/#/agent"); await p.waitForTimeout(1500);
   await p.locator("#agent-message").fill("Which receipt is waiting for my approval?"); await p.keyboard.press("Enter");

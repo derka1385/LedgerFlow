@@ -3,6 +3,10 @@
 **Snap the receipt. It's in your Excel.**
 An accounting agent for small businesses: photograph a receipt and LedgerFlow books it in the Excel workbook you already use, after you approve.
 
+### 🧪 Jury: [try the live web app — no account](https://smilies-hoping-derived-delivering.trycloudflare.com/welcome/)
+
+Opens the real LedgerFlow app with a shared demo workspace (fictional data): connect the sample workbook, send a sample receipt, ask the agent, approve, download the modified `.xlsx`. Works in any browser (Windows, Android, Mac). If a receipt was already sent by someone else, LedgerFlow flags it as a possible duplicate: choose **Different purchase: continue**.
+
 ### 👉 [Open the landing page](https://derka1385.github.io/LedgerFlow/) · [Watch the demo film](https://derka1385.github.io/LedgerFlow/landing/#film) · [Download the demo video (MP4)](landing/assets/demo-film.mp4)
 
 | | |

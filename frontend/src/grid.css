@@ -343,3 +343,8 @@ a.live-sheet-row:hover { background: color-mix(in srgb, var(--accent-wash) 55%, 
 .mac-signin-form > * { animation: lf-rise .5s var(--ease-out) both; }
 .mac-signin-form > *:nth-child(2) { animation-delay: .08s; } .mac-signin-form > *:nth-child(3) { animation-delay: .16s; } .mac-signin-form > *:nth-child(4) { animation-delay: .24s; }
 @media (prefers-reduced-motion: reduce) { .mac-signin-page .mac-setup-art, .mac-signin-form > * { animation: none; } }
+
+/* Mac window without a title bar: keep clear of the traffic lights and let the top strip drag the window */
+html.mac-shell body { padding-top: 0; }
+html.mac-shell .sidebar, html.mac-shell .mac-setup, html.mac-shell .mac-intro, html.mac-shell main.native-connection { padding-top: max(var(--mac-top, 0px), 38px); }
+html.mac-shell::before { content: ""; position: fixed; inset: 0 0 auto 0; height: 30px; z-index: 1000; -webkit-app-region: drag; pointer-events: none; }

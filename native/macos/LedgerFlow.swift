@@ -19,6 +19,11 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
         let size = NSSize(width: min(1600, screen.width * 0.94), height: min(1040, screen.height * 0.94))
         let win = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         win.title = "LedgerFlow"
+        // No visible title bar: content runs to the top, traffic lights float over it.
+        win.titleVisibility = .hidden
+        win.titlebarAppearsTransparent = true
+        win.styleMask.insert(.fullSizeContentView)
+        win.isMovableByWindowBackground = true
         win.isReleasedWhenClosed = false
         win.minSize = NSSize(width: min(1060, screen.width), height: min(700, screen.height))
         win.center()
@@ -131,6 +136,8 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
 
     private func loadWorkspace(_ url: URL) {
         let configuration = WKWebViewConfiguration()
+        configuration.userContentController.addUserScript(WKUserScript(
+            source: "document.documentElement.classList.add('mac-shell')", injectionTime: .atDocumentStart, forMainFrameOnly: true))
         configuration.websiteDataStore = .default()
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = self; view.uiDelegate = self

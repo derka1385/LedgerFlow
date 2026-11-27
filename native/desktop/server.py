@@ -112,9 +112,32 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         request = api.jbody(ctx)
         with api.LOCK:
             if consumed_bootstrap or not secrets.compare_digest(str(request.get("token", "")), bootstrap) or ctx["handler"].client_address[0] != "127.0.0.1":
-                raise api.ApiError(401,"BOOTSTRAP_INVALID","Relancez l’application Mac pour ouvrir votre espace.")
+                raise api.ApiError(401,"BOOTSTRAP_INVALID","Reopen the Mac app to open your workspace.")
             consumed_bootstrap = True
-            return session("owner", "usr_local_owner", "Mon espace", "Mac")
+            return session("owner", "usr_local_owner", "My workspace", "Mac")
+
+    login_failures = []
+
+    @api.route("POST", "/desktop/login", auth=False)
+    def login(ctx):
+        """Email + password sign-in on this Mac, so a signed-out user can come back without relaunching the app.
+        Demo account from LEDGERFLOW_DEMO_EMAIL / LEDGERFLOW_DEMO_PASSWORD in the git-ignored .env. Loopback only."""
+        api.vsi.load_dotenv()
+        body = api.jbody(ctx)
+        email, password = os.environ.get("LEDGERFLOW_DEMO_EMAIL", ""), os.environ.get("LEDGERFLOW_DEMO_PASSWORD", "")
+        if ctx["handler"].client_address[0] != "127.0.0.1":
+            raise api.ApiError(403, "LOGIN_LOCAL_ONLY", "Sign in on the Mac itself. On iPhone, pair from the Mac.")
+        with api.LOCK:
+            now = time.time()
+            login_failures[:] = [t for t in login_failures if now - t < 60]
+            if len(login_failures) >= 5:
+                raise api.ApiError(429, "LOGIN_THROTTLED", "Too many attempts. Wait a minute and try again.", True)
+            ok = bool(email and password) and secrets.compare_digest(str(body.get("email", "")).strip().lower(), email.lower()) \
+                and secrets.compare_digest(str(body.get("password", "")), password)
+            if not ok:
+                login_failures.append(now)
+                raise api.ApiError(401, "LOGIN_INVALID", "Email or password is incorrect.")
+            return session("owner", "usr_local_owner", "My workspace", "Mac")
 
     @api.route("GET", "/desktop/status")
     def status(ctx):
@@ -140,8 +163,28 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             raise api.ApiError(400, "INVALID_WORKSPACE_PROFILE", "Enter a workspace name and select an accounting source.")
         with api.LOCK:
             profile = {"name": name.strip(), "source": source, "agent_name": agent_name.strip()}
+            previous = api.DB.get("desktop_workspace_profile")
+            if previous is None:
+                profile["setup_step"] = "workbook"
+            elif "setup_step" in previous:
+                profile["setup_step"] = previous["setup_step"]
             api.DB["desktop_workspace_profile"] = profile
         return 200, {"profile": profile}
+
+    @api.route("POST", "/desktop/workspace-setup", roles=("owner",))
+    def update_setup(ctx):
+        if ctx["handler"].client_address[0] != "127.0.0.1":
+            raise api.ApiError(403, "MAC_REQUIRED", "Continue setup on the Mac.")
+        step = api.jbody(ctx).get("step")
+        if step not in ("workbook", "guide", "iphone", "complete"):
+            raise api.ApiError(400, "INVALID_SETUP_STEP", "Choose a valid setup step.")
+        with api.LOCK:
+            profile = api.DB.get("desktop_workspace_profile")
+            if not profile:
+                raise api.ApiError(409, "WORKSPACE_REQUIRED", "Create a workspace before continuing.")
+            updated = {**profile, "setup_step": step}
+            api.DB["desktop_workspace_profile"] = updated
+        return 200, {"profile": updated}
 
     def render_pdf(data):
         renderer = REPO / "native/macos/build/LedgerFlow.app/Contents/MacOS/render-receipt"
@@ -172,13 +215,13 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             raise api.ApiError(400,"INVALID_SCOPE","Choisissez capture ou espace complet.")
         peers = [v for v in addresses if v != "127.0.0.1"]
         if not peers:
-            raise api.ApiError(409,"NO_LOCAL_NETWORK","Connectez le Mac et l’iPhone au même réseau Wi-Fi.")
+            raise api.ApiError(409,"NO_LOCAL_NETWORK","Connect the Mac and the iPhone to the same Wi-Fi network.")
         with api.LOCK:
             for records in (pairings, paired):
                 for identifier, record in list(records.items()):
                     if record["deadline"] < time.time():
                         del records[identifier]
-            if len(pairings) >= 10: raise api.ApiError(429,"PAIRING_LIMIT","Fermez un code existant puis réessayez.")
+            if len(pairings) >= 10: raise api.ApiError(429,"PAIRING_LIMIT","Close the existing code, then try again.")
             token, pid = secrets.token_urlsafe(32), api.oid("pair")
             pairings[pid] = {"digest":api.sha(token.encode()),"deadline":time.time()+120,"uid":ctx["session"]["user_id"],"scope":scope}
         origin = f"https://{peers[0]}:{port}"
@@ -198,7 +241,7 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
     def unpair(ctx,pid):
         with api.LOCK:
             value=pairings.get(pid)
-            if value and value["uid"] != ctx["session"]["user_id"]: raise api.ApiError(403,"FORBIDDEN","Ce code appartient à un autre utilisateur.")
+            if value and value["uid"] != ctx["session"]["user_id"]: raise api.ApiError(403,"FORBIDDEN","This code belongs to another user.")
             pairings.pop(pid,None)
             if pid in paired and paired[pid]["uid"] == ctx["session"]["user_id"]:
                 paired.pop(pid)
@@ -207,14 +250,14 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
     @api.route("POST", "/desktop/pairings/exchange",auth=False)
     def exchange(ctx):
         token = str(api.jbody(ctx).get("token", ""))
-        if not 32 <= len(token) <= 100: raise api.ApiError(401,"PAIRING_INVALID","Le code est invalide ou expiré. Générez-en un autre sur le Mac.")
+        if not 32 <= len(token) <= 100: raise api.ApiError(401,"PAIRING_INVALID","The code is invalid or expired. Generate a new one on the Mac.")
         digest=api.sha(token.encode())
         with api.LOCK:
             found=next(((pid,p) for pid,p in pairings.items() if secrets.compare_digest(p["digest"],digest)),None)
-            if not found or found[1]["deadline"] <= time.time(): raise api.ApiError(401,"PAIRING_INVALID","Le code est invalide ou expiré. Générez-en un autre sur le Mac.")
+            if not found or found[1]["deadline"] <= time.time(): raise api.ApiError(401,"PAIRING_INVALID","The code is invalid or expired. Generate a new one on the Mac.")
             pid,p=found
             del pairings[pid]  # atomic single use, never persisted
-            result = session("owner" if p["scope"] == "workspace" else "employee",p["uid"] if p["scope"]=="workspace" else "usr_phone_capture","Mon iPhone", "iPhone")
+            result = session("owner" if p["scope"] == "workspace" else "employee",p["uid"] if p["scope"]=="workspace" else "usr_phone_capture","My iPhone", "iPhone")
             paired[pid] = {"uid": p["uid"], "deadline": time.time() + 120}
             return result
 
@@ -228,11 +271,11 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
     def chat(ctx):
         body=api.jbody(ctx)
         text=body.get("text", "")
-        if not isinstance(text,str) or not 1<=len(text.strip())<=3000: raise api.ApiError(400,"MESSAGE_INVALID","Votre message doit contenir entre 1 et 3 000 caractères.")
-        if not api.vsi.enabled(): raise api.ApiError(503,"INFERENCE_UNAVAILABLE","Le modèle de vision n’est pas configuré sur ce Mac. Consultez « Connexion du modèle » dans Réglages.",True)
+        if not isinstance(text,str) or not 1<=len(text.strip())<=3000: raise api.ApiError(400,"MESSAGE_INVALID","Your message must be between 1 and 3,000 characters.")
+        if not api.vsi.enabled(): raise api.ApiError(503,"INFERENCE_UNAVAILABLE","The vision model is not configured on this Mac. See “Model connection” in Settings.",True)
         uid, role=ctx["session"]["user_id"],ctx["session"]["role"]
         with api.LOCK:
-            if uid in chat_busy: raise api.ApiError(409,"ASSISTANT_BUSY","Une réponse est déjà en cours.",True)
+            if uid in chat_busy: raise api.ApiError(409,"ASSISTANT_BUSY","A reply is already in progress.",True)
             chat_busy.add(uid)
             runs=[api.snapshot(r,role) for r in api.DB["runs"].values() if role!="employee" or r.get("created_by")==uid][-25:]
             workbooks=[api.workbook_view(w) for w in api.DB["workbooks"].values()]
@@ -241,14 +284,14 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         try:
             context={"role":role,"workbooks":[{"name":w["display_name"],"status":w["status"],"versions":w["version_count"]} for w in workbooks],
                      "documents":[{"merchant":r.get("transaction",{}).get("merchant_name") if r.get("transaction") else None,"state":r["state"],"review_items":r.get("review_items",[]),"amount_minor":(r.get("transaction") or {}).get("gross_minor"),"currency":(r.get("transaction") or {}).get("currency")} for r in runs],
-                     "vision_model":api.vsi.MODEL,"storage":"Mac local; iPhone sur le même réseau via QR; LedgerFlow actif et Mac éveillé. Fermer la fenêtre laisse le moteur actif; quitter LedgerFlow ou mettre le Mac en veille coupe l’accès iPhone."}
+                     "vision_model":api.vsi.MODEL,"storage":"Local Mac; iPhone on the same network via QR; LedgerFlow running and the Mac awake. Closing the window keeps the engine running; quitting LedgerFlow or sleeping the Mac cuts iPhone access."}
             result,meta=assistant.answer(api.vsi,context,[*history,user],body.get("language") if body.get("language") in assistant.LANGUAGES else "fr")
             allowed={"capture","overview"} if role=="employee" else set(assistant.SCHEMA["properties"]["actions"]["items"]["enum"])
             reply={"id":api.oid("msg"),"role":"assistant","text":result["answer"],"actions":[a for a in result["actions"] if a in allowed],"user_id":uid,"created_at":api.now(),"model":meta["model_id"]}
             with api.LOCK: api.DB["assistant_messages"].extend([user,reply])
             return 201,{"items":[user,reply]}
         except api.vsi.VsiError as exc:
-            raise api.ApiError(503,"ASSISTANT_UNAVAILABLE","Le modèle ne répond pas pour le moment. Votre message peut être réessayé.",True) from exc
+            raise api.ApiError(503,"ASSISTANT_UNAVAILABLE","The model is not responding right now. You can retry your message.",True) from exc
         finally:
             with api.LOCK: chat_busy.discard(uid)
 
@@ -298,11 +341,11 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         def _dispatch(self,method):
             host=self.headers.get("Host", "")
             permitted={f"{address}:{port}" for address in addresses}|{f"localhost:{port}"}
-            if host not in permitted: return self._err(api.ApiError(403,"HOST_INVALID","Adresse non autorisée."))
+            if host not in permitted: return self._err(api.ApiError(403,"HOST_INVALID","Address not allowed."))
             request_origin=self.headers.get("Origin")
             if method!="GET" and request_origin and request_origin!="https://"+host:
-                return self._err(api.ApiError(403,"ORIGIN_INVALID","Origine non autorisée."))
-            if self.headers.get("Sec-Fetch-Site")=="cross-site": return self._err(api.ApiError(403,"ORIGIN_INVALID","Origine non autorisée."))
+                return self._err(api.ApiError(403,"ORIGIN_INVALID","Origin not allowed."))
+            if self.headers.get("Sec-Fetch-Site")=="cross-site": return self._err(api.ApiError(403,"ORIGIN_INVALID","Origin not allowed."))
             return super()._dispatch(method)
     return DesktopHandler,flush
 
@@ -323,7 +366,7 @@ def main():
     if saved is not None: api.DB.update(saved)
     for run in api.DB["runs"].values():
         if run["state"] not in {"COMMITTED","CANCELLED","REJECTED","FAILED","EXPIRED","AWAITING_APPROVAL","NEEDS_REVIEW","DUPLICATE_REVIEW","STALE_BASE"}:
-            api.set_state(run,"FAILED","APP_INTERRUPTED","Le Mac a été arrêté pendant le traitement. Relancez cette pièce depuis sa fiche.")
+            api.set_state(run,"FAILED","APP_INTERRUPTED","The Mac stopped during processing. Restart this receipt from its page.")
     def ensure_default_workbook():
         """The iPhone can only send receipts to a ready workbook. A fresh Mac has none, so receipts
         stayed queued on the phone. Seed the synthetic Nordvik T-accounts book once, owner-confirmed."""
@@ -348,12 +391,12 @@ def main():
     api.vsi.load_dotenv()
     # No automatic mocked extraction in the delivered Mac application.
     if not api.vsi.enabled():
-        def unavailable(*a,**k): raise api.ApiError(503,"INFERENCE_UNAVAILABLE","Le modèle de vision n’est pas configuré.")
+        def unavailable(*a,**k): raise api.ApiError(503,"INFERENCE_UNAVAILABLE","The vision model is not configured.")
         def start_unavailable(run_id, from_stage="EXTRACTING"):
             with api.LOCK:
                 run=api.DB["runs"][run_id]
                 run["transaction"]=api.blank_transaction(api.DB["documents"][run["document_id"]],run)
-                api.set_state(run,"NEEDS_REVIEW","INFERENCE_UNAVAILABLE","Le modèle de vision n’est pas configuré. Rien n’a été écrit.")
+                api.set_state(run,"NEEDS_REVIEW","INFERENCE_UNAVAILABLE","The vision model is not configured. Nothing was written.")
         api.start_run_worker=start_unavailable
     addresses=local_addresses()
     cert,key,fingerprint=certificate(args.data_dir,addresses)

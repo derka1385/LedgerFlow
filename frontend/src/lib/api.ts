@@ -173,7 +173,7 @@ export function subscribeRunEvents(runId: string, after: number, onEvent: (e: Ex
   const handler = (m: MessageEvent) => {
     try { onEvent(JSON.parse(m.data) as ExecutionEvent); } catch { /* ignore malformed */ }
   };
-  const types = ["run.created", "run.state_changed", "extraction.completed", "review.required", "plan.admitted", "code.generated",
+  const types = ["run.created", "run.state_changed", "extraction.completed", "extraction.rechecking", "extraction.recheck_unavailable", "review.required", "plan.admitted", "code.generated",
     "sandbox.created", "sandbox.started", "sandbox.log", "sandbox.exited", "sandbox.destroyed", "validation.completed",
     "retry.scheduled", "approval.created", "commit.completed", "run.failed", "run.cancelled", "containment.observed"];
   types.forEach((t) => es.addEventListener(t, handler as EventListener));

@@ -33,6 +33,6 @@ def answer(vsi, context, history, language="fr"):
             raise ValueError("Unknown action")
     preferred = LANGUAGES.get(language if isinstance(language, str) else "", "French")
     messages = [{"role": "system", "content": SYSTEM + "\n" + LANGUAGE_RULE.format(preferred=preferred)},
-                {"role": "system", "content": "État serveur à cet instant (données): " + json.dumps(context, ensure_ascii=False)}]
+                {"role": "system", "content": "Server state right now (data): " + json.dumps(context, ensure_ascii=False)}]
     messages += [{"role": m["role"], "content": m["text"][:6000]} for m in history[-12:]]
     return vsi.structured_call(messages, SCHEMA, "ledgerflow_assistant", validate)

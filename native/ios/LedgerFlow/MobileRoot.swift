@@ -5,6 +5,9 @@ import Vision
 import VisionKit
 
 struct MobileRoot: View {
+    @ObservedObject var reviewAlerts: ReviewAlerts
+    @State private var activeTab = 0
+    @State private var historyFilter = "All"
     private enum Sheet: String, Identifiable {
         case pairing, account
         var id: String { rawValue }
@@ -21,7 +24,8 @@ struct MobileRoot: View {
             if showingLaunch {
                 ReceiptLaunch(finish: finishLaunch).transition(.opacity)
             } else if workspace.canEnter {
-                MobileTabs(workspace: workspace, pair: { present(.pairing) }, account: { present(.account) })
+                MobileTabs(workspace: workspace, reviewAlerts: reviewAlerts, pair: { present(.pairing) }, account: { present(.account) },
+                           selection: $activeTab, historyFilter: $historyFilter)
             } else {
                 MobileWelcome(workspace: workspace, pair: { present(.pairing) }, account: { present(.account) })
             }
@@ -44,10 +48,19 @@ struct MobileRoot: View {
                 if await workspace.pair(url.absoluteString) { await workspace.refresh() }
             }
         }
+        .onChange(of: reviewAlerts.openReview, initial: true) {
+            guard reviewAlerts.openReview != nil else { return }
+            activeTab = 2
+            historyFilter = "To check"
+        }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
+            await reviewAlerts.updatePermission()
             while !Task.isCancelled {
                 await workspace.refresh()
+                if workspace.connected, let scope = workspace.connection?.scope {
+                    await reviewAlerts.publish(receipts: workspace.snapshot.receipts, scope: scope)
+                }
                 do { try await Task.sleep(for: .seconds(8)) } catch { break }
             }
         }
@@ -65,9 +78,11 @@ struct MobileRoot: View {
 
 private struct MobileTabs: View {
     let workspace: MobileWorkspace
+    @ObservedObject var reviewAlerts: ReviewAlerts
     let pair: () -> Void
     let account: () -> Void
-    @State private var selection = 0
+    @Binding var selection: Int
+    @Binding var historyFilter: String
 
     var body: some View {
         TabView(selection: $selection) {
@@ -76,8 +91,8 @@ private struct MobileTabs: View {
             }.tabItem { Label("Home", systemImage: "house") }.tag(0)
             NavigationStack { CaptureScreen(workspace: workspace, openQueue: { selection = 2 }) }
                 .tabItem { Label("Scan", systemImage: "viewfinder") }.tag(1)
-            NavigationStack { HistoryScreen(workspace: workspace) }
-                .tabItem { Label("History", systemImage: "clock") }.badge(workspace.pending.count).tag(2)
+            NavigationStack { HistoryScreen(workspace: workspace, reviewAlerts: reviewAlerts, filter: $historyFilter) }
+                .tabItem { Label("History", systemImage: "clock") }.badge(workspace.pending.count + workspace.snapshot.receipts.filter(\.needsReviewAlert).count).tag(2)
             NavigationStack { AgentScreen(workspace: workspace, pair: pair) }
                 .tabItem { Label("Agent", systemImage: "bubble.left.and.text.bubble.right") }.tag(3)
         }
@@ -425,8 +440,9 @@ private struct DocumentCamera: UIViewControllerRepresentable {
 
 private struct HistoryScreen: View {
     let workspace: MobileWorkspace
+    @ObservedObject var reviewAlerts: ReviewAlerts
     @State private var query = ""
-    @State private var filter = "All"
+    @Binding var filter: String
     private let filters = ["All", "Sending", "To check", "Booked"]
 
     private func group(_ r: ReceiptRecord) -> String {
@@ -448,6 +464,16 @@ private struct HistoryScreen: View {
         List {
             Section {
                 ConnectionBadge(workspace: workspace)
+                if workspace.connection != nil && (reviewAlerts.status == .notDetermined || reviewAlerts.status == .denied) {
+                    Button(reviewAlerts.status == .denied ? "Manage review alerts" : "Enable review alerts") {
+                        Task {
+                            await reviewAlerts.enable()
+                            if workspace.connected, let scope = workspace.connection?.scope {
+                                await reviewAlerts.publish(receipts: workspace.snapshot.receipts, scope: scope)
+                            }
+                        }
+                    }
+                }
                 Picker("Show", selection: $filter) { ForEach(filters, id: \.self) { Text($0) } }.pickerStyle(.segmented)
             }
             if (filter == "All" || filter == "Sending") && !workspace.pending.isEmpty {

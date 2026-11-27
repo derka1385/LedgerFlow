@@ -3,6 +3,7 @@ import { ApiError, createRun, fixtureFile, getDocument, getRun, listFixtures, su
 import { isTerminal, mergeEvents, STATE_LABEL } from "../lib/format";
 import type { ExecutionEvent, RunSnapshot, Session, UploadTarget } from "../lib/types";
 import { Callout, ErrorNote, Icon, Skeleton, StatePill } from "../ui";
+import ReceiptProgress from "./ReceiptProgress";
 import { ReceiptSummary } from "./Employee";
 
 type Phase = "pick" | "preview" | "sending" | "sent";
@@ -14,7 +15,7 @@ const STEPS: [string, string[]][] = [
   ["Booked", ["COMMITTED"]],
 ];
 
-export default function Capture({ session }: { session: Session }) {
+export default function Capture({ session, mac = false }: { session: Session; mac?: boolean }) {
   const [targets, setTargets] = useState<UploadTarget[] | null>(null);
   const [target, setTarget] = useState<UploadTarget | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -22,10 +23,11 @@ export default function Capture({ session }: { session: Session }) {
   const [small, setSmall] = useState(false);
   const [progress, setProgress] = useState(0);
   const [sendStage, setSendStage] = useState("Uploading photo");
+  const [fileIsPDF, setFileIsPDF] = useState(false);
   const [phase, setPhase] = useState<Phase>("pick");
   const [error, setError] = useState<unknown>(null);
   const [run, setRun] = useState<RunSnapshot | null>(null);
-  const [, setEvents] = useState<ExecutionEvent[]>([]);
+  const [events, setEvents] = useState<ExecutionEvent[]>([]);
   const uploadId = useRef<string>("");
   const documentId = useRef<string | null>(null);
   const sending = useRef(false);
@@ -42,14 +44,14 @@ export default function Capture({ session }: { session: Session }) {
 
   useEffect(() => () => abort.current?.abort(), []);
   useEffect(() => {
-    if (!file) { setPreview(null); return; }
+    if (!file || fileIsPDF) { setPreview(null); setSmall(false); return; }
     const url = URL.createObjectURL(file); setPreview(url); setSmall(false);
     const img = new Image();
     img.onload = () => setSmall(Math.min(img.naturalWidth, img.naturalHeight) < 1000);
     img.onerror = () => setError(new Error("This image could not be decoded. Retake it or choose a JPEG / PNG."));
     img.src = url;
     return () => { img.onload = null; img.onerror = null; URL.revokeObjectURL(url); };
-  }, [file]);
+  }, [file, fileIsPDF]);
 
   useEffect(() => {
     if (!run || isTerminal(run.state)) return;
@@ -62,13 +64,15 @@ export default function Capture({ session }: { session: Session }) {
   const choose = (f: File | undefined) => {
     if (!f) return;
     setError(null);
-    if (f.size > 10 * 1024 * 1024) { setError(new ApiError(413, "IMAGE_TOO_LARGE", "This file can't be used (max 10 MB, JPG or PNG).")); return; }
-    if (!/^image\/(jpeg|png)$/.test(f.type)) {
-      setError(new ApiError(415, "IMAGE_UNREADABLE", "Use a JPG or PNG photo. On iPhone, set Camera > Formats > Most Compatible, or upload a screenshot."));
+    const pdf = f.type === "application/pdf" || (!f.type && /\.pdf$/i.test(f.name));
+    if (f.size > 10 * 1024 * 1024) { setError(new ApiError(413, "IMAGE_TOO_LARGE", "The file exceeds 10 MB.")); return; }
+    if (!/^image\/(jpeg|png)$/.test(f.type) && !(mac && pdf)) {
+      setError(new ApiError(415, "IMAGE_UNREADABLE", mac ? "Choose a JPEG, PNG or single-page PDF." : "Use a JPEG or PNG photo."));
       return;
     }
     uploadId.current = `cap_${crypto.randomUUID().replace(/-/g, "").slice(0, 20)}`;
     documentId.current = null;
+    setFileIsPDF(pdf);
     setFile(f);
     setPhase("preview");
   };
@@ -124,7 +128,7 @@ export default function Capture({ session }: { session: Session }) {
     <div className="stack-lg">
       <div className="stack" style={{ gap: 6 }}>
         <h1>{phase === "sent" ? "Receipt submitted." : "New receipt"}</h1><p className="capture-workbook">{target?.display_name}</p>
-        <p className="muted">Photograph a receipt or invoice. Finance takes it from there.</p>
+        <p className="muted">{mac && phase === "sent" ? null : mac ? "Import a receipt or invoice. LedgerFlow reads the supplier, amounts and VAT for review." : "Photograph a receipt or invoice. Finance takes it from there."}</p>
       </div>
       {targets.length > 1 ? (
         <label htmlFor="target">Company workbook
@@ -135,14 +139,18 @@ export default function Capture({ session }: { session: Session }) {
       ) : null}
 
       <input ref={camera} type="file" accept="image/jpeg,image/png" capture="environment" hidden onChange={(e) => choose(e.target.files?.[0])} />
-      <input ref={picker} type="file" accept="image/jpeg,image/png" hidden onChange={(e) => choose(e.target.files?.[0])} />
+      <input ref={picker} type="file" aria-label="Receipt file" accept={mac ? "image/jpeg,image/png,application/pdf,.pdf" : "image/jpeg,image/png"} hidden onChange={(e) => choose(e.target.files?.[0])} />
 
       {phase === "pick" ? (
         <div className="stack">
-          <div className="capture-guide"><div className="capture-framing"><Icon name="file" /></div><h2>Keep the whole receipt in frame.</h2><p>Use good light and a flat surface. Check that the total and date are readable.</p></div>
+          {mac ? <div className="capture-guide" onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); choose(event.dataTransfer.files[0]); }}>
+            <div className="capture-framing"><Icon name="file"/></div><h2>Drop a receipt here</h2>
+            <p>JPEG, PNG or single-page PDF · up to 10 MB</p>
+            <button className="btn primary big" onClick={() => picker.current?.click()}><Icon name="upload"/>Choose file from Mac</button>
+          </div> : <><div className="capture-guide"><div className="capture-framing"><Icon name="file" /></div><h2>Keep the whole receipt in frame.</h2><p>Use good light and a flat surface. Check that the total and date are readable.</p></div>
           <button className="btn primary big" onClick={() => camera.current?.click()}><Icon name="camera" />Take photo</button>
           <button className="btn" onClick={() => picker.current?.click()}><Icon name="upload" />Upload a file</button>
-          <p className="small">JPEG or PNG, up to 10 MB. Convert PDF or HEIC to an image before uploading.</p>
+          <p className="small">JPEG or PNG, up to 10 MB.</p></>}
           {samples.length ? (
             <label htmlFor="sample">Development backend: use a sample document
               <select id="sample" defaultValue="" onChange={(e) => e.target.value && fixtureFile(e.target.value).then(choose).catch(setError)}>
@@ -154,21 +162,21 @@ export default function Capture({ session }: { session: Session }) {
         </div>
       ) : null}
 
-      {(phase === "preview" || phase === "sending") && preview ? (
+      {(phase === "preview" || phase === "sending") && (preview || fileIsPDF) ? (
         <div className="stack">
-          <img className="capture-preview" src={preview} alt="Photo you are about to send" />
+          {fileIsPDF ? <div className="panel row"><Icon name="file"/><strong>{file?.name}</strong></div> : preview ? <img className="capture-preview" src={preview} alt="Receipt you are about to send" /> : null}
           {small ? <Callout tone="warn">This photo looks small. Small text may be unreadable.</Callout> : null}
           {phase === "sending" ? <div className="stack" aria-live="polite"><label htmlFor="upload-progress">{sendStage}{sendStage === "Uploading photo" ? ` · ${progress}%` : ""}</label><progress id="upload-progress" max={100} value={progress} /></div> : null}
           <button className="btn primary big" onClick={send} disabled={phase === "sending" || !navigator.onLine}>
-            <Icon name="upload" />{phase === "sending" ? "Sending…" : "Use this photo"}
+            <Icon name="upload" />{phase === "sending" ? "Sending…" : mac ? "Read receipt" : "Use this photo"}
           </button>
-          <button className="btn" onClick={reset} disabled={phase === "sending"}>Retake</button>
+          <button className="btn" onClick={reset} disabled={phase === "sending"}>{mac ? "Choose another file" : "Retake"}</button>
         </div>
       ) : null}
 
       <ErrorNote error={error} />
 
-      {phase === "sent" && run ? (
+      {phase === "sent" && run ? mac ? <ReceiptProgress run={run} events={events} onReset={reset}/> : (
         <div className="panel stack">
           <div className="spread">
             <div>
@@ -186,11 +194,11 @@ export default function Capture({ session }: { session: Session }) {
               return <li key={label} className={cls}><Icon name={cls === "done" ? "checkCircle" : "clock"} />{label}</li>;
             })}
           </ol>
-          {run.state === "NEEDS_REVIEW" ? <p className="muted">A detail needs checking. <a href={`#/expenses/${run.run_id}`}>See the request</a>.</p> :
+          {run.state === "NEEDS_REVIEW" ? <p className="muted">A detail needs checking. <a href={`#/${mac ? "receipts" : "expenses"}/${run.run_id}`}>See the request</a>.</p> :
             <p className="muted">You can close this page. Nothing else is needed from you.</p>}
           {["FAILED", "REJECTED"].includes(run.state) ? <p className="small">Status: {STATE_LABEL[run.state]}</p> : null}
           <button className="btn" onClick={reset}><Icon name="camera" />Photograph another</button>
-          {session.role === "employee" ? <a href={`#/expenses/${run.run_id}`}>View receipt status</a> : <a href={`#/transactions/${run.run_id}`}>Open in financial workspace</a>}
+          {session.role === "employee" ? <a href={`#/expenses/${run.run_id}`}>View receipt status</a> : <a href={`#/${mac ? "receipts" : "transactions"}/${run.run_id}`}>Open in financial workspace</a>}
         </div>
       ) : null}
     </div>

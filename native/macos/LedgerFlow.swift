@@ -204,7 +204,7 @@ final class LedgerFlowDelegate: NSObject, NSApplicationDelegate, WKNavigationDel
     func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable ([URL]?) -> Void) {
         guard let window else { completionHandler(nil); return }
         let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.allowsMultipleSelection = false
-        panel.allowedContentTypes = [.jpeg, .png] + [UTType(filenameExtension: "xlsx")].compactMap { $0 }
+        panel.allowedContentTypes = [.jpeg, .png, .pdf] + [UTType(filenameExtension: "xlsx")].compactMap { $0 }
         panel.beginSheetModal(for: window) { result in completionHandler(result == .OK ? panel.urls : nil) }
     }
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {

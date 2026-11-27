@@ -25,6 +25,8 @@ export default function Review({ runId, session, activityOnly = false }: { runId
   const [diff, setDiff] = useState<DiffResponse | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [captureOrigin, setCaptureOrigin] = useState<string | null>(null);
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [monitor, setMonitor] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [stream, setStream] = useState<"open" | "reconnecting">("open");
@@ -46,7 +48,7 @@ export default function Review({ runId, session, activityOnly = false }: { runId
   }, [run?.state]);
   useEffect(() => {
     if (!run) return;
-    req<{ image_url: string }>("GET", `/documents/${run.document_id}`).then((d) => setImageUrl(safeDocumentUrl(d.image_url))).catch(() => undefined);
+    req<{ image_url: string; original_url?: string; capture_origin?: string }>("GET", `/documents/${run.document_id}`).then(d => { setImageUrl(safeDocumentUrl(d.image_url)); setOriginalUrl(d.original_url ? safeDocumentUrl(d.original_url) : null); setCaptureOrigin(d.capture_origin ?? null); }).catch(() => undefined);
     if (finance) getInspection(run.workbook_id).then((i) => setNames(Object.fromEntries((i.accounts ?? []).map((a: any) => [a.account_id, a.name])))).catch(() => undefined);
   }, [run?.document_id]);
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function Review({ runId, session, activityOnly = false }: { runId
       <StateCallouts run={run} finance={finance} onChange={refresh} />
 
       <div className="review">
-        <Evidence run={run} imageUrl={imageUrl} />
+        <Evidence run={run} imageUrl={imageUrl} originalUrl={originalUrl} captureOrigin={captureOrigin} />
         <div className="stack review-proposal">
           <EntryPanel run={run} names={names} />
           {run.state === "NEEDS_REVIEW" && finance ? <Corrections run={run} onDone={refresh} /> : null}
@@ -149,7 +151,7 @@ function StateCallouts({ run, finance, onChange }: { run: RunSnapshot; finance: 
   );
 }
 
-function Evidence({ run, imageUrl }: { run: RunSnapshot; imageUrl: string | null }) {
+function Evidence({ run, imageUrl, originalUrl, captureOrigin }: { run: RunSnapshot; imageUrl: string | null; originalUrl: string | null; captureOrigin: string | null }) {
   const t = run.transaction;
   const quote = (field: string) => [...(t?.evidence ?? [])].reverse().find((e) => e.field === field); // latest source wins
   const rows: [string, string | null][] = t ? [
@@ -163,6 +165,8 @@ function Evidence({ run, imageUrl }: { run: RunSnapshot; imageUrl: string | null
   return (
     <section className="panel stack" aria-labelledby="ev-h">
       <h2 id="ev-h">Document</h2>
+      {captureOrigin ? <p className="small">Uploaded from {captureOrigin}</p> : null}
+      {originalUrl ? <a className="btn" href={originalUrl}><Icon name="download"/>Download original PDF</a> : null}
       {imageUrl ? <img className="receipt" src={imageUrl} alt={t ? `Receipt from ${t.merchant_name ?? "unknown supplier"}, total ${money(t.gross_minor)} SEK` : "Uploaded document"} />
         : <Skeleton lines={6} />}
       <h3>What we read</h3>

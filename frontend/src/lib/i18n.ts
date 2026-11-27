@@ -64,6 +64,7 @@ const en: Dict = {
   "agent.welcomeReadyBody": "Your workbook is ready. Hand me an invoice or a receipt, or ask what is waiting for you.",
   "agent.welcomeStartBody": "Connect the workbook you already use. Then each receipt lands in the right cells, with proof.",
   "agent.dossier": "Your file", "agent.workbook": "Connected workbook", "agent.attention": "Needs your attention", "agent.recent": "Latest documents",
+  "agent.noWorkbook": "Connect a workbook to start processing receipts.", "agent.noDecisions": "Nothing to review yet.", "agent.noReceipts": "Imported and scanned receipts will appear here.", "agent.recordsHere": "Stored on this Mac",
   "agent.a.capture": "Add a document", "agent.a.workbook": "Connect my Excel", "agent.a.transactions": "Review documents", "agent.a.activity": "See the agent's work",
   "agent.a.overview": "Open the files", "agent.a.phone": "Pair my iPhone",
 };
@@ -93,6 +94,7 @@ const fr: Dict = {
   "agent.welcomeReadyBody": "Votre classeur est prêt. Confiez-moi une facture ou un reçu, ou demandez ce qui vous attend.",
   "agent.welcomeStartBody": "Connectez le classeur que vous utilisez déjà. Ensuite, chaque reçu arrive dans les bonnes cellules, avec la preuve.",
   "agent.dossier": "Votre dossier", "agent.workbook": "Classeur connecté", "agent.attention": "À votre attention", "agent.recent": "Dernières pièces",
+  "agent.noWorkbook": "Connectez un classeur pour traiter vos pièces.", "agent.noDecisions": "Aucune décision en attente.", "agent.noReceipts": "Les pièces importées et scannées apparaîtront ici.", "agent.recordsHere": "Conservés sur ce Mac",
   "agent.a.capture": "Ajouter une pièce", "agent.a.workbook": "Connecter mon Excel", "agent.a.transactions": "Revoir les pièces", "agent.a.activity": "Voir le travail de l’agent",
   "agent.a.overview": "Ouvrir les dossiers", "agent.a.phone": "Associer mon iPhone",
 };
@@ -122,6 +124,7 @@ const sv: Dict = {
   "agent.welcomeReadyBody": "Din arbetsbok är redo. Ge mig en faktura eller ett kvitto, eller fråga vad som väntar på dig.",
   "agent.welcomeStartBody": "Koppla arbetsboken du redan använder. Sedan hamnar varje kvitto i rätt celler, med bevis.",
   "agent.dossier": "Ditt underlag", "agent.workbook": "Kopplad arbetsbok", "agent.attention": "Behöver din uppmärksamhet", "agent.recent": "Senaste underlag",
+  "agent.noWorkbook": "Koppla en arbetsbok för att behandla kvitton.", "agent.noDecisions": "Inget att granska ännu.", "agent.noReceipts": "Importerade och skannade kvitton visas här.", "agent.recordsHere": "Sparas på denna Mac",
   "agent.a.capture": "Lägg till underlag", "agent.a.workbook": "Koppla min Excel", "agent.a.transactions": "Granska underlag", "agent.a.activity": "Se agentens arbete",
   "agent.a.overview": "Öppna underlagen", "agent.a.phone": "Koppla min iPhone",
 };

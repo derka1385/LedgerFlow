@@ -205,6 +205,19 @@ def real_extraction(run: dict, doc: dict) -> bool:
     art = DB["artifacts"][doc["artifact_id"]]
     try:
         obj, meta = vsi.extract(art["bytes"], art["content_type"], COMPANY)
+        fields = vsi.recheck_fields(obj)
+        if fields and not obj.get("embedded_instructions_detected"):
+            emit(rid, "extraction.rechecking", "EXTRACTING", "Re-reading uncertain fields against the original document.")
+            try:
+                checked, check_meta = vsi.recheck_receipt(art["bytes"], art["content_type"], fields)
+                meta["calls"] += check_meta["calls"]
+                meta["usage"] += check_meta["usage"]
+                for field, fact in checked.items():
+                    if obj[field]["status"] == "unknown" and fact["status"] in ("known", "conflicting"):
+                        obj[field] = fact
+            except vsi.VsiError:
+                emit(rid, "extraction.recheck_unavailable", "EXTRACTING",
+                     "The additional reading was unavailable. The original evidence and unresolved fields were kept.")
         txn, flags = vsi.to_transaction(obj, blank_transaction(doc, run), COMPANY)
         if txn.get("category_account_id") is None and txn.get("gross_minor") is not None:
             with LOCK:
@@ -766,7 +779,7 @@ def list_versions(ctx, wid):
 
 # ------------------------------------------------------------------ routes: documents and runs
 @route("POST", "/workbooks/([A-Za-z0-9_\\-]+)/documents", idem=True)
-def upload_document(ctx, wid):
+def upload_document(ctx, wid, normalize_pdf=None):
     get_or_404("workbooks", wid)
     fields, files = parse_multipart(ctx)
     f = files.get("file")
@@ -775,22 +788,36 @@ def upload_document(ctx, wid):
     data = f["bytes"]
     if len(data) > MAX_UPLOAD:
         raise ApiError(413, "IMAGE_TOO_LARGE", "Photo exceeds 10 MiB.")
+    original = None
+    filename = f["filename"] or "receipt"
+    if normalize_pdf and data.startswith(b"%PDF-"):
+        original = data
+        data = normalize_pdf(original)
     if not (data[:3] == b"\xff\xd8\xff" or data[:8] == b"\x89PNG\r\n\x1a\n"):
         raise ApiError(415, "IMAGE_UNREADABLE", "Only JPEG or PNG photos are accepted.")
     with LOCK:
         did = oid("doc")
-        art = put_artifact(data, f["filename"] or "receipt", "image/png" if data[:4] == b"\x89PNG" else "image/jpeg")
+        art = put_artifact(data, "receipt-preview.jpg" if original else filename, "image/png" if data[:4] == b"\x89PNG" else "image/jpeg")
         DB["documents"][did] = {"document_id": did, "workbook_id": wid, "sha256": sha(data), "artifact_id": art, "status": "ready",
                                 "uploaded_by": ctx["session"]["user_id"], "client_upload_id": fields.get("client_upload_id"),
                                 "created_at": now(), "fixture_case": (FIXTURE_BY_SHA.get(sha(data)) or {}).get("case_id")}
+        if ctx["session"].get("device"):
+            DB["documents"][did]["capture_origin"] = ctx["session"]["device"]
+        if original:
+            DB["documents"][did]["original_artifact_id"] = put_artifact(original, filename, "application/pdf")
     return 202, {"document_id": did, "sha256": sha(data), "status": "normalizing"}
 
 
 @route("GET", "/documents/([A-Za-z0-9_\\-]+)")
 def get_document(ctx, did):
     d = get_or_404("documents", did)
-    return 200, {k: d[k] for k in ("document_id", "workbook_id", "sha256", "status", "created_at")} | {
+    result = {k: d[k] for k in ("document_id", "workbook_id", "sha256", "status", "created_at")} | {
         "image_url": f"/api/v1/artifacts/{d['artifact_id']}/download"}
+    if d.get("original_artifact_id"):
+        result["original_url"] = f"/api/v1/artifacts/{d['original_artifact_id']}/download"
+    if d.get("capture_origin"):
+        result["capture_origin"] = d["capture_origin"]
+    return 200, result
 
 
 @route("POST", "/runs", idem=True)
@@ -842,10 +869,15 @@ def list_runs(ctx):
         if q.get("state") and r["state"] not in q["state"][0].split(","):
             continue
         t = r.get("transaction") or {}
+        account = t.get("category_account_id")
+        mapping = DB["mappings"].get(r.get("mapping_id"), {})
+        expense_category = mapping.get("detected", {}).get("accounts", {}).get(account, {}).get("name") if account else None
         items.append({"run_id": r["run_id"], "state": r["state"], "state_reason": r["state_reason"], "workbook_id": r["workbook_id"],
                       "document_id": r["document_id"], "merchant_name": t.get("merchant_name"), "gross_minor": t.get("gross_minor"),
                       "document_date": t.get("document_date"), "kind": t.get("kind"), "validation_summary": r["validation_summary"],
-                      "created_at": r["created_at"], "updated_at": r["updated_at"], "created_by": r.get("created_by")})
+                      "created_at": r["created_at"], "updated_at": r["updated_at"], "created_by": r.get("created_by"),
+                      "capture_origin": DB["documents"].get(r["document_id"], {}).get("capture_origin"),
+                      "expense_category": expense_category})
     return 200, {"items": items[:100], "next_cursor": None}
 
 

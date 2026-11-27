@@ -7,47 +7,61 @@ import { Callout, ErrorNote, Icon } from "./ui";
 
 interface Pairing { pairing_id: string; fragment_token: string; expires_at: string }
 
-export function ScanWithPhone({ session, onClose }: { session: Session; onClose: () => void }) {
-  return session.backend === "LOCAL" ? <LocalPhone onClose={onClose} /> : <PublicPhone session={session} onClose={onClose} />;
+export function ScanWithPhone({ session, onClose, onPaired }: { session: Session; onClose: () => void; onPaired?: () => void }) {
+  return session.backend === "LOCAL" ? <LocalPhone onClose={onClose} onPaired={onPaired} /> : <PublicPhone session={session} onClose={onClose} />;
 }
 
-function LocalPhone({ onClose }: { onClose: () => void }) {
+function LocalPhone({ onClose, onPaired }: { onClose: () => void; onPaired?: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [scope, setScope] = useState("workspace");
-  const [pairing, setPairing] = useState<{ pairing_id: string; url: string; expires_at: string } | null>(null);
-  const current = useRef<string | null>(null);
-  const [qr, setQr] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [pairing, setPairing] = useState<{ pairing_id: string; expires_at: string; qr: string }>();
+  const [linked, setLinked] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now());
-  const alive = useRef(true);
-  const revoke = (id: string) => req("DELETE", `/desktop/pairings/${encodeURIComponent(id)}`).catch(() => undefined);
-  async function generate(mode = scope) {
-    setBusy(true); setError(null); setQr(""); setPairing(null);
-    try {
-      if (current.current) await revoke(current.current);
-      const p = await req<{ pairing_id: string; url: string; expires_at: string }>("POST", "/desktop/pairings", { body: { scope: mode } });
-      if (!alive.current) { void revoke(p.pairing_id); return; }
-      current.current = p.pairing_id;
-      setPairing(p);
-      setQr(await QRCode.toDataURL(p.url, { width: 280, margin: 3, color: { dark: "#123E34", light: "#FFFFFF" } }));
-    } catch (e) { if (alive.current) setError(e); }
-    finally { if (alive.current) setBusy(false); }
-  }
+
   useEffect(() => {
-    alive.current = true; dialog.current?.showModal();
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => { alive.current = false; clearInterval(timer); if (current.current) void revoke(current.current); };
+    const modal = dialog.current;
+    modal?.showModal();
+    return () => modal?.close();
   }, []);
-  const expired = !!pairing && Date.parse(pairing.expires_at) <= now;
-  return <dialog ref={dialog} className="phone-dialog local-phone" onCancel={onClose} onClick={e => { if (e.target === e.currentTarget) onClose(); }}><div className="spread"><h2>Votre iPhone, relié au Mac.</h2><button className="btn ghost" aria-label="Fermer" onClick={onClose}><Icon name="x" /></button></div><div className="stack">
-    <p>Sur votre iPhone, ouvrez LedgerFlow et touchez <strong>Associer mon Mac</strong>. Scannez ensuite ce code, sur le même Wi-Fi.</p>
-    <fieldset className="phone-scope"><legend>Ce que l’iPhone peut faire</legend>{[["workspace", "Retrouver tout mon espace", "Agent, dossiers et validations"], ["capture", "Scanner des pièces uniquement", "Aucun droit de validation"]].map(([key,label,detail]) => <label key={key}><input type="radio" name="phone-scope" checked={scope === key} disabled={busy} onChange={() => { setScope(key); setPairing(null); setQr(""); if (current.current) { void revoke(current.current); current.current = null; } }} /><span><strong>{label}</strong><small>{detail}</small></span></label>)}</fieldset>
-    {qr && !expired ? <img className="pairing-qr" src={qr} alt="Code d’association à scanner dans LedgerFlow sur iPhone" /> : <div className="qr-placeholder"><Icon name="phone" /><span>{busy ? "Préparation du code…" : expired ? "Ce code a expiré." : "Générez un code pour associer votre iPhone."}</span></div>}
-    <button className="btn primary" disabled={busy} onClick={() => void generate()}>{busy ? "Préparation…" : pairing ? "Générer un nouveau code" : "Afficher le code d’association"}</button>
-    {pairing && !expired ? <p className="small">Utilisable une fois · expire dans {Math.max(0, Math.ceil((Date.parse(pairing.expires_at)-now)/1000))} s</p> : null}
-    <p className="small">La connexion est chiffrée et associée à ce Mac. Gardez LedgerFlow actif et le Mac éveillé pour synchroniser les dossiers. Fermer cette fenêtre révoque le code inutilisé.</p><ErrorNote error={error} />
-  </div></dialog>;
+  useEffect(() => {
+    let active = true;
+    let id: string | undefined;
+    const revoke = (value: string) => void req("DELETE", `/desktop/pairings/${encodeURIComponent(value)}`).catch(() => undefined);
+    req<{ pairing_id: string; url: string; expires_at: string }>("POST", "/desktop/pairings", {body: {scope: "workspace"}})
+      .then(async result => {
+        id = result.pairing_id;
+        if (!active) { revoke(id); return; }
+        const qr = await QRCode.toDataURL(result.url, { width: 280, margin: 4, errorCorrectionLevel: "M", color: { dark: "#123E34", light: "#FFFFFF" } });
+        if (active) setPairing({pairing_id: id, expires_at: result.expires_at, qr});
+      }).catch(reason => { if (active) setError(reason); });
+    return () => { active = false; if (id) revoke(id); };
+  }, [attempt]);
+
+  useEffect(() => {
+    if (!pairing || linked) return;
+    let active = true;
+    const tick = setInterval(() => {
+      setNow(Date.now());
+      req<{state: string}>("GET", `/desktop/pairings/${encodeURIComponent(pairing.pairing_id)}`)
+        .then(result => { if (active && result.state === "linked") setLinked(true); })
+        .catch(() => undefined);
+    }, 1400);
+    return () => { active = false; clearInterval(tick); };
+  }, [pairing, linked]);
+
+  const expiresIn = pairing ? Math.max(0, Math.ceil((Date.parse(pairing.expires_at) - now) / 1000)) : 0;
+  return <dialog ref={dialog} className="phone-dialog local-phone mac-pair-dialog" aria-labelledby="mac-pair-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className="spread"><h2 id="mac-pair-title">{linked ? "iPhone paired" : "Connect your iPhone"}</h2><button className="btn ghost" type="button" aria-label="Close" onClick={onClose}><Icon name="x" /></button></div>
+    {linked ? <div className="stack"><p role="status"><Icon name="checkCircle"/> Your iPhone now shares this workspace, including receipts and expenses.</p><button className="btn primary" onClick={onPaired ?? onClose}>{onPaired ? "Finish setup" : "Done"}</button></div> : <div className="stack">
+      <p>On the same Wi-Fi, open LedgerFlow on the iPhone and tap <strong>Connect to your Mac</strong>. Scan this code to link your workspace.</p>
+      {pairing && expiresIn ? <div className="mac-pair-code"><img className="pairing-qr" src={pairing.qr} alt="LedgerFlow pairing QR code"/><p className="small">Waiting for your iPhone · {expiresIn}s</p></div> :
+        <p className="qr-placeholder" role="status">{error ? "A pairing code could not be created." : pairing ? "This code expired." : "Preparing your code…"}</p>}
+      {error || (pairing && !expiresIn) ? <button type="button" className="btn" onClick={() => {setError(null); setPairing(undefined); setNow(Date.now()); setAttempt(n => n + 1);}}>Get a new code</button> : null}
+      <ErrorNote error={error}/>
+      <p className="small">This single-use code grants full access to this workspace. Use it with your own iPhone. Keep LedgerFlow running on your Mac to sync.</p>
+    </div>}
+  </dialog>;
 }
 
 function PublicPhone({ session, onClose }: { session: Session; onClose: () => void }) {

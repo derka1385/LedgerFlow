@@ -8,6 +8,7 @@ nonisolated struct MobileIdentity: Codable, Equatable {
     let role: String
     let csrf_token: String
     let backend: String?
+    var agent_name: String? = nil
 }
 
 nonisolated struct Workbook: Codable, Identifiable {
@@ -37,10 +38,13 @@ nonisolated struct ReceiptRecord: Codable, Identifiable {
     let document_date: String?
     let created_at: String
     let state: String
+    var updated_at: String? = nil
     var created_by: String? = nil
+    var capture_origin: String? = nil
     var id: String { run_id }
+    var needsReviewAlert: Bool { ["NEEDS_REVIEW", "DUPLICATE_REVIEW", "STALE_BASE"].contains(state) }
     /// Who sent it, as the Mac records it (paired iPhone vs. the Mac owner).
-    var source: String { (created_by ?? "").contains("phone") ? "iPhone" : "Mac" }
+    var source: String? { capture_origin ?? (created_by?.contains("phone") == true ? "iPhone" : nil) }
 }
 
 nonisolated struct AgentMessage: Codable, Identifiable {
@@ -56,6 +60,7 @@ nonisolated struct MobileSnapshot: Codable {
     var receipts: [ReceiptRecord] = []
     var messages: [AgentMessage] = []
     var updated: Date?
+    var agentName: String?
 }
 
 nonisolated struct SavedConnection: Codable {
@@ -232,6 +237,20 @@ final class MobileWorkspace {
     var connected: Bool { availability == .connected }
     var macLinked: Bool { connection?.pin != nil }
 
+    /// Sign out of the Mac on this iPhone: ends the server session (best effort) and forgets the pairing.
+    /// Receipts still queued on the iPhone are kept; pair again to send them.
+    func signOut() async {
+        if let api, let identity {
+            _ = try? await api.bytes("/api/v1/auth/session", method: "DELETE", csrf: identity.csrf_token)
+        }
+        api?.transport.invalidateAndCancel()
+        api = nil; identity = nil; connection = nil
+        generation = UUID()
+        snapshot = MobileSnapshot()
+        availability = .unlinked
+        try? FileManager.default.removeItem(at: root.appending(path: "connection.json"))
+    }
+
     func createProfile(_ name: String) {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { return }
@@ -323,6 +342,7 @@ final class MobileWorkspace {
             snapshot.workbooks = workbooks
             snapshot.targets = targets.items
             snapshot.receipts = receipts.items
+            snapshot.agentName = info.agent_name
             snapshot.updated = .now
             if !asking {
                 do {

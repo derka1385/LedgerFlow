@@ -4,12 +4,16 @@ Open `LedgerFlow.xcodeproj` in Xcode and run the LedgerFlow scheme on an iPhone.
 
 ## Connect and scan
 
-1. On the Mac, open LedgerFlow and choose **Scan with iPhone** to generate a pairing code. Choose full workspace access to see all permitted workbooks and share the existing conversation.
+1. On the Mac, open LedgerFlow and choose **Show pairing code** in the final setup step or **Connect iPhone** under **Account & settings**. The code links the complete workspace.
 2. On iPhone, tap **Connect to your Mac** and scan the code. Keep both devices on the same Wi-Fi. The phone verifies the Mac’s certificate against the fingerprint in the pairing code.
 3. Use **Workbooks** to see linked Excel files and share the latest version. Use **Scan** to capture a document or import a photo, then choose a workbook or assign it later in **History**. Each scanned page is queued as a separate receipt.
 4. Use **Agent** to ask about the connected workspace. The Mac’s existing model setup and permissions apply to the conversation.
 
 **Create an account or sign in** offers a local iPhone profile for scanning before pairing, and invitation sign-in for an existing HTTPS workspace. If you previously paired with an older LedgerFlow build, scan a new code to establish the native session. The previous address can serve as a sign-in hint.
+
+## Review alerts
+
+In **History**, tap **Enable review alerts** and allow notifications in iOS. LedgerFlow schedules a local alert when an active sync detects a new document that needs your review. The notification hides supplier and payment details and opens **History → To check**. Newly flagged documents on the Mac appear at the next iPhone sync. Remote alerts while the phone app is closed require APNs.
 
 ## When the Mac is unavailable
 

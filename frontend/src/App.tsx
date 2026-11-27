@@ -8,6 +8,10 @@ import Login from "./pages/Login";
 import Capture from "./pages/Capture";
 import Onboarding from "./pages/Onboarding";
 import Overview from "./pages/Overview";
+import MacSignIn from "./MacSignIn";
+import MacSetupFlow from "./MacSetupFlow";
+import { WorkbookChecks } from "./pages/MacFinance";
+import ExpensesTracker from "./pages/ExpensesTracker";
 import Agent from "./pages/Agent";
 import Transactions from "./pages/Transactions";
 import Versions from "./pages/Versions";
@@ -16,7 +20,7 @@ import { ExpenseDetail, ExpenseHistory } from "./pages/Employee";
 import Settings, { type Appearance } from "./pages/Settings";
 import Home from "./pages/Home";
 import Explainer from "./Explainer";
-import { MacIntro, WorkspaceSetup, sourceName, type WorkspaceProfile } from "./MacWorkspace";
+import { MacReceipt, MacIntro, WorkspaceSetup, sourceName, type WorkspaceProfile } from "./MacWorkspace";
 import { LANGS, useT } from "./lib/i18n";
 
 export function useHashRoute(): string[] {
@@ -27,6 +31,7 @@ export function useHashRoute(): string[] {
 }
 export const go = (path: string) => { window.location.hash = `#/${path}`; };
 const FINANCE_NAV = [["agent", "Agent", "message"], ["overview", "Overview", "overview"], ["transactions", "Transactions", "transactions"], ["receipts", "Receipts", "file"], ["workbook", "Excel Workbooks", "grid"], ["activity", "Agent Activity", "terminal"], ["security", "Security", "shield"], ["audit", "Audit History", "clock"], ["settings", "Settings", "settings"]];
+const MAC_NAV = [["agent", "Agent", "message"], ["overview", "Dashboard", "overview"], ["receipts", "Receipts", "file"], ["expenses", "Expenses", "transactions"], ["workbook", "Workbooks", "grid"], ["security", "Workbook checks", "shield"], ["activity", "Activity", "terminal"], ["audit", "Audit history", "clock"]];
 const EMPLOYEE_NAV = [["home", "Home", "overview"], ["capture", "Scan", "camera"], ["expenses", "Expenses", "file"], ["requests", "Requests", "flag"], ["profile", "Profile", "user"]];
 const PHONE_OWNER_NAV = [["home", "nav.home", "overview"], ["agent", "nav.agent", "message"], ["capture", "nav.capture", "camera"], ["overview", "nav.files", "file"], ["settings", "nav.settings", "settings"]];
 const isPhone = () => typeof matchMedia !== "undefined" && matchMedia("(max-width: 760px)").matches;
@@ -82,7 +87,7 @@ function NativeConnectionGate({ token, bootstrap, onSignedIn }: {
     onHoldEnd={() => setIntro(phase => phase === "holding" ? "ready" : phase)}
     onSkip={() => setIntro("done")}
     onExit={() => setIntro("done")}/>;
-  return <main className="native-connection"><BrandMark size={64} /><h1>{error ? "La connexion n’a pas abouti." : bootstrap ? "Votre agent arrive…" : "Association à votre Mac…"}</h1>{error ? <><ErrorNote error={error} /><p>Relancez l’application Mac ou scannez un nouveau code.</p></> : <p>Votre dossier s’ouvre automatiquement.</p>}</main>;
+  return <main className="native-connection"><BrandMark size={64} /><h1>{error ? "The connection failed." : bootstrap ? "Your agent is on its way…" : "Pairing with your Mac…"}</h1>{error ? <><ErrorNote error={error} /><p>Reopen the Mac app or scan a new code.</p></> : <p>Your workspace opens automatically.</p>}</main>;
 }
 
 function PairingGate({ token, onSignedIn }: { token: string; onSignedIn: (s: Session) => void }) {
@@ -102,6 +107,14 @@ export default function App() {
   const [revealDashboard, setRevealDashboard] = useState(false);
   const [authError, setAuthError] = useState<unknown>(null);
   const [scan, setScan] = useState(false), [menu, setMenu] = useState(false);
+  const [sidebarHidden, setSidebarHidden] = useState(false);
+  const [compactSidebar, setCompactSidebar] = useState(() => matchMedia("(max-width: 900px)").matches);
+  useEffect(() => {
+    const media = matchMedia("(max-width: 900px)");
+    const update = () => setCompactSidebar(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const [online, setOnline] = useState(navigator.onLine);
   const [appearance, updateAppearance] = useState<Appearance>(() => { try { const v = localStorage.getItem("ledgerflow.appearance"); return v === "light" || v === "dark" ? v : "system"; } catch { return "system"; } });
   const route = useHashRoute();
@@ -114,8 +127,9 @@ export default function App() {
   };
   useEffect(() => { if (mac && profile === undefined) loadProfile(); }, [mac, profile]);
   const aliases: Record<string, string> = { inbox: "transactions", runs: "transactions", versions: "workbook" };
-  const page = route[0] ?? (mac ? "overview" : session?.backend === "LOCAL" ? "agent" : finance ? "overview" : "home");
-  const activePage = aliases[page] ?? page;
+  const page = route[0] ?? (mac ? "agent" : session?.backend === "LOCAL" ? "agent" : finance ? "overview" : "home");
+  const resolvedPage = aliases[page] ?? page;
+  const activePage = mac && resolvedPage === "transactions" ? "receipts" : resolvedPage;
   const loadSession = () => { setAuthError(null); currentSession().then(setSession).catch(setAuthError); };
   useEffect(() => { if (!["bootstrap", "associate", "pair"].includes(route[0])) loadSession(); }, []);
   useEffect(() => {
@@ -134,7 +148,7 @@ export default function App() {
     sync(); media.addEventListener("change", sync); return () => media.removeEventListener("change", sync);
   }, [appearance]);
   useEffect(() => { setMenu(false); setScan(false); }, [page]);
-  useEffect(() => { if (page !== "overview" && page !== "bootstrap") setRevealDashboard(false); }, [page]);
+  useEffect(() => { if (page === "overview") return () => setRevealDashboard(false); }, [page]);
   useEffect(() => {
     if (!session || mac || !isPhone() || page === "how" || page === "capture") return;
     let seen = "1"; try { seen = localStorage.getItem(HOW_SEEN) ?? ""; } catch { /* no storage: do not loop */ }
@@ -146,57 +160,65 @@ export default function App() {
     if (!finance) return;
     const key = (e: KeyboardEvent) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey || (e.target instanceof HTMLElement && (e.target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)))) return;
-      if (/^[1-9]$/.test(e.key)) { e.preventDefault(); go(FINANCE_NAV[Number(e.key) - 1][0]); }
+      if (/^[1-9]$/.test(e.key)) { const shortcut = (mac ? MAC_NAV : FINANCE_NAV)[Number(e.key) - 1]; if (shortcut) { e.preventDefault(); go(shortcut[0]); } }
       if (e.key.toLowerCase() === "n") { e.preventDefault(); go("capture"); }
-      if (e.key.toLowerCase() === "k") { e.preventDefault(); if (!document.getElementById("workspace-search")) go("transactions"); setTimeout(() => document.getElementById("workspace-search")?.focus(), 100); }
+      if (e.key.toLowerCase() === "k") { e.preventDefault(); if (!document.getElementById("workspace-search")) go(mac ? "receipts" : "transactions"); setTimeout(() => document.getElementById("workspace-search")?.focus(), 100); }
     };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
-  }, [finance]);
+  }, [finance, mac]);
   async function logout() { try { await signOut(); setSession(null); setScan(false); go(""); } catch (e) { setAuthError(e); } }
   const signedIn = (s: Session, preparedProfile?: WorkspaceProfile | null) => {
     setSession(s);
     if (preparedProfile !== undefined) setProfile(preparedProfile);
     if (page === "bootstrap") setRevealDashboard(true);
-    if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : page === "bootstrap" ? "overview" : "agent") : s.role === "employee" ? "home" : "overview");
+    if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : "agent") : s.role === "employee" ? "home" : "overview");
   };
   const setAppearance = (value: Appearance) => { updateAppearance(value); try { localStorage.setItem("ledgerflow.appearance", value); } catch { /* preference still applies */ } };
   if (["bootstrap", "associate"].includes(page) && route[1]) return <NativeConnectionGate token={route[1]} bootstrap={page === "bootstrap"} onSignedIn={signedIn} />;
   if (page === "pair" && route[1]) return <PairingGate token={route[1]} onSignedIn={signedIn} />;
   if (authError && session === undefined) return <main className="narrow stack-lg"><BrandMark size={48} /><h1>Connect to your workspace.</h1><ErrorNote error={authError} /><button className="btn" onClick={loadSession}>Try again</button></main>;
   if (session === undefined) return <main className="narrow"><Skeleton /></main>;
-  if (!session && isLocalBackend()) return <main className="native-connection"><BrandMark size={64}/><h1>Votre session est fermée.</h1><p>Sur le Mac, quittez puis rouvrez LedgerFlow pour retrouver votre espace. Sur iPhone, touchez l’engrenage et associez de nouveau votre Mac.</p><p className="muted">Vos dossiers et les écritures validées restent enregistrés sur le Mac.</p></main>;
+  if (!session && isLocalBackend() && mac) return <MacSignIn onSignedIn={signedIn} />;
+  if (!session && isLocalBackend()) return <main className="native-connection"><BrandMark size={64}/><h1>You are signed out.</h1><p>On iPhone, tap the gear and pair with your Mac again.</p><p className="muted">Your files and approved entries stay saved on the Mac.</p></main>;
   if (!session) return <Login onSignedIn={signedIn} />;
   if (mac && profileError) return <main className="narrow stack"><h1>Open your workspace</h1><ErrorNote error={profileError}/><button className="btn" onClick={loadProfile}>Try again</button></main>;
   if (mac && profile === undefined) return <main className="narrow"><Skeleton /></main>;
-  if (mac && (!profile || page === "workspace-profile")) return <WorkspaceSetup key={profile ? "edit" : "create"} profile={profile ?? null}
-    onSave={next => { if (!profile) setRevealDashboard(true); setProfile(next); go("overview"); }} onCancel={profile ? () => go("overview") : undefined}/>;
-  const label = (path: string) => mac ? ({overview: "Dashboard", transactions: "Tasks", receipts: "Receipts", workbook: "Workbooks", activity: "Activity", audit: "Audit history", security: "Security", settings: "Settings", agent: "Agent"} as Record<string, string>)[path] ?? t(`nav.${path}`) : t(`nav.${path}`);
+  if (mac && (!profile?.agent_name || page === "workspace-profile")) return <WorkspaceSetup key={profile ? "edit" : "create"} profile={profile ?? null}
+    onSave={next => { setProfile(next); go(profile ? profile.agent_name ? "settings" : "agent" : "connect-workspace"); }} onCancel={profile?.agent_name ? () => go("settings") : undefined}/>;
+  const label = (path: string) => mac ? MAC_NAV.find(([id]) => id === path)?.[1] ?? (path === "settings" ? "Account & settings" : t(`nav.${path}`)) : t(`nav.${path}`);
+  if (mac && profile && (page === "connect-workspace" || (profile.setup_step && profile.setup_step !== "complete"))) {
+    return <MacSetupFlow session={session} profile={profile} onChange={next => {
+      setProfile(next);
+      if (next.setup_step === "complete") go("agent");
+    }}/>;
+  }
   let body;
   if (page === "how") body = <Explainer onDone={finishHow} />;
   else if (page === "home") body = <Home session={session} />;
-  else if (page === "agent") body = <Agent session={session} onPhone={() => setScan(true)} />;
-  else if (page === "capture") body = <Capture session={session} />;
-  else if (page === "settings" || page === "profile") body = <Settings session={session} appearance={appearance} setAppearance={setAppearance} onSignOut={logout} />;
+  else if (page === "agent") body = <Agent session={session} agentName={mac ? profile?.agent_name ?? "LedgerFlow" : undefined} onPhone={mac ? () => go("settings") : () => setScan(true)} />;
+  else if (page === "capture") body = <Capture session={session} mac={mac} />;
+  else if (page === "settings" || page === "profile") body = <Settings session={session} appearance={appearance} setAppearance={setAppearance} onSignOut={logout} mac={mac} onPhone={() => setScan(true)} />;
   else if (!finance && page === "expenses" && route[1]) body = <ExpenseDetail key={route[1]} id={route[1]} />;
   else if (!finance && (page === "expenses" || page === "requests")) body = <ExpenseHistory questionsOnly={page === "requests"} />;
   else if (!finance) body = <Home session={session} />;
   else if (page === "workbook") body = <div className="stack-lg"><div className="tabs"><a className="btn ghost" href={`#/workbook${route[1] ? `/${route[1]}` : ""}`} aria-current="page">Structure & accounts</a><a className="btn ghost" href={`#/versions${route[1] ? `/${route[1]}` : ""}`}>Version history</a></div><Onboarding key={route[1] ?? "latest"} session={session} workbookId={route[1]} /></div>;
   else if (page === "versions") body = <div className="stack-lg"><a href="#/workbook">Back to workbook structure</a><Versions key={route[1] ?? "latest"} workbookId={route[1]} /></div>;
-  else if (page === "security") body = <Security />;
-  else if (["transactions", "inbox", "runs", "receipts", "activity", "audit"].includes(page)) body = <Transactions session={session} selected={route[1]} mode={aliases[page] ?? page} />;
+  else if (mac && page === "expenses") body = <ExpensesTracker />;
+  else if (page === "security") body = mac ? <WorkbookChecks /> : <Security />;
+  else if (["transactions", "inbox", "runs", "receipts", "activity", "audit"].includes(page)) body = <Transactions key={page} session={session} selected={route[1]} mode={activePage} />;
   else body = <Overview mac={mac} workspace={profile?.name} reveal={mac && revealDashboard} />;
-  const nav = finance ? FINANCE_NAV : EMPLOYEE_NAV;
-  return <div className={`app-shell ${finance ? "finance-shell" : "employee-shell"} ${menu ? "sidebar-open" : ""} ${mac ? "mac-shell" : ""}`}>
+  const nav = mac ? MAC_NAV : finance ? FINANCE_NAV : EMPLOYEE_NAV;
+  return <div className={`app-shell ${finance ? "finance-shell" : "employee-shell"} ${menu ? "sidebar-open" : ""} ${mac ? `mac-shell${sidebarHidden ? " mac-sidebar-hidden" : ""}` : ""}`}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to content</a>
-    {finance ? <aside className="sidebar">
-      <a className="brand" href={mac ? "#/overview" : "#/agent"}><BrandMark size={34} /><Wordmark /></a>
+    {finance ? <aside id="workspace-sidebar" className="sidebar">
+      <a className="brand" href="#/agent">{mac ? <MacReceipt size={30}/> : <BrandMark size={34} />}<Wordmark /></a>
       {mac && profile ? <a className="mac-company" href="#/workspace-profile"><Icon name="box"/><span><strong>{profile.name}</strong><small>{sourceName(profile.source)}</small></span><Icon name="settings"/></a> : <p className="sidebar-label">{t("shell.workspace")}</p>}
-      <nav aria-label="Main">{(mac ? [nav[1], nav[0], ...nav.slice(2, 6), nav[7], nav[6]] : nav).map(([p, , icon]) =>
-        <a key={p} href={`#/${p}`} className={p === (mac ? "activity" : "security") ? "nav-group-start" : undefined} aria-current={activePage === p ? "page" : undefined}>
-          <Icon name={icon} />{label(p)}</a>)}</nav>
-      <div className="sidebar-foot"><a href="#/settings"><span className="account-avatar"><Icon name="user" /></span><span><strong>{mac ? "Account & settings" : session.display_name ?? session.role}</strong><small>{mac ? "Local profile" : t("shell.account")}</small></span></a></div>
+      <nav aria-label="Main">{nav.map(([p, , icon]) =>
+        <a key={p} href={`#/${p}`} className={p === "agent" && mac ? "mac-agent-nav" : p === (mac ? "workbook" : "security") ? "nav-group-start" : undefined} aria-current={activePage === p ? "page" : undefined}>
+          <Icon name={icon} /><span>{label(p)}{mac && p === "agent" && profile?.agent_name ? <small>{profile.agent_name}</small> : null}</span></a>)}</nav>
+      <div className="sidebar-foot"><a href="#/settings"><span className="account-avatar"><Icon name="user" /></span><span><strong>{mac ? "Account & settings" : session.display_name ?? session.role}</strong><small>{mac ? "Local profile" : t("shell.account")}</small></span></a><button type="button" className="sidebar-signout" onClick={() => void logout()} aria-label="Sign out"><Icon name="logout" /><span>Sign out</span></button></div>
     </aside> : null}
-    <div className="app-body"><header className="workspace-toolbar"><div className="toolbar-location">{finance ? <button className="btn ghost menu-toggle" aria-label="Toggle navigation" aria-expanded={menu} onClick={() => setMenu(v => !v)}><Icon name="menu" /></button> : <a className="brand" href="#/home"><BrandMark /><Wordmark /></a>}{finance ? <><span className="muted">{t("shell.workspace")}</span><span className="toolbar-slash">/</span><strong>{nav.some(n => n[0] === activePage) ? label(activePage) : activePage === "how" ? t("how.title") : activePage === "home" ? t("nav.home") : t("nav.capture")}</strong></> : null}</div><div className="row"><LangSwitch />{finance ? <><button className="btn phone-association-action" onClick={() => setScan(true)}><Icon name="phone" /><span>{t("shell.scanIphone")}</span></button>{session.backend === "LOCAL" ? <a className="btn phone-direct-capture" href="#/capture"><Icon name="camera"/>Scanner</a> : null}</> : null}<a className="account-button" href={finance ? "#/settings" : "#/profile"} aria-label="Account settings"><Icon name="user" /><span>{session.display_name ?? session.role}</span></a></div></header>
+    <div className="app-body"><header className="workspace-toolbar"><div className="toolbar-location">{finance ? <button className="btn ghost menu-toggle" aria-label="Toggle sidebar" aria-controls="workspace-sidebar" aria-expanded={mac && !compactSidebar ? !sidebarHidden : menu} onClick={() => { if (mac && !compactSidebar) setSidebarHidden(v => !v); else setMenu(v => !v); }}><Icon name="menu" /></button> : <a className="brand" href="#/home"><BrandMark /><Wordmark /></a>}{finance ? <><span className="muted">{t("shell.workspace")}</span><span className="toolbar-slash">/</span><strong>{nav.some(n => n[0] === activePage) ? label(activePage) : activePage === "how" ? t("how.title") : activePage === "home" ? t("nav.home") : t("nav.capture")}</strong></> : null}</div><div className="row">{!mac ? <LangSwitch /> : <a href="#/capture" className="btn mac-new-receipt"><Icon name="upload"/>Add receipt</a>}{finance && !mac ? <><button className="btn phone-association-action" onClick={() => setScan(true)}><Icon name="phone" /><span>{t("shell.scanIphone")}</span></button>{session.backend === "LOCAL" ? <a className="btn phone-direct-capture" href="#/capture"><Icon name="camera"/>Scanner</a> : null}</> : null}<a className="account-button" href={finance ? "#/settings" : "#/profile"} aria-label="Account settings"><Icon name="user" /><span>{session.display_name ?? session.role}</span></a></div></header>
     {session.backend === "DEV-MOCK" || isMockBackend() ? <details className="mockbar" role="note"><summary><Icon name="alert" /><span>Development environment <span className="environment-separator">/</span> {session.inference === "vultr" ? "Vultr inference" : "Mock inference"}</span></summary><p>Execution, verification and approval follow the development service. This is not the public Vultr deployment.</p></details> : null}
     {!online ? <div className="offline-banner" role="status">You’re offline. Reconnect to upload receipts or change your workbook. No financial actions are queued.</div> : null}
     <main id="main-content" tabIndex={-1} className={finance ? (page === "capture" ? "workspace-content capture-content" : "workspace-content") : "employee-content"}><ErrorNote error={authError} />{body}</main></div>

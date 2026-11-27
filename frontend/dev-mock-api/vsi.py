@@ -191,6 +191,39 @@ def extract(image: bytes, mime: str, company: dict) -> tuple[dict, dict]:
     return structured_call(messages, EXTRACTION_SCHEMA, "receipt_extraction", _validate_extraction)
 
 
+# Those fields determine whether the visible document is usable for review.
+RECHECK_FIELDS = ("supplier_name", "document_date", "currency", "gross", "vat", "payment_status")
+VAT_CONTEXT_FIELDS = ("vat_rate", "supplier_org_no")
+
+
+def recheck_fields(extraction: dict) -> list[str]:
+    tax = extraction["vat"]
+    fields = RECHECK_FIELDS + (VAT_CONTEXT_FIELDS if tax["status"] == "known" and (_minor(tax["value"]) or 0) > 0 else ())
+    return [field for field in fields if extraction[field]["status"] in ("unknown", "conflicting")]
+
+
+def recheck_receipt(image: bytes, mime: str, fields: list[str]) -> tuple[dict, dict]:
+    schema = {"type": "object", "additionalProperties": False, "required": fields,
+              "properties": {field: FACT for field in fields}}
+
+    def validate(result):
+        if set(result) != set(fields):
+            raise ValueError("Return only the requested fields.")
+        for field in fields:
+            fact = result[field]
+            if not isinstance(fact, dict) or fact.get("status") not in ("known", "unknown", "derived", "conflicting"):
+                raise ValueError(f"{field} must be a fact.")
+            if fact["status"] == "known" and not all(isinstance(fact.get(key), str) and fact[key].strip() for key in ("value", "quote")):
+                raise ValueError(f"{field} needs a visible value and its printed evidence.")
+
+    messages = [{"role": "system", "content": EXTRACTION_SYSTEM},
+                {"role": "user", "content": [
+                    {"type": "text", "text": "Independently re-read only these fields: " + ", ".join(fields) +
+                                             ". Examine the headings and totals. Return a known value only with its exact printed evidence. Leave guesses and absent fields unknown."},
+                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{base64.b64encode(image).decode()}"}}]}]
+    return structured_call(messages, schema, "receipt_recheck", validate)
+
+
 def _minor(v: str | None) -> int | None:
     if v in (None, ""):
         return None
@@ -198,7 +231,7 @@ def _minor(v: str | None) -> int | None:
         d = Decimal(str(v).replace(" ", "").replace(",", ".")) * 100
     except InvalidOperation:
         return None
-    return int(d) if d == d.to_integral_value() and d >= 0 else None
+    return int(d) if d.is_finite() and d == d.to_integral_value() and d >= 0 else None
 
 
 def to_transaction(o: dict, base: dict, company: dict) -> tuple[dict, list[str]]:
@@ -248,6 +281,10 @@ def to_transaction(o: dict, base: dict, company: dict) -> tuple[dict, list[str]]
         unresolved.append("kind")
     if o["legibility"] == "poor":
         unresolved.append("gross_minor")
+    for field in RECHECK_FIELDS + VAT_CONTEXT_FIELDS:
+        if o[field]["status"] == "conflicting":
+            normalized = {"vat": "tax_minor", "vat_rate": "tax_lines"}.get(field, field_map.get(field, field))
+            unresolved.append(normalized)
     txn["unresolved_fields"] = sorted(set(unresolved))
     flags = ["SEC-INJECTION-TEXT"] if o.get("embedded_instructions_detected") else []
     return txn, flags

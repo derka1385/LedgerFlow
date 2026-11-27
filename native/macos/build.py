@@ -39,5 +39,9 @@ if local:
 with (app / "Contents" / "Info.plist").open("wb") as f:
     plistlib.dump(info, f)
 subprocess.run(["swiftc", "-swift-version", "6", "-target", f"{platform.machine()}-apple-macos13.0", "-parse-as-library", "-module-cache-path", "/tmp/ledgerflow-swift-module-cache", "-framework", "AppKit", "-framework", "WebKit", str(here / "LedgerFlow.swift"), str(here.parent / "shared/WorkspaceTrust.swift"), "-o", str(macos / "LedgerFlow")], check=True)
+renderer = macos / "render-receipt"
+subprocess.run(["swiftc", "-target", f"{platform.machine()}-apple-macos13.0", "-module-cache-path",
+                "/tmp/ledgerflow-swift-module-cache", str(here / "RenderReceipt.swift"), "-o", str(renderer)], check=True)
+subprocess.run(["codesign", "--force", "--sign", "-", "--timestamp=none", str(renderer)], check=True)
 subprocess.run(["codesign", "--force", "--sign", "-", "--timestamp=none", str(app)], check=True)
 print(f"Built {app}\nLocal ad-hoc signature only; not notarized or App Store signed.")

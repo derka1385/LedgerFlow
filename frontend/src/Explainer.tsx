@@ -8,16 +8,16 @@ const DWELL_MS = 5200;
 const reduced = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** Four-step animated explanation of the real pipeline. Figures are sample values and labelled as such. */
-export default function Explainer({ onDone }: { onDone: () => void }) {
+export default function Explainer({ onDone, manual = false, doneLabel }: { onDone: () => void; manual?: boolean; doneLabel?: string }) {
   const [t] = useT();
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(() => !reduced());
   const start = useRef<number | null>(null);
   useEffect(() => {
-    if (!playing || step === STEPS - 1) return;
+    if (manual || !playing || step === STEPS - 1) return;
     const id = window.setTimeout(() => setStep(s => Math.min(STEPS - 1, s + 1)), DWELL_MS);
     return () => clearTimeout(id);
-  }, [playing, step]);
+  }, [manual, playing, step]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") setStep(s => Math.min(STEPS - 1, s + 1));
@@ -38,7 +38,7 @@ export default function Explainer({ onDone }: { onDone: () => void }) {
     </header>
     <ol className="explainer-progress" aria-label={t("how.title")}>
       {Array.from({ length: STEPS }, (_, i) => <li key={i}><button onClick={() => go(i)} aria-current={i === step ? "step" : undefined} className={i < step ? "done" : i === step ? "active" : ""}>
-        <span className="num">{String(i + 1).padStart(2, "0")}</span><span className="bar"><i style={i === step && playing && !last ? { animationDuration: `${DWELL_MS}ms` } : undefined} /></span>
+        <span className="num">{String(i + 1).padStart(2, "0")}</span><span className="bar"><i style={!manual && i === step && playing && !last ? { animationDuration: `${DWELL_MS}ms` } : undefined} /></span>
       </button></li>)}
     </ol>
     <div className="explainer-stage" key={step}>
@@ -54,7 +54,7 @@ export default function Explainer({ onDone }: { onDone: () => void }) {
       <span className="explainer-spacer" />
       <div className="row">
         {step > 0 ? <button className="btn" onClick={() => go(step - 1)}>{t("how.back")}</button> : null}
-        <button className="btn primary" onClick={() => (last ? onDone() : go(step + 1))}>{last ? t("how.done") : t("how.next")}<Icon name="arrow" /></button>
+        <button className="btn primary" onClick={() => (last ? onDone() : go(step + 1))}>{last ? doneLabel ?? t("how.done") : t("how.next")}<Icon name="arrow" /></button>
       </div>
     </footer>
   </section>;

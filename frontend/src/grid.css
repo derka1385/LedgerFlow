@@ -322,3 +322,18 @@ a.live-sheet-row:hover { background: color-mix(in srgb, var(--accent-wash) 55%, 
 .setup-progress li.done span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
 .setup-progress li.done span svg { width: 13px; height: 13px; }
 @media (prefers-reduced-motion: reduce) { .setup-progress li.now span { animation: none; } .setup-bar i { transition: none; } }
+
+/* Mac sign-in */
+.mac-signin { min-height: 100vh; display: grid; place-items: center; background: var(--canvas); padding: 24px; }
+.mac-signin-card { width: min(380px, 100%); background: var(--sheet); border: 1px solid var(--grid-strong); border-radius: 14px; padding: 32px; gap: 10px; }
+.mac-signin-card h1 { font-size: 26px; margin: 10px 0 0; }
+.mac-signin-card label { font-size: 13px; font-weight: 600; margin-top: 6px; }
+.mac-signin-card input { min-height: 40px; }
+.mac-signin-card .btn { margin-top: 10px; justify-content: center; }
+.signin-bar { margin-top: 14px; } .signin-bar i { width: 100%; animation: lf-signin 1.4s var(--ease-out) both; }
+@keyframes lf-signin { from { width: 4%; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .signin-bar i { animation: none; } }
+
+.sidebar-signout { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 8px; padding: 9px 10px; border: 1px solid var(--grid-strong); border-radius: 8px; background: none; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
+.sidebar-signout:hover { color: var(--ink); background: var(--sheet); }
+.sidebar-signout svg { width: 16px; height: 16px; }

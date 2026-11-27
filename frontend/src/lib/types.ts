@@ -122,6 +122,9 @@ export interface RunSnapshot {
 
 export interface RunListItem {
   run_id: string;
+  workbook_id?: string;
+  capture_origin?: string | null;
+  expense_category?: string | null;
   state: RunState;
   state_reason: string;
   merchant_name: string | null;

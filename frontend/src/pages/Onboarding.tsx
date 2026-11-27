@@ -4,7 +4,7 @@ import { money, shortHash } from "../lib/format";
 import type { Session, WorkbookView } from "../lib/types";
 import { Callout, ErrorNote, Icon, Pill, Skeleton } from "../ui";
 
-export default function Onboarding({ session, workbookId }: { session: Session; workbookId?: string }) {
+export default function Onboarding({ session, workbookId, embedded, onContinue, continuing }: { session: Session; workbookId?: string; embedded?: boolean; onContinue?: () => void; continuing?: boolean }) {
   const [wbs, setWbs] = useState<WorkbookView[] | null>(null);
   const [active, setActive] = useState<WorkbookView | null>(null);
   const [inspection, setInspection] = useState<Record<string, any> | null>(null);
@@ -59,7 +59,7 @@ export default function Onboarding({ session, workbookId }: { session: Session; 
 
   return (
     <div className="stack-lg">
-      {wbs.length > 1 ? <label>Workbook<select value={active?.workbook_id ?? ""} onChange={e => { window.location.hash = `#/workbook/${e.target.value}`; }}>{wbs.map(w => <option key={w.workbook_id} value={w.workbook_id}>{w.display_name}</option>)}</select></label> : null}
+      {wbs.length > 1 ? <label>Workbook<select value={active?.workbook_id ?? ""} onChange={e => { if (embedded) void load(e.target.value).catch(setError); else window.location.hash = `#/workbook/${e.target.value}`; }}>{wbs.map(w => <option key={w.workbook_id} value={w.workbook_id}>{w.display_name}</option>)}</select></label> : null}
       <div className="spread">
         <div className="stack" style={{ gap: 4 }}>
           <h1>{active ? active.display_name : "Connect your Excel ledger"}</h1>
@@ -164,8 +164,11 @@ export default function Onboarding({ session, workbookId }: { session: Session; 
 
           {ready ? (
             <Callout tone="ok" title="Mapping confirmed.">
+              {embedded ? <div className="stack"><p>Your workbook is ready. LedgerFlow can now prepare entries for your review.</p>
+                <div><button className="btn primary" disabled={continuing} onClick={onContinue}>See how it works<Icon name="arrow"/></button></div></div> :
               <p>Mapping <code>{active.mapping?.mapping_id}</code> · {shortHash(active.mapping?.mapping_sha256)}. Employees can now submit receipts.
                 Share <code>{window.location.origin}/#/capture</code> with your team.</p>
+              }
             </Callout>
           ) : owner ? (
             <section className="panel stack">

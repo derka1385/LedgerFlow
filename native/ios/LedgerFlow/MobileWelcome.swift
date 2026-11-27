@@ -225,6 +225,12 @@ struct AccountSheet: View {
     var body: some View {
         NavigationStack {
             Form {
+                if workspace.connection != nil {
+                    Section("Connected workspace") {
+                        ConnectionBadge(workspace: workspace)
+                        Button("Sign out", role: .destructive) { Task { await workspace.signOut(); dismiss() } }
+                    }
+                }
                 Section("Start on this iPhone") {
                     Text("Create a local profile to scan and keep receipts until you connect a workspace.")
                         .font(.subheadline).foregroundStyle(.secondary)

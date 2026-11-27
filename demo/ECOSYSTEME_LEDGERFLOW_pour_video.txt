@@ -1,0 +1,272 @@
+LEDGERFLOW — FONCTIONNEMENT COMPLET DE L'ÉCOSYSTÈME
+Document de référence pour écrire le prompt d'une vidéo en motion design.
+Langue de l'interface : anglais (sélecteur EN / FR / SV disponible). Textes d'écran cités entre « ».
+Données montrées en démo : fictives (entreprise d'exemple « Nordvik Trading AB », reçus d'exemple, classeur Rusta d'exemple).
+
+======================================================================
+0. EN UNE PHRASE
+======================================================================
+LedgerFlow est un agent comptable : tu prends un reçu en photo (iPhone, en option) ou tu le déposes sur le Mac,
+un modèle d'IA hébergé chez Vultr le lit, des règles comptables fixes décident de l'écriture, un petit programme
+écrit uniquement les bonnes cellules de TON fichier Excel dans une sandbox isolée, un vérificateur indépendant
+relit le fichier, et rien n'est enregistré tant que tu n'as pas approuvé cellule par cellule.
+
+Promesse visuelle : « Your books, one receipt at a time. » — « Every receipt lands in the right cells. With proof. »
+
+======================================================================
+1. L'IDENTITÉ VISUELLE (pour le motion design)
+======================================================================
+- Concept graphique : « The Ledger Grid ». Le seul élément signature est le RECTANGLE DE SÉLECTION d'un tableur
+  (comme dans Excel) avec sa petite POIGNÉE CARRÉE en bas à droite (fill handle).
+  Il encadre toujours ce qui vient d'être écrit ou vérifié.
+- Règle de couleur : GRIS = pas encore vérifié. NOIR/ENCRE = vérifié. Le vert = la sélection, la preuve, l'action.
+- Couleurs :
+    vert forêt      #0B5A45  (couleur principale, sélection, boutons)
+    vert menthe     #8FE3B8  (poignée de sélection, accents sur fond sombre)
+    vert profond    #06291F / #0B2219 (panneaux sombres, fonds)
+    fond clair      #F2F5F3  (canevas)
+    lignes de grille #DCE2DC
+    encre           #121614
+    ambre           #8F5E07  (reçu mis en attente / à vérifier)
+- Typo : Schibsted Grotesk (titres), Martian Mono (uniquement les données : montants, dates, codes de comptes, hash).
+  Le logotype « LedgerFlow » est en serif clair.
+- Logo : carré vert arrondi avec « LF » (L blanc, F menthe) et une poignée de sélection menthe en bas à droite.
+- Illustration récurrente : un reçu stylisé crème avec des lignes et une coche, posé sur des VAGUES de traits fins.
+- Écran de connexion : panneau vert avec des NUAGES verts flous qui dérivent lentement (cycles 21–35 s) et des
+  traits qui ONDULENT comme une houle, chacun à son rythme.
+- Mouvement : apparitions douces de bas en haut (rise), écriture de cellule (la valeur grise devient noire, « ink »),
+  le rectangle de sélection se pose avec un léger rebond, pulsation discrète sur l'étape en cours.
+  Si « Réduire les animations » est activé : tout reste immobile, l'état final est montré.
+
+======================================================================
+2. LES ACTEURS DE L'ÉCOSYSTÈME
+======================================================================
+A) L'app Mac « LedgerFlow » (centre de tout, obligatoire)
+   - Fenêtre sans barre de titre ; les 3 boutons de fenêtre flottent sur le contenu.
+   - Contient : l'agent (chat), les classeurs Excel, les reçus, les transactions à approuver, l'historique d'audit.
+   - Fait tourner en local un moteur (serveur sécurisé HTTPS sur le Mac) qui stocke tout sur le Mac.
+
+B) L'app iPhone « LedgerFlow » (OPTIONNELLE)
+   - Sert à scanner les reçus là où ils sont (magasin, voiture) et à suivre les dépenses.
+   - Elle ne contient pas la comptabilité : elle envoie les reçus au Mac et affiche ce que le Mac lui renvoie.
+   - Sans iPhone, tout se fait sur le Mac (déposer un fichier image/PDF du reçu).
+
+C) Vultr Serverless Inference (le « cerveau » IA, dans le cloud Vultr)
+   - Fournisseur : Vultr Serverless Inference, API compatible OpenAI (api.vultrinference.com).
+   - Modèle choisi par benchmark : qwen3.8-27b, raisonnement « minimal », température 0.
+   - Rôles : 1) LIRE le reçu (vision : fournisseur, date, total, TVA, numéro, moyen de paiement),
+             2) ÉCRIRE le petit programme Python qui remplit les cellules prévues,
+             3) RÉPONDRE dans le chat de l'agent (en anglais, français ou suédois selon la langue du message).
+   - Ce que le modèle NE fait PAS : il ne décide jamais du débit/crédit. Ce sont des règles comptables fixes.
+   - Résultats mesurés au benchmark : 22/22 reçus correctement comptabilisés, 0 fait critique inventé,
+     3/3 tentatives d'injection détectées, 11/11 programmes générés valides du premier coup.
+
+D) La sandbox (l'endroit isolé où le programme écrit dans l'Excel)
+   - Un conteneur Docker jetable, image python:3.12-slim.
+   - Verrouillé : aucun accès réseau (network none), système de fichiers en lecture seule, 1 CPU, 512 Mo de RAM,
+     128 processus max, aucun privilège (cap-drop ALL, utilisateur non-root 10001), espace de travail limité à 128 Mo.
+   - Détruit après chaque exécution ; en cas de dépassement de temps, il est tué et rien n'est gardé.
+   - S'il n'y a pas de sandbox disponible, LedgerFlow REFUSE d'exécuter le programme (jamais d'exécution hors isolation).
+   - OÙ elle tourne, précisément :
+       * Mode app Mac (la démo) : le conteneur Docker tourne sur le Mac (Docker Desktop).
+       * Mode serveur (déploiement) : sur une machine Vultr Cloud Compute dédiée appelée « runner »,
+         protégée par un pare-feu Vultr, créée avec OpenTofu.
+     Donc : Vultr = l'IA (toujours) + la machine d'exécution isolée (en mode serveur).
+   - Dans l'interface, la sandbox est visible :
+       * dans l'explication « How it works », étape 03 : un bloc de code sombre, puis une barre pointillée verte
+         « sandbox · offline · 128 MiB » qui se remplit, puis 5 coches qui apparaissent une à une ;
+       * dans « Settings » › « Model connection » : « Isolated execution : Docker ready » ;
+       * dans « Agent Activity » / « Execution monitor » : la vie du conteneur (créé, exécuté, détruit), le code, les limites.
+
+E) Le vérificateur indépendant (sur le Mac / le serveur, pas dans le modèle)
+   - Relit le vrai fichier Excel produit et compare avec le plan. 5 contrôles affichés :
+       exact_write_set         → seules les cellules prévues ont changé
+       formulas_unchanged      → aucune formule n'a été modifiée
+       features_preserved      → listes déroulantes, mises en forme, feuilles intactes
+       new_entry_balanced      → l'écriture est équilibrée (débit = crédit)
+       no_new_active_content   → aucune macro ou contenu actif ajouté
+   - Le reçu montre aussi « 21/21 checks » sur la page de la transaction.
+
+F) Le fichier Excel de l'utilisateur
+   - Format pris en charge pour l'écriture : classeur en COMPTES EN T (style exercice SSE : une feuille « T-Accounts »,
+     une feuille « Chart of accounts » avec des codes [NNNN], des listes déroulantes de comptes).
+   - L'original reste la version 1. Chaque écriture approuvée crée une NOUVELLE version (identifiée par un hash).
+   - Tout autre .xlsx (ex. tableau de dépenses Rusta) peut être déposé et gardé comme fichier de référence.
+   - Au premier lancement, le Mac crée automatiquement un classeur d'exemple « Expenses (sample) » prêt à recevoir des reçus.
+
+======================================================================
+3. PARCOURS SUR LE MAC — ÉCRAN PAR ÉCRAN, GESTE PAR GESTE
+======================================================================
+3.1 Lancement
+   - Geste : double-clic sur l'icône LedgerFlow (Applications).
+   - Écran : animation d'intro plein écran sur fond vert sombre avec les vagues de traits ; le reçu stylisé apparaît,
+     puis le logotype « LedgerFlow ». Bouton discret « Skip introduction ».
+
+3.2 Connexion (compte)
+   - Écran « Welcome back » : à gauche le panneau vert (nuages qui dérivent, traits qui ondulent, reçu + logo),
+     à droite le formulaire qui apparaît en fondu : « Email », « Password », bouton « Sign in → ».
+   - Geste : taper l'email, le mot de passe, clic sur « Sign in ».
+   - Transition : le titre devient « Opening your workspace… », une barre verte se remplit
+     (« Loading your workbooks, receipts and agent. »), puis l'espace s'ouvre.
+   - Déconnexion : bouton « Sign out » en bas de la barre latérale → retour à « Welcome back ». Répétable à volonté.
+
+3.3 Première configuration (une seule fois)
+   - « Name your agent » : geste = taper un nom (ex. « Atlas »), « Continue ».
+   - « Set up your workspace » : nom de l'entreprise, choix de la source comptable (Excel, Fortnox, Visma, QuickBooks,
+     SAP, Microsoft Dynamics, Other ERP), « Create workspace ».
+   - Écran de chargement par étapes « Preparing your workspace » : barre de progression + 4 lignes qui se cochent
+     une à une : « Creating Atlas » ✓, « Saving the workspace on this Mac » ✓,
+     « Preparing a sample Excel workbook » ✓, « Checking the Vultr model connection » ✓ (environ 3 s).
+   - Parcours guidé en 3 onglets en haut : « Workbook » · « How it works » · « iPhone (optional) ».
+
+3.4 Onglet « Workbook » — connecter l'Excel
+   - Zone « Connect another workbook » : bouton « Choose File », champ « Display name », bouton « Upload and inspect ».
+     Liens « Examples: Use sample workbook · Use sample with a pre-existing error ».
+   - Geste : choisir le .xlsx, clic « Upload and inspect ».
+   - L'app affiche ce qu'elle a compris :
+       « What LedgerFlow found » : Layout T-accounts on sheet « T-Accounts », Accounts 32, Entry slots 369 (68 used, 301 free),
+       Formulas 6 (never edited), Dropdown lists 66 ranges (preserved byte for byte), Sheets.
+       « Balances » : soldes d'ouverture équilibrés, total débits / crédits ; si le fichier avait déjà une erreur,
+       une carte ambre l'explique et précise que LedgerFlow ne touchera pas aux écritures existantes.
+       Tableau « Accounts and write areas » (compte, rôle, cases libres).
+   - Geste : confirmer le mapping (bouton de confirmation) → le classeur passe « ready » (prêt à recevoir des reçus).
+   - Promesse affichée : « LedgerFlow writes into your existing workbook. It never changes its structure, formulas or
+     opening balances, and every change needs your approval. »
+
+3.5 Onglet « How it works » — l'explication animée en 4 étapes (avec bouton pause, flèches, « Back » / « Next »)
+   01 « Snap the receipt » : un reçu papier apparaît dans un viseur photo avec coins de cadrage et bouton déclencheur.
+      Texte : prendre une photo sur iPhone ou déposer un fichier sur le Mac ; l'original est gardé intact.
+   02 « LedgerFlow reads it » : à côté d'un petit document, une mini-feuille A/B se remplit ligne par ligne :
+      Supplier, Date, Total, VAT 25 %, Paid with ; le rectangle de sélection vert encadre la colonne lue.
+      Texte : « A model on Vultr reads supplier, date, total and VAT. Our rules, not the model, decide debit and credit. »
+   03 « Code writes, a sandbox runs, a verifier checks » : bloc de code sombre
+         writes = plan.cells()
+         patch_cells(book, "T-Accounts", writes)
+         assert reread(book) == plan
+      puis la barre pointillée « sandbox · offline · 128 MiB » qui se remplit, puis les 5 coches
+      (exact_write_set, formulas_unchanged, features_preserved, new_entry_balanced, no_new_active_content).
+   04 « You approve the exact file » : une grille de cellules (R7 [6110] 1 250,00 · S7 · R8 [2640] 312,50 …) encadrée
+      d'un seul rectangle vert avec poignée, une empreinte « sha256 fea407e9… », un bouton « Approve 8 cells »,
+      et une frise « v1 ——— v2 ». Texte : « You see every cell that changes. Your approval signs that file's hash;
+      the previous version stays safe. »
+   - Mention en bas : « Illustration with sample figures ».
+
+3.6 Onglet « iPhone (optional) » — association de l'iPhone (FACULTATIF)
+   - Écran « Connect your iPhone » : « Scan receipts on your iPhone and see the same documents and expenses on your Mac. »
+   - Geste Mac : clic « Connect iPhone » → un QR code s'affiche (valable 2 minutes, usage unique).
+   - On peut passer cette étape : tout le reste fonctionne sans iPhone.
+   - Plus tard : bouton « Scan with iPhone » en haut à droite du Mac, ou « Settings » › « iPhone ».
+
+3.7 Utilisation quotidienne sur le Mac
+   - Barre latérale : Agent, Dashboard, Receipts, Expenses, Workbooks, Workbook checks, Activity, Audit history ;
+     en bas « Account & settings » et « Sign out ». En haut : sélecteur de langue EN/FR/SV, « Scan with iPhone ».
+   - Agent (chat) : « Ask about your receipts. » Geste = taper une question, Entrée. L'agent répond dans la langue
+     du message. Boutons d'action proposés : « Add a receipt », « Connect my Excel », « Review receipts »…
+   - Ajouter un reçu sans iPhone : « Submit a receipt » / « Add a receipt » → déposer l'image.
+   - Transactions : liste à gauche (fournisseur, montant, statut), au centre le reçu original, à droite
+     « Proposed entry » (ex. 6110 Office supplies débit 1 000,00 ; 2640 Input VAT débit 250,00 ; 1940 Bank account
+     crédit 1 250,00 ; « balanced »), l'explication « Why: … », « Built by deterministic rules … The model never writes
+     debits or credits. », puis « Changes to your workbook » : la grille Excel avec les cellules modifiées encadrées
+     d'un rectangle vert + poignée, et « 21/21 checks ».
+   - Geste clé : approuver → nouvelle version du fichier, barre du bas « Committed · New version d607…4fec · date »,
+     boutons « Audit log » et « Download .xlsx » (télécharger le classeur rempli).
+   - Reçu en devise étrangère (EUR, USD, GBP, NOK, DKK, CHF…) : converti en SEK au cours officiel de la Riksbank du jour,
+     montant entier en charge (TVA étrangère non déductible en Suède), avec la phrase explicative
+     « Paid in EUR: 23.50 EUR × 11.208 SEK (Riksbank mid rate …) = SEK 263.39 … ».
+   - Reçu douteux : mis en attente en ambre (« Needs your answer », « To check ») au lieu d'être écrit.
+
+======================================================================
+4. PARCOURS SUR L'IPHONE (OPTIONNEL) — ÉCRAN PAR ÉCRAN, GESTE PAR GESTE
+======================================================================
+4.1 Premier lancement
+   - Écran d'accueil : logo + logotype, titre « Your books, one receipt at a time. », une mini-feuille animée en
+     4 étapes qui défilent seules (01 · 02 · 03 · 04, bouton pause), mention « Sample figures ».
+   - Gros bouton vert « Pair with my Mac », sous-texte « On the Mac: open LedgerFlow, then “Scan with iPhone”.
+     Both devices on the same Wi-Fi. », liens « Paste a pairing link » et « Other connection options ».
+
+4.2 Association (geste)
+   - Sur le Mac : « Scan with iPhone » → QR code.
+   - Sur l'iPhone : « Pair with my Mac » → la caméra s'ouvre → viser le QR code → association faite.
+   - Technique : même Wi-Fi ; le QR contient l'adresse du Mac + l'empreinte de son certificat (connexion chiffrée,
+     l'iPhone vérifie que c'est bien CE Mac) + un code à usage unique valable 2 minutes.
+   - Pastille d'état toujours visible : vert « Connected to your Mac » (+ nombre de classeurs prêts),
+     orange « Mac unreachable · same Wi-Fi? LedgerFlow open? » ou « Pairing expired », gris « Not paired with a Mac ».
+
+4.3 Onglets de l'app iPhone : Home · Scan · History · Agent
+   - HOME (page principale unique) :
+       pastille de connexion ;
+       carte verte « This month » : gros montant du mois (comptabilisé + à vérifier), détail « X booked · Y to check »,
+       « N on the Mac », « N waiting on this iPhone » ;
+       « Recent expenses » : les 5 derniers reçus (miniature photo, fournisseur, montant en gras, date, provenance
+       « from iPhone / from Mac »), lien « See all » vers toutes les dépenses groupées par mois ;
+       « Workbooks » : les classeurs du Mac.
+   - SCAN :
+       geste = « Scan a receipt » → scanner de documents d'Apple (détection automatique des bords, plusieurs pages)
+       ou choisir une photo.
+       L'iPhone LIT le texte lui-même (reconnaissance de texte sur l'appareil, suédois/français/anglais) et affiche
+       une carte « Read on this iPhone » : le TOTAL en grand, puis Supplier, Date, VAT, et « All text » repliable.
+       Mention : « The Mac's model checks these values before anything is written. »
+       Geste = choisir le classeur et envoyer.
+   - HISTORY :
+       filtre en haut « All · Sending · To check · Booked » ;
+       groupes « On this iPhone » (envoi en cours, avec le logo de chargement LF et un arc qui tourne),
+       « Processing on the Mac », « To check », « Booked », « Stopped », chacun avec son nombre et son total ;
+       chaque ligne : photo, fournisseur, montant, date, provenance ; un blocage s'explique en orange.
+       Recherche par fournisseur, tirer vers le bas pour rafraîchir.
+   - AGENT : chat avec l'agent du Mac (« Message LedgerFlow »), réponses dans la langue du téléphone.
+   - Compte : « Your account » › « Connected workspace » › « Sign out » (oublie l'association ; les reçus en attente
+     restent sur le téléphone).
+   - Si le Mac est éteint : les reçus attendent sur l'iPhone (« Waiting for the Mac ») et partent seuls au retour.
+
+======================================================================
+5. LE VOYAGE D'UN REÇU — DE BOUT EN BOUT (fil rouge de la vidéo)
+======================================================================
+ 1. CAPTURE      iPhone (scan + lecture du texte sur l'appareil) OU dépôt du fichier sur le Mac.
+ 2. ENVOI        iPhone → Mac par le Wi-Fi local, connexion chiffrée et épinglée au certificat du Mac.
+                 L'image originale est gardée telle quelle (preuve).
+ 3. LECTURE IA   Le Mac envoie l'image à Vultr Serverless Inference (qwen3.8-27b) qui renvoie des champs structurés :
+                 fournisseur, n° d'organisation, date, n° de reçu, devise, total, TVA, moyen de paiement.
+                 Une deuxième lecture de contrôle revérifie les champs critiques. Les textes suspects dans l'image
+                 (tentative d'injection du type « ignore les règles ») sont signalés, jamais obéis.
+ 4. RÈGLES       Le moteur comptable (règles fixes, pas l'IA) décide l'écriture : compte de charge, TVA déductible
+                 (2640) ou non, contrepartie (1940 banque / 1930 / dette), contrôle des taux de TVA suédois,
+                 seuil des 4 000 SEK, conversion des devises étrangères, détection des doublons.
+                 Si un doute subsiste → mis en attente (« To check »), rien n'est écrit.
+ 5. PLAN         Le moteur liste exactement quelles cellules du classeur vont changer (ex. R7, S7, R8, S8, K24, L24…).
+ 6. CODE         Vultr génère un petit programme Python qui écrit UNIQUEMENT ces cellules.
+ 7. SANDBOX      Le programme tourne dans le conteneur isolé (pas de réseau, lecture seule, 1 CPU, 512 Mo,
+                 non-root, détruit après), sur une copie du classeur.
+ 8. VÉRIFICATION Le vérificateur relit le fichier produit : 5 contrôles + équilibre ; s'il y a le moindre écart,
+                 le résultat est jeté.
+ 9. APPROBATION  L'humain voit le reçu, l'écriture proposée, la raison, et la grille Excel avec les cellules
+                 encadrées ; il approuve. L'approbation est liée à l'empreinte (hash) exacte du fichier.
+10. VERSION      Nouvelle version du classeur (v2, v3…), l'ancienne reste intacte ; journal d'audit ;
+                 téléchargement du .xlsx rempli.
+11. RETOUR       L'iPhone affiche le reçu « Booked », le montant entre dans « This month ».
+
+======================================================================
+6. SÉCURITÉ ET CONFIANCE (messages clés à faire passer)
+======================================================================
+- Les données restent sur le Mac (classeurs, reçus, conversation). Seule l'image du reçu part au modèle Vultr pour lecture.
+- La clé Vultr n'est jamais affichée, ni dans l'app, ni dans les logs.
+- L'IA lit et rédige ; elle ne décide pas des débits/crédits et n'écrit jamais directement dans le fichier.
+- Aucun code n'est exécuté hors de la sandbox ; si la sandbox manque, l'app refuse.
+- Rien n'est enregistré sans approbation humaine ; chaque version est conservée.
+- L'iPhone ne parle qu'au Mac auquel il a été associé (certificat épinglé, code à usage unique de 2 minutes).
+- Connexion au compte sur le Mac (email + mot de passe), déconnexion en un clic.
+
+======================================================================
+7. PISTE DE STORYBOARD (suggestion, environ 60–75 s)
+======================================================================
+ 0–5 s    Fond de nuages verts qui dérivent, traits qui ondulent ; le reçu crème se pose, logo « LedgerFlow ».
+ 5–10 s   Écran « Welcome back » : saisie email / mot de passe, « Sign in », barre verte « Opening your workspace… ».
+10–18 s   Mac : dépôt du fichier Excel → « What LedgerFlow found » (32 comptes, 369 cases, formules jamais modifiées).
+18–24 s   Option iPhone : QR code sur le Mac, l'iPhone le scanne, pastille « Connected to your Mac » (sous-titre :
+          « Optional — works without iPhone too »).
+24–32 s   iPhone : scan d'un reçu Rusta, les bords se détectent, carte « Read on this iPhone » avec le total en grand.
+32–40 s   Lecture par l'IA Vultr : les champs remplissent une mini-feuille, le rectangle de sélection vert se pose.
+          Légende : « Vultr Serverless Inference · qwen3.8-27b ».
+40–50 s   Code + sandbox : bloc de code, barre « sandbox · offline · 128 MiB », coches qui tombent une à une.
+50–60 s   Mac : grille Excel, cellules encadrées, « 21/21 checks », clic « Approve », « v1 → v2 », empreinte sha256.
+60–68 s   iPhone : History « Booked », carte « This month » dont le montant monte.
+68–75 s   Plan final : « Your books, one receipt at a time. » + logo.

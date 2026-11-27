@@ -125,6 +125,7 @@ private struct WorkbookScreen: View {
                         }.padding(16).background(.white, in: .rect(cornerRadius: 16))
                     }.buttonStyle(.plain)
                 }
+                ConnectionBadge(workspace: workspace)
                 summary
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
@@ -283,11 +284,20 @@ private struct CaptureScreen: View {
                 if !pages.isEmpty {
                     Text(pages.count == 1 ? "1 page ready" : "\(pages.count) pages ready").font(.headline)
                     if !scannedText.isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label("Text read on this iPhone", systemImage: "text.viewfinder").font(.subheadline.weight(.semibold))
-                            Text(scannedText).font(.system(.footnote, design: .monospaced)).textSelection(.enabled)
-                                .frame(maxWidth: .infinity, alignment: .leading).lineLimit(14)
-                        }.padding(12).background(.white, in: .rect(cornerRadius: 12))
+                        let read = ParsedReceipt(scannedText)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Read on this iPhone", systemImage: "text.viewfinder").font(.footnote.weight(.semibold)).foregroundStyle(MobilePalette.forest)
+                            Text(read.total.map { sek($0) } ?? "Total not found").font(.system(.largeTitle, design: .serif).weight(.semibold)).monospacedDigit()
+                            Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
+                                GridRow { Text("Supplier").foregroundStyle(.secondary); Text(read.supplier ?? "–").fontWeight(.semibold) }
+                                GridRow { Text("Date").foregroundStyle(.secondary); Text(read.date ?? "–").monospacedDigit() }
+                                GridRow { Text("VAT").foregroundStyle(.secondary); Text(read.vat.map { sek($0) } ?? "–").monospacedDigit() }
+                            }.font(.subheadline)
+                            DisclosureGroup("All text") {
+                                Text(scannedText).font(.system(.caption, design: .monospaced)).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+                            }.font(.footnote).tint(MobilePalette.forest)
+                            Text("The Mac's model checks these values before anything is written.").font(.caption).foregroundStyle(.secondary)
+                        }.padding(16).frame(maxWidth: .infinity, alignment: .leading).background(.white, in: .rect(cornerRadius: 16))
                     } else if readingText { ProgressView("Reading the receipt text…").font(.footnote) }
                 } else {
                     Text("Scan a receipt").font(.system(.title, design: .serif))
@@ -416,54 +426,68 @@ private struct DocumentCamera: UIViewControllerRepresentable {
 private struct HistoryScreen: View {
     let workspace: MobileWorkspace
     @State private var query = ""
-    @State private var pendingOnly = false
+    @State private var filter = "All"
+    private let filters = ["All", "Sending", "To check", "Booked"]
+
+    private func group(_ r: ReceiptRecord) -> String {
+        switch r.state {
+        case "COMMITTED": "Booked"
+        case "AWAITING_APPROVAL", "NEEDS_REVIEW", "DUPLICATE_REVIEW", "STALE_BASE": "To check"
+        case "FAILED", "REJECTED", "CANCELLED", "EXPIRED": "Stopped"
+        default: "Processing on the Mac"
+        }
+    }
+    private var receipts: [ReceiptRecord] {
+        workspace.snapshot.receipts.filter { query.isEmpty || ($0.merchant_name ?? "").localizedCaseInsensitiveContains(query) }
+    }
+    private func shows(_ g: String) -> Bool {
+        filter == "All" || filter == g || (filter == "Sending" && g == "Processing on the Mac")
+    }
 
     var body: some View {
         List {
             Section {
-                Toggle("Pending receipts only", isOn: $pendingOnly)
+                ConnectionBadge(workspace: workspace)
+                Picker("Show", selection: $filter) { ForEach(filters, id: \.self) { Text($0) } }.pickerStyle(.segmented)
             }
-            if !workspace.pending.isEmpty || pendingOnly {
-                Section("Pending · \(workspace.pending.count)") {
-                    if workspace.pending.isEmpty { Text("The receipt queue is empty.").foregroundStyle(.secondary) }
+            if (filter == "All" || filter == "Sending") && !workspace.pending.isEmpty {
+                Section("On this iPhone · \(workspace.pending.count)") {
                     ForEach(workspace.pending) { item in
-                        NavigationLink {
-                            OutboxDetail(workspace: workspace, id: item.id, created: item.created)
-                        } label: {
-                            Label {
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text(item.issue ?? (item.workbookID == nil ? "Choose a workbook" : "Waiting to sync")).font(.subheadline.weight(.medium))
+                        NavigationLink { OutboxDetail(workspace: workspace, id: item.id, created: item.created) } label: {
+                            HStack(spacing: 12) {
+                                if workspace.syncing && item.issue == nil { UploadSpinner() }
+                                else { Image(systemName: item.issue == nil ? "arrow.up.circle" : "exclamationmark.triangle.fill")
+                                        .font(.title3).foregroundStyle(item.issue == nil ? MobilePalette.forest : .orange).frame(width: 28) }
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(item.issue == nil ? (workspace.syncing ? "Sending to the Mac…" : "Waiting for the Mac") : "Not sent")
+                                        .font(.subheadline.weight(.semibold))
+                                    if let issue = item.issue { Text(issue).font(.footnote).foregroundStyle(.orange) }
                                     Text(item.created, format: .dateTime.month().day().hour().minute()).font(.footnote).foregroundStyle(.secondary)
                                 }
-                            } icon: {
-                                if workspace.syncing && item.issue == nil { UploadSpinner() }
-                                else { Image(systemName: "tray.and.arrow.up").foregroundStyle(MobilePalette.forest) }
                             }
                         }
                     }
                 }
             }
-            if !pendingOnly {
-                Section("Submitted receipts") {
-                    if matching.isEmpty {
-                        Text(query.isEmpty ? "Submitted receipts will appear here." : "No receipts match your search.").foregroundStyle(.secondary)
-                    }
-                    ForEach(matching) { receipt in
-                        NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) }
+            ForEach(["Processing on the Mac", "To check", "Booked", "Stopped"], id: \.self) { g in
+                let items = receipts.filter { group($0) == g }
+                if shows(g) && !items.isEmpty {
+                    Section {
+                        ForEach(items) { receipt in
+                            NavigationLink { ReceiptDetail(workspace: workspace, receipt: receipt) } label: { ReceiptRow(receipt: receipt, workspace: workspace) }
+                        }
+                    } header: {
+                        HStack { Text("\(g) · \(items.count)"); Spacer(); Text(sek(items.compactMap(\.gross_minor).reduce(0, +))).monospacedDigit() }
                     }
                 }
             }
+            if workspace.pending.isEmpty && receipts.isEmpty {
+                Section { Text(query.isEmpty ? "No receipts yet. Scan one from the Scan tab." : "No receipts match your search.").foregroundStyle(.secondary) }
+            }
         }
         .scrollContentBackground(.hidden).background(MobilePalette.paper)
-        .navigationTitle("History").searchable(text: $query, prompt: "Search receipts")
+        .navigationTitle("History").searchable(text: $query, prompt: "Search by supplier")
         .refreshable { await workspace.refresh() }
-    }
-
-    private var matching: [ReceiptRecord] {
-        workspace.snapshot.receipts.filter { row in
-            query.isEmpty || (row.merchant_name ?? "Receipt").localizedCaseInsensitiveContains(query)
-                || stateTitle(row.state).localizedCaseInsensitiveContains(query)
-        }
     }
 }
 
@@ -528,7 +552,7 @@ private struct ReceiptRow: View {
                 .overlay { if ["QUEUED", "EXTRACTING", "PLANNING", "GENERATING", "VALIDATING", "COMMITTING", "RUNNING"].contains(receipt.state) { UploadSpinner().padding(4).background(.ultraThinMaterial, in: .circle) } }
             VStack(alignment: .leading, spacing: 4) {
                 Text(receipt.merchant_name ?? "Reading…").font(.subheadline.weight(.semibold))
-                Text("\(stateTitle(receipt.state)) · from \(receipt.source)").font(.footnote).foregroundStyle(.secondary)
+                Text([stateTitle(receipt.state), receipt.source].compactMap { $0 }.joined(separator: " · ")).font(.footnote).foregroundStyle(.secondary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
@@ -587,6 +611,7 @@ private struct AgentScreen: View {
     @State private var draft: String?
     @FocusState private var focused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var agentName: String { workspace.snapshot.agentName ?? "LedgerFlow" }
 
     var body: some View {
         ScrollViewReader { scroll in
@@ -597,7 +622,7 @@ private struct AgentScreen: View {
                             ReceiptGlyph().frame(width: 38).padding(5).background(MobilePalette.forest, in: .rect(cornerRadius: 12))
                             VStack(alignment: .leading, spacing: 7) {
                                 Text("Ask about your receipts.").font(.system(.title2, design: .serif))
-                                Text("LedgerFlow answers using the receipts and workbooks you can access.").font(.subheadline).foregroundStyle(.secondary)
+                                Text("\(agentName) answers using the receipts and workbooks you can access.").font(.subheadline).foregroundStyle(.secondary)
                             }
                         }.padding(.bottom, 8)
                         Button("Which receipts need my attention?") { send("Which receipts need my attention?") }
@@ -627,7 +652,7 @@ private struct AgentScreen: View {
         .background(MobilePalette.paper.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
             HStack(alignment: .bottom, spacing: 12) {
-                TextField("Message LedgerFlow", text: $question, axis: .vertical).lineLimit(1...5)
+                TextField("Message \(agentName)", text: $question, axis: .vertical).lineLimit(1...5)
                     .padding(12).focused($focused)
                 Button { send(question) } label: {
                     Image(systemName: "arrow.up").font(.body.weight(.semibold)).foregroundStyle(.white)
@@ -639,7 +664,7 @@ private struct AgentScreen: View {
                 .overlay { RoundedRectangle(cornerRadius: 20).strokeBorder(MobilePalette.rule) }
                 .padding(.horizontal, 16).padding(.vertical, 9).background(MobilePalette.paper)
         }
-        .navigationTitle("Agent").refreshable { await workspace.refresh() }
+        .navigationTitle(agentName).refreshable { await workspace.refresh() }
     }
 
     // Tappable whenever there is text; ask() explains why it cannot send (offline, receipts-only pairing).
@@ -658,7 +683,7 @@ private struct AgentScreen: View {
 
     private func messageView(_ text: String, fromUser: Bool) -> some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(fromUser ? "You" : "LedgerFlow").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Text(fromUser ? "You" : agentName).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             Text(text).font(.body).textSelection(.enabled)
         }.padding(fromUser ? 13 : 0)
             .background(fromUser ? MobilePalette.moss.opacity(0.37) : .clear, in: .rect(cornerRadius: 15))
@@ -746,5 +771,54 @@ private struct UploadSpinner: View {
         .frame(width: 28, height: 28)
         .onAppear { turning = true }
         .accessibilityLabel("Uploading")
+    }
+}
+
+
+/// Sorts the OCR lines into the fields people look for. Advisory only; the Mac re-reads the image.
+struct ParsedReceipt {
+    var supplier: String?, date: String?, total: Int?, vat: Int?
+    init(_ text: String) {
+        let lines = text.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        let skip = ["kvitto", "receipt", "reçu", "välkommen", "welcome", "org", "tel"]
+        supplier = lines.first { l in l.count > 2 && l.rangeOfCharacter(from: .letters) != nil && !skip.contains { l.lowercased().hasPrefix($0) } }
+        let datePattern = /(20\d{2})[-\/.](\d{1,2})[-\/.](\d{1,2})|(\d{1,2})[-\/.](\d{1,2})[-\/.](20\d{2})/
+        if let m = text.firstMatch(of: datePattern) {
+            date = m.1 != nil ? "\(m.1!)-\(m.2!)-\(m.3!)" : "\(m.6!)-\(m.5!)-\(m.4!)"
+        }
+        func amount(_ line: String) -> Int? {
+            let found = line.matches(of: /(\d{1,3}(?:[ \u00A0.]\d{3})*|\d+)[,.](\d{2})(?!\d)/)
+            guard let last = found.last else { return nil }
+            let whole = String(last.1).filter(\.isNumber)
+            return Int(whole + String(last.2))
+        }
+        func find(_ keys: [String]) -> Int? {
+            for (i, l) in lines.enumerated() where keys.contains(where: { l.lowercased().contains($0) }) {
+                if let a = amount(l) ?? (i + 1 < lines.count ? amount(lines[i + 1]) : nil) { return a }
+            }
+            return nil
+        }
+        total = find(["att betala", "totalt", "total", "summa", "à payer", "montant"])
+        vat = find(["moms", "vat", "tva"])
+    }
+}
+
+/// Always-visible link status with the Mac.
+struct ConnectionBadge: View {
+    let workspace: MobileWorkspace
+    var body: some View {
+        let (color, text): (Color, String) = switch workspace.availability {
+        case .connected: (.green, "Connected to your Mac")
+        case .checking: (.yellow, "Looking for your Mac…")
+        case .unreachable: (.orange, "Mac unreachable · same Wi-Fi? LedgerFlow open?")
+        case .expired: (.orange, "Pairing expired · pair again from the Mac")
+        case .unlinked: (.gray, "Not paired with a Mac")
+        }
+        HStack(spacing: 8) {
+            Circle().fill(color).frame(width: 9, height: 9)
+            Text(text).font(.footnote.weight(.medium))
+            Spacer()
+            if workspace.availability == .connected { Text("\(workspace.snapshot.targets.count) workbook\(workspace.snapshot.targets.count == 1 ? "" : "s")").font(.footnote).foregroundStyle(.secondary) }
+        }.accessibilityElement(children: .combine)
     }
 }

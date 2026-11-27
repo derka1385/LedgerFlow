@@ -20,6 +20,7 @@ import socket
 import ssl
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from urllib.parse import urlsplit, urlencode, quote
@@ -70,6 +71,7 @@ def certificate(directory, addresses):
 
 def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples=False):
     pairings = {}
+    paired = {}
     consumed_bootstrap = False
     chat_busy = set()
     api.DB.setdefault("assistant_messages", [])
@@ -97,9 +99,9 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
                 sys.stderr.write("Local workspace background save failed.\n")
     threading.Thread(target=writer, daemon=True).start()
 
-    def session(role, uid, name):
+    def session(role, uid, name, device):
         sid, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
-        value = {"user_id":uid,"role":role,"display_name":name,"tenant_id":"ten_nordvik", "csrf_token":csrf,
+        value = {"user_id":uid,"role":role,"display_name":name,"tenant_id":"ten_nordvik", "csrf_token":csrf, "device":device,
                  "expires_at":(datetime.now(timezone.utc) + timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M:%SZ")}
         api.DB["sessions"][sid] = value
         return 201, {**value,"backend":"LOCAL","inference":"vultr" if api.vsi.enabled() else "unavailable"}, {"Set-Cookie": f"ledgerflow_session={sid}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800"}
@@ -112,7 +114,7 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             if consumed_bootstrap or not secrets.compare_digest(str(request.get("token", "")), bootstrap) or ctx["handler"].client_address[0] != "127.0.0.1":
                 raise api.ApiError(401,"BOOTSTRAP_INVALID","Relancez l’application Mac pour ouvrir votre espace.")
             consumed_bootstrap = True
-            return session("owner", "usr_local_owner", "Mon espace")
+            return session("owner", "usr_local_owner", "Mon espace", "Mac")
 
     @api.route("GET", "/desktop/status")
     def status(ctx):
@@ -130,14 +132,37 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         if ctx["handler"].client_address[0] != "127.0.0.1":
             raise api.ApiError(403, "MAC_REQUIRED", "Change the workspace profile on its Mac.")
         body = api.jbody(ctx)
-        name, source = body.get("name"), body.get("source")
+        name, source, agent_name = body.get("name"), body.get("source"), body.get("agent_name", "LedgerFlow")
         sources = ("excel", "fortnox", "visma", "quickbooks", "sap", "dynamics", "other")
+        if not isinstance(agent_name, str) or not 1 <= len(agent_name.strip()) <= 48:
+            raise api.ApiError(400, "INVALID_WORKSPACE_PROFILE", "Enter a name for your agent.")
         if not isinstance(name, str) or not 1 <= len(name.strip()) <= 80 or source not in sources:
             raise api.ApiError(400, "INVALID_WORKSPACE_PROFILE", "Enter a workspace name and select an accounting source.")
         with api.LOCK:
-            profile = {"name": name.strip(), "source": source}
+            profile = {"name": name.strip(), "source": source, "agent_name": agent_name.strip()}
             api.DB["desktop_workspace_profile"] = profile
         return 200, {"profile": profile}
+
+    def render_pdf(data):
+        renderer = REPO / "native/macos/build/LedgerFlow.app/Contents/MacOS/render-receipt"
+        if not renderer.is_file():
+            raise api.ApiError(503, "PDF_RENDERER_UNAVAILABLE", "The Mac PDF renderer is unavailable. Update LedgerFlow or use a JPEG or PNG.")
+        with tempfile.TemporaryDirectory(prefix="ledgerflow-pdf-") as folder:
+            source, preview = Path(folder) / "receipt.pdf", Path(folder) / "preview.jpg"
+            source.write_bytes(data)
+            try:
+                result = subprocess.run([str(renderer), str(source), str(preview)], timeout=12, capture_output=True)
+                if result.returncode == 2:
+                    raise api.ApiError(422, "PDF_PAGE_COUNT", "Choose a single-page receipt or invoice PDF.")
+                if result.returncode == 0 and preview.is_file() and 0 < preview.stat().st_size <= api.MAX_UPLOAD:
+                    return preview.read_bytes()
+            except (subprocess.TimeoutExpired, OSError):
+                pass
+            raise api.ApiError(422, "PDF_UNREADABLE", "Choose an unlocked, readable PDF or use a JPEG or PNG.")
+
+    @api.route("POST", "/workbooks/([A-Za-z0-9_\\-]+)/documents", idem=True)
+    def local_document(ctx, wid):
+        return api.upload_document(ctx, wid, render_pdf if ctx["session"]["role"] == "owner" else None)
 
     @api.route("POST", "/desktop/pairings", roles=("owner",), idem=True)
     def pair(ctx):
@@ -149,8 +174,10 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         if not peers:
             raise api.ApiError(409,"NO_LOCAL_NETWORK","Connectez le Mac et l’iPhone au même réseau Wi-Fi.")
         with api.LOCK:
-            for identifier,p in list(pairings.items()):
-                if p["deadline"] < time.time(): del pairings[identifier]
+            for records in (pairings, paired):
+                for identifier, record in list(records.items()):
+                    if record["deadline"] < time.time():
+                        del records[identifier]
             if len(pairings) >= 10: raise api.ApiError(429,"PAIRING_LIMIT","Fermez un code existant puis réessayez.")
             token, pid = secrets.token_urlsafe(32), api.oid("pair")
             pairings[pid] = {"digest":api.sha(token.encode()),"deadline":time.time()+120,"uid":ctx["session"]["user_id"],"scope":scope}
@@ -158,12 +185,23 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
         link = "ledgerflow://connect?"+urlencode({"origin":origin,"pin":fingerprint,"mode":scope})+"#"+token
         return 201,{"pairing_id":pid,"url":link,"expires_at":(datetime.now(timezone.utc)+timedelta(seconds=120)).isoformat(),"scope":scope}
 
+    @api.route("GET", "/desktop/pairings/([A-Za-z0-9_\\-]+)", roles=("owner",))
+    def pairing_status(ctx, pid):
+        with api.LOCK:
+            value = paired.get(pid) or pairings.get(pid)
+            if not value or value["uid"] != ctx["session"]["user_id"]:
+                raise api.ApiError(404, "PAIRING_NOT_FOUND", "This pairing is no longer available.")
+            state = "linked" if pid in paired else "expired" if value["deadline"] <= time.time() else "waiting"
+            return 200, {"state": state}
+
     @api.route("DELETE", "/desktop/pairings/([A-Za-z0-9_\\-]+)",roles=("owner",))
     def unpair(ctx,pid):
         with api.LOCK:
             value=pairings.get(pid)
             if value and value["uid"] != ctx["session"]["user_id"]: raise api.ApiError(403,"FORBIDDEN","Ce code appartient à un autre utilisateur.")
             pairings.pop(pid,None)
+            if pid in paired and paired[pid]["uid"] == ctx["session"]["user_id"]:
+                paired.pop(pid)
         return 200,{"ok":True}
 
     @api.route("POST", "/desktop/pairings/exchange",auth=False)
@@ -176,7 +214,9 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
             if not found or found[1]["deadline"] <= time.time(): raise api.ApiError(401,"PAIRING_INVALID","Le code est invalide ou expiré. Générez-en un autre sur le Mac.")
             pid,p=found
             del pairings[pid]  # atomic single use, never persisted
-            return session("owner" if p["scope"] == "workspace" else "employee",p["uid"] if p["scope"]=="workspace" else "usr_phone_capture","Mon iPhone")
+            result = session("owner" if p["scope"] == "workspace" else "employee",p["uid"] if p["scope"]=="workspace" else "usr_phone_capture","Mon iPhone", "iPhone")
+            paired[pid] = {"uid": p["uid"], "deadline": time.time() + 120}
+            return result
 
     @api.route("GET", "/assistant/messages")
     def messages(ctx):
@@ -228,6 +268,10 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
 
         def _json(self,status,obj,headers=None):
             if isinstance(obj,dict) and obj.get("backend")=="DEV-MOCK": obj={**obj,"backend":"LOCAL","inference":"vultr" if api.vsi.enabled() else "unavailable"}
+            if self.command == "GET" and self.path == "/api/v1/auth/session" and status == 200 and obj.get("role") == "owner":
+                with api.LOCK:
+                    profile = api.DB.get("desktop_workspace_profile") or {}
+                obj = {**obj, "agent_name": profile.get("agent_name")}
             if self.command in ("POST","DELETE") and status<400: flush()
             super()._json(status,obj,headers)
 
@@ -280,6 +324,27 @@ def main():
     for run in api.DB["runs"].values():
         if run["state"] not in {"COMMITTED","CANCELLED","REJECTED","FAILED","EXPIRED","AWAITING_APPROVAL","NEEDS_REVIEW","DUPLICATE_REVIEW","STALE_BASE"}:
             api.set_state(run,"FAILED","APP_INTERRUPTED","Le Mac a été arrêté pendant le traitement. Relancez cette pièce depuis sa fiche.")
+    def ensure_default_workbook():
+        """The iPhone can only send receipts to a ready workbook. A fresh Mac has none, so receipts
+        stayed queued on the phone. Seed the synthetic Nordvik T-accounts book once, owner-confirmed."""
+        if any(w.get("status") == "ready" for w in api.DB["workbooks"].values()):
+            return
+        data = (api.FIXTURES / "nordvik_t_accounts.xlsx").read_bytes()
+        b = "lfseed" + secrets.token_hex(6)
+        raw = (f"--{b}\r\nContent-Disposition: form-data; name=\"display_name\"\r\n\r\nExpenses (sample)\r\n"
+               f"--{b}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"nordvik_t_accounts.xlsx\"\r\n"
+               "Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\r\n\r\n").encode() + data + f"\r\n--{b}--\r\n".encode()
+        owner = {"user_id": "usr_local_owner", "role": "owner"}
+        _, wb = api.upload_workbook({"headers": {"Content-Type": f"multipart/form-data; boundary={b}"}, "raw": raw, "session": owner})
+        wid = wb["workbook_id"]; ver = api.DB["versions"][api.DB["workbooks"][wid]["current_version_id"]]
+        _, mp = api.propose_mapping({"raw": json.dumps({"base_version_id": ver["version_id"], "base_sha256": ver["sha256"]}).encode(), "session": owner}, wid)
+        m = api.DB["mappings"][mp["mapping_id"]]
+        api.confirm_mapping({"raw": json.dumps({"expected_mapping_sha256": m["mapping_sha256"], "expected_mapping_version": m["mapping_version"],
+                                                "baseline_acknowledgement": "Default sample workbook created by the Mac app"}).encode(), "session": owner}, wid, m["mapping_id"])
+    try:
+        ensure_default_workbook()
+    except Exception as exc:  # never block the app on the sample book
+        print("default workbook not created:", type(exc).__name__, exc, flush=True)
     api.vsi.load_dotenv()
     # No automatic mocked extraction in the delivered Mac application.
     if not api.vsi.enabled():
@@ -292,7 +357,20 @@ def main():
         api.start_run_worker=start_unavailable
     addresses=local_addresses()
     cert,key,fingerprint=certificate(args.data_dir,addresses)
-    server=api.ThreadingHTTPServer(("0.0.0.0",0),api.Handler)
+    port_file = args.data_dir / "port"
+    try:
+        saved_port = int(port_file.read_text())
+        if not 1024 <= saved_port <= 65535:
+            saved_port = 0
+    except (FileNotFoundError, ValueError):
+        saved_port = 0
+    try:
+        server = api.ThreadingHTTPServer(("0.0.0.0", saved_port), api.Handler)
+    except OSError:
+        if not saved_port:
+            raise
+        server = api.ThreadingHTTPServer(("0.0.0.0", 0), api.Handler)
+    port_file.write_text(str(server.server_port))
     server.daemon_threads=True
     bootstrap=secrets.token_urlsafe(32)
     handler,flush=install_routes(store,bootstrap,addresses,fingerprint,server.server_port,args.allow_samples)

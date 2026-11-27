@@ -174,6 +174,8 @@ export default function App() {
     if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : "agent") : s.role === "employee" ? "home" : "overview");
   };
   const setAppearance = (value: Appearance) => { updateAppearance(value); try { localStorage.setItem("ledgerflow.appearance", value); } catch { /* preference still applies */ } };
+  // The Mac opens on its own sign-in screen (accounts), not an automatic session.
+  if (page === "bootstrap") return session ? null : <MacSignIn onSignedIn={signedIn} />;
   if (["bootstrap", "associate"].includes(page) && route[1]) return <NativeConnectionGate token={route[1]} bootstrap={page === "bootstrap"} onSignedIn={signedIn} />;
   if (page === "pair" && route[1]) return <PairingGate token={route[1]} onSignedIn={signedIn} />;
   if (authError && session === undefined) return <main className="narrow stack-lg"><BrandMark size={48} /><h1>Connect to your workspace.</h1><ErrorNote error={authError} /><button className="btn" onClick={loadSession}>Try again</button></main>;

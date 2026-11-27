@@ -19,7 +19,7 @@ export default function MacSignIn({ onSignedIn }: { onSignedIn: (s: Session) => 
         const s = await req<Session>("POST", "/desktop/login", { body: { email, password } });
         const wait = 1400 - (performance.now() - started);
         if (wait > 0 && !matchMedia("(prefers-reduced-motion: reduce)").matches) await new Promise(r => window.setTimeout(r, wait));
-        adoptSession(s); history.replaceState(null, "", "/#/agent"); onSignedIn(s);
+        adoptSession(s); onSignedIn(s); location.replace("#/agent");
       } catch (err) { setError(err); setBusy(false); }
     }}>
       <BrandMark size={52}/>

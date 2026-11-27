@@ -24,6 +24,8 @@ export default function Onboarding({ session, workbookId, embedded, onContinue, 
     setInspection(pick ? await getInspection(pick.workbook_id).catch(() => null) : null);
   };
   useEffect(() => { load(workbookId).catch(setError); }, [workbookId]);
+  // A new file is a new request: reusing the key made the Mac return the previous workbook instead of saving this one.
+  useEffect(() => { setUploadKey(newIdempotencyKey("wb")); }, [file]);
 
   const upload = async () => {
     if (!file) return;

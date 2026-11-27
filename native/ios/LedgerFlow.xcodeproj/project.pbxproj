@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A10000000000000000000014 /* LedgerFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* LedgerFlowApp.swift */; };
-		A10000000000000000000015 /* WorkspaceWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* WorkspaceWebView.swift */; };
+		A10000000000000000000015 /* MobileRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* MobileRoot.swift */; };
+		A10000000000000000000062 /* MobileWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000060 /* MobileWorkspace.swift */; };
+		A10000000000000000000063 /* MobileWelcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000061 /* MobileWelcome.swift */; };
 		A10000000000000000000016 /* WorkspaceEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000003 /* WorkspaceEndpoint.swift */; };
 		A10000000000000000000018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000004 /* Assets.xcassets */; };
 		A10000000000000000000019 /* WorkspaceEndpointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000007 /* WorkspaceEndpointTests.swift */; };
@@ -29,7 +31,9 @@
 
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* LedgerFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFlowApp.swift; sourceTree = "<group>"; };
-		A10000000000000000000002 /* WorkspaceWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWebView.swift; sourceTree = "<group>"; };
+		A10000000000000000000002 /* MobileRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileRoot.swift; sourceTree = "<group>"; };
+		A10000000000000000000060 /* MobileWorkspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWorkspace.swift; sourceTree = "<group>"; };
+		A10000000000000000000061 /* MobileWelcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileWelcome.swift; sourceTree = "<group>"; };
 		A10000000000000000000003 /* WorkspaceEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceEndpoint.swift; sourceTree = "<group>"; };
 		A10000000000000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000005 /* Info.Debug.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.Debug.plist; sourceTree = "<group>"; };
@@ -67,7 +71,9 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000001 /* LedgerFlowApp.swift */,
-				A10000000000000000000002 /* WorkspaceWebView.swift */,
+				A10000000000000000000002 /* MobileRoot.swift */,
+				A10000000000000000000060 /* MobileWorkspace.swift */,
+				A10000000000000000000061 /* MobileWelcome.swift */,
 				A10000000000000000000003 /* WorkspaceEndpoint.swift */,
 				A1000000000000000000005A /* WorkspaceAssociation.swift */,
 				A1000000000000000000005B /* AssociationScanner.swift */,
@@ -209,7 +215,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000014 /* LedgerFlowApp.swift in Sources */,
-				A10000000000000000000015 /* WorkspaceWebView.swift in Sources */,
+				A10000000000000000000015 /* MobileRoot.swift in Sources */,
+				A10000000000000000000062 /* MobileWorkspace.swift in Sources */,
+				A10000000000000000000063 /* MobileWelcome.swift in Sources */,
 				A10000000000000000000016 /* WorkspaceEndpoint.swift in Sources */,
 				A1000000000000000000005D /* WorkspaceAssociation.swift in Sources */,
 				A1000000000000000000005E /* AssociationScanner.swift in Sources */,

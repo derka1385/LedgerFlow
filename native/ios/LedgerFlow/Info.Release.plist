@@ -38,7 +38,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Photograph a receipt and submit it to your LedgerFlow workspace.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Associer LedgerFlow à votre Mac et synchroniser vos pièces sur le même réseau.</string>
+	<string>Connect LedgerFlow to your Mac and sync receipts on the same network.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose receipt photos to submit to your LedgerFlow workspace.</string>
 	<key>UIApplicationSceneManifest</key>

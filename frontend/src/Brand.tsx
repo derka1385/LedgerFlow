@@ -1,5 +1,5 @@
 export function Wordmark() {
-  return <svg className="brand-wordmark" width="128" height="22" viewBox="0 0 207 32" role="img" aria-label="LedgerFlow"><use href="/icons/wordmark.svg#wordmark" width="207" height="32" /></svg>;
+  return <svg className="brand-wordmark" width="128" height="22" viewBox="0 0 207 44" role="img" aria-label="LedgerFlow"><use href="/icons/wordmark.svg#wordmark" width="207" height="44" /></svg>;
 }
 
 /** The LF monogram as a selected cell: the forest tile is the cell, the mint square is the spreadsheet fill handle. */

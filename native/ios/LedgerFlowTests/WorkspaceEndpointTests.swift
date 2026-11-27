@@ -3,6 +3,18 @@ import Testing
 @testable import LedgerFlow
 
 struct WorkspaceEndpointTests {
+    @Test func offlineReceiptsSurviveWorkspaceRelaunch() throws {
+        let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let original = MobileWorkspace(storageURL: directory)
+        let scannedPages = [Data([0xff, 0xd8, 1]), Data([0xff, 0xd8, 2]), Data([0xff, 0xd8, 3])]
+        #expect(original.saveScans(scannedPages, workbookID: nil) == 3)
+        let reopened = MobileWorkspace(storageURL: directory)
+        #expect(reopened.pending.count == 3)
+        #expect(reopened.pending.allSatisfy { $0.workbookID == nil && $0.scope == nil })
+        #expect(reopened.pending.compactMap { reopened.queuedImage($0.id) } == scannedPages)
+        #expect(reopened.availability == .unlinked)
+    }
     @Test func httpsWorkspaceAndHashRoute() throws {
         let endpoint = try WorkspaceEndpoint("https://ledger.example")
         #expect(endpoint.url.absoluteString == "https://ledger.example/")

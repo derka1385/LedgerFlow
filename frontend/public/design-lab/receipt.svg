@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 180" fill="none">
+<defs><linearGradient id="paper" x1="24" y1="12" x2="140" y2="166" gradientUnits="userSpaceOnUse"><stop stop-color="#fffef4"/><stop offset="1" stop-color="#c8d6bb"/></linearGradient><linearGradient id="fold" x1="103" y1="14" x2="133" y2="47" gradientUnits="userSpaceOnUse"><stop stop-color="#94b6a0"/><stop offset="1" stop-color="#ecf1df"/></linearGradient></defs>
+<path d="M29 14H106L133 42V160L120 150L107 160L94 150L81 160L68 150L55 160L42 150L29 160V14Z" fill="#082e25" opacity=".15" transform="translate(0 5)"/>
+<path d="M27 10H104L131 38V156L118 146L105 156L92 146L79 156L66 146L53 156L40 146L27 156V10Z" fill="url(#paper)"/>
+<path d="M104 10V38H131" fill="url(#fold)"/>
+<path d="M43 35H78" stroke="#164e3c" stroke-width="6" stroke-linecap="round"/>
+<path d="M43 54H88" stroke="#164e3c" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+<path d="M43 78H114M43 96H114M43 114H114M79 72V122" stroke="#164e3c" stroke-opacity=".24" stroke-width="1.5"/>
+<path d="M49 87H66M86 105H106" stroke="#164e3c" stroke-width="4" stroke-linecap="round"/>
+<path d="M84 129L93 137L112 119" stroke="#164e3c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

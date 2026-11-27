@@ -13,9 +13,9 @@ struct AssociationScanner: UIViewControllerRepresentable {
         context.coordinator.startTask = Task { @MainActor in
             let allowed = await AVCaptureDevice.requestAccess(for: .video)
             guard !Task.isCancelled else { return }
-            guard allowed else { onFailure("Autorisez la caméra dans les réglages pour scanner le code du Mac."); return }
+            guard allowed else { onFailure("Allow camera access in Settings to scan your Mac’s code."); return }
             do { try scanner.startScanning() }
-            catch { onFailure("Le scanner n’est pas disponible. Collez le lien d’association à la place.") }
+            catch { onFailure("The scanner is unavailable. Paste a pairing link instead.") }
         }
         return scanner
     }
@@ -38,7 +38,7 @@ struct AssociationScanner: UIViewControllerRepresentable {
         }
         func dataScanner(_ dataScanner: DataScannerViewController, becameUnavailableWithError error: DataScannerViewController.ScanningUnavailable) {
             guard !completed else { return }
-            completed = true; onFailure("La caméra n’est plus disponible. Réessayez ou collez le lien d’association.")
+            completed = true; onFailure("The camera became unavailable. Try again or paste a pairing link.")
         }
     }
 }

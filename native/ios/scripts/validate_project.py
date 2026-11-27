@@ -56,7 +56,11 @@ images = 0
 for manifest in catalog.rglob("Contents.json"):
     contents = json.loads(manifest.read_text())
     for image in contents.get("images", []):
-        header = (manifest.parent / image["filename"]).read_bytes()[:24]
+        filename = manifest.parent / image["filename"]
+        if filename.suffix == ".svg":
+            assert ET.parse(filename).getroot().tag.endswith("}svg")
+            continue
+        header = filename.read_bytes()[:24]
         assert header[:8] == b"\x89PNG\r\n\x1a\n"
         dimensions = struct.unpack(">II", header[16:24])
         size = float(image.get("size", "48x48").split("x")[0])

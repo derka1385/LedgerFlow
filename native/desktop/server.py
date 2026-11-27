@@ -120,6 +120,25 @@ def install_routes(store, bootstrap, addresses, fingerprint, port, allow_samples
                      "docker":api.sandbox.docker_available(), "image_ready":api.sandbox.image_available(),
                      "phone_available":len(addresses)>1, "persistent":True, "assistant":True}
 
+    @api.route("GET", "/desktop/workspace-profile", roles=("owner",))
+    def workspace_profile(ctx):
+        with api.LOCK:
+            return 200, {"profile": api.DB.get("desktop_workspace_profile")}
+
+    @api.route("POST", "/desktop/workspace-profile", roles=("owner",))
+    def save_workspace_profile(ctx):
+        if ctx["handler"].client_address[0] != "127.0.0.1":
+            raise api.ApiError(403, "MAC_REQUIRED", "Change the workspace profile on its Mac.")
+        body = api.jbody(ctx)
+        name, source = body.get("name"), body.get("source")
+        sources = ("excel", "fortnox", "visma", "quickbooks", "sap", "dynamics", "other")
+        if not isinstance(name, str) or not 1 <= len(name.strip()) <= 80 or source not in sources:
+            raise api.ApiError(400, "INVALID_WORKSPACE_PROFILE", "Enter a workspace name and select an accounting source.")
+        with api.LOCK:
+            profile = {"name": name.strip(), "source": source}
+            api.DB["desktop_workspace_profile"] = profile
+        return 200, {"profile": profile}
+
     @api.route("POST", "/desktop/pairings", roles=("owner",), idem=True)
     def pair(ctx):
         body = api.jbody(ctx)

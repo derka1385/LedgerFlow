@@ -1,0 +1,53 @@
+.mac-intro, .mac-setup-art, .mac-dashboard-hero {
+  background: radial-gradient(ellipse at 80% 0%, #285841, transparent 70%), #102e25;
+  color: #f0f4e5;
+  overflow: hidden;
+  isolation: isolate;
+  position: relative;
+}
+.mac-intro { display: grid; place-items: center; min-height: 100dvh; }
+.mac-intro > div, .mac-setup-art > div { display: grid; justify-items: center; gap: 20px; }
+.mac-intro .brand-wordmark, .mac-setup-art .brand-wordmark { width: 174px; height: auto; color: #f0f4e5; }
+.mac-intro .brand-wordmark { animation: mac-reveal .55s .23s cubic-bezier(.23,1,.32,1) both; }
+.mac-receipt { filter: drop-shadow(0 10px 18px #071b1359); }
+.mac-intro .mac-receipt { animation: mac-receipt-in .65s cubic-bezier(.23,1,.32,1) both; }
+.mac-waves { position: absolute; inset: -8%; width: 116%; height: 116%; z-index: -1; pointer-events: none; animation: mac-current 14s ease-in-out infinite alternate; }
+@keyframes mac-current { from { transform: translate3d(-1%, 0, 0); } to { transform: translate3d(2%, -3%, 0); } }
+@keyframes mac-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mac-receipt-in { from { opacity: 0; transform: translateY(15px) rotate(-14deg); } to { opacity: 1; transform: rotate(-5deg); } }
+.mac-setup { max-width: 1160px; min-height: 100dvh; margin: auto; padding: clamp(18px, 4vw, 52px); display: grid; align-items: stretch; grid-template-columns: minmax(250px, .9fr) minmax(0, 1.1fr); gap: clamp(22px, 5vw, 68px); }
+.mac-setup-art { border-radius: 24px; display: grid; place-items: center; min-height: 210px; }
+.mac-setup-form { align-self: center; display: grid; gap: 13px; min-width: 0; animation: mac-reveal .35s cubic-bezier(.23,1,.32,1) both; }
+.mac-setup-form h1, .mac-dashboard-hero h1 { font: 500 clamp(31px, 4vw, 53px)/1.07 Georgia, serif; margin: 0; letter-spacing: -.04em; }
+.mac-setup-form p { margin: 0 0 9px; }
+.mac-setup-form input:not([type=radio]) { min-height: 42px; }
+.mac-setup-form fieldset { border: 0; padding: 0; min-width: 0; margin: 9px 0 0; }
+.mac-setup-form legend { margin-bottom: 10px; font-weight: 600; }
+.accounting-sources { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.accounting-source { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 6px 9px; border: 1px solid var(--grid); border-radius: 9px; background: var(--panel); font-size: 13px; cursor: pointer; }
+.accounting-source input { margin: 0; accent-color: var(--accent); width: 14px; height: 14px; flex: none; }
+.accounting-source:has(:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.accounting-source > span { width: 23px; height: 23px; flex: none; display: grid; place-items: center; border-radius: 5px; color: white; font-weight: 700; }
+.mac-source-note { min-height: 3em; font-size: 13px; color: var(--ink-2); }
+.mac-shell .sidebar { overflow-y: auto; }
+.mac-shell .sidebar .brand { margin-bottom: 22px; }
+.mac-shell .sidebar nav a { min-height: 38px; border-radius: 8px; font-size: 13px; }
+.mac-shell .sidebar-foot small { font-size: 11px; }
+.mac-company { display: flex; align-items: center; gap: 9px; padding: 10px; margin-bottom: 18px; border: 1px solid var(--grid); border-radius: 10px; color: var(--ink); text-decoration: none; }
+.mac-company span { min-width: 0; flex: 1; }
+.mac-company strong, .mac-company small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mac-company small { font-size: 11px; color: var(--ink-2); }
+.mac-company .icon { width: 15px; flex: none; }
+.mac-dashboard-hero { border-radius: 20px; min-height: 204px; display: grid; align-items: center; padding: clamp(22px, 5vw, 42px); }
+.mac-dashboard-hero p { margin: 0 0 6px; color: #c4d8bd; overflow-wrap: anywhere; }
+.mac-dashboard-hero .row { margin-top: 23px; flex-wrap: wrap; }
+.mac-dashboard-hero .btn { background: #274a3b; color: #eef4e6; border-color: #739580; }
+.mac-dashboard-hero .btn.primary { background: #d2e4bd; color: #163327; border-color: #d2e4bd; }
+@media (max-width: 760px) {
+  .mac-setup { grid-template-columns: minmax(0,1fr); gap: 24px; }
+  .mac-setup-art { min-height: 165px; }
+  .mac-setup-art .mac-receipt { width: 68px; height: 76px; }
+  .mac-setup-art > div { gap: 10px; }
+}
+@media (max-width: 390px) { .accounting-sources { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .mac-waves, .mac-intro .mac-receipt, .mac-intro .brand-wordmark, .mac-setup-form { animation: none; } }

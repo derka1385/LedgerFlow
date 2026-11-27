@@ -16,6 +16,7 @@ import { ExpenseDetail, ExpenseHistory } from "./pages/Employee";
 import Settings, { type Appearance } from "./pages/Settings";
 import Home from "./pages/Home";
 import Explainer from "./Explainer";
+import { MacIntro, WorkspaceSetup, sourceName, type WorkspaceProfile } from "./MacWorkspace";
 import { LANGS, useT } from "./lib/i18n";
 
 export function useHashRoute(): string[] {
@@ -48,9 +49,15 @@ function NativeConnectionGate({ token, bootstrap, onSignedIn }: { token: string;
       promise = req<Session>("POST", bootstrap ? "/desktop/bootstrap" : "/desktop/pairings/exchange", { body: { token: decodeURIComponent(token) } });
       connectionPromises.set(key, promise);
     }
-    promise.then(s => { if (active) { adoptSession(s); onSignedIn(s); } }).catch(e => { if (active) setError(e); });
-    return () => { active = false; };
+    let timer = 0;
+    const reveal = new Promise<void>(resolve => {
+      if (!bootstrap || matchMedia("(prefers-reduced-motion: reduce)").matches) resolve();
+      else timer = window.setTimeout(resolve, 1550);
+    });
+    Promise.all([promise, reveal]).then(([s]) => { if (active) { adoptSession(s); onSignedIn(s); } }).catch(e => { if (active) setError(e); });
+    return () => { active = false; window.clearTimeout(timer); };
   }, [token, bootstrap]);
+  if (bootstrap && !error) return <MacIntro/>;
   return <main className="native-connection"><BrandMark size={64} /><h1>{error ? "La connexion n’a pas abouti." : bootstrap ? "Votre agent arrive…" : "Association à votre Mac…"}</h1>{error ? <><ErrorNote error={error} /><p>Relancez l’application Mac ou scannez un nouveau code.</p></> : <p>Votre dossier s’ouvre automatiquement.</p>}</main>;
 }
 
@@ -66,6 +73,8 @@ function PairingGate({ token, onSignedIn }: { token: string; onSignedIn: (s: Ses
 
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [profile, setProfile] = useState<WorkspaceProfile | null | undefined>();
+  const [profileError, setProfileError] = useState<unknown>(null);
   const [authError, setAuthError] = useState<unknown>(null);
   const [scan, setScan] = useState(false), [menu, setMenu] = useState(false);
   const [online, setOnline] = useState(navigator.onLine);
@@ -73,8 +82,14 @@ export default function App() {
   const route = useHashRoute();
   const [t] = useT();
   const finance = !!session && session.role !== "employee";
+  const mac = session?.backend === "LOCAL" && session.role === "owner" && window.location.hostname === "127.0.0.1";
+  const loadProfile = () => {
+    setProfileError(null);
+    req<{profile: WorkspaceProfile | null}>("GET", "/desktop/workspace-profile").then(result => setProfile(result.profile)).catch(setProfileError);
+  };
+  useEffect(() => { if (mac) loadProfile(); }, [mac]);
   const aliases: Record<string, string> = { inbox: "transactions", runs: "transactions", versions: "workbook" };
-  const page = route[0] ?? (session?.backend === "LOCAL" ? "agent" : finance ? "overview" : "home");
+  const page = route[0] ?? (mac ? "overview" : session?.backend === "LOCAL" ? "agent" : finance ? "overview" : "home");
   const activePage = aliases[page] ?? page;
   const loadSession = () => { setAuthError(null); currentSession().then(setSession).catch(setAuthError); };
   useEffect(() => { if (!["bootstrap", "associate", "pair"].includes(route[0])) loadSession(); }, []);
@@ -95,10 +110,10 @@ export default function App() {
   }, [appearance]);
   useEffect(() => { setMenu(false); setScan(false); }, [page]);
   useEffect(() => {
-    if (!session || !isPhone() || page === "how" || page === "capture") return;
+    if (!session || mac || !isPhone() || page === "how" || page === "capture") return;
     let seen = "1"; try { seen = localStorage.getItem(HOW_SEEN) ?? ""; } catch { /* no storage: do not loop */ }
     if (!seen) go("how");
-  }, [session?.user_id]);
+  }, [session?.user_id, mac]);
   const finishHow = () => { try { localStorage.setItem(HOW_SEEN, "1"); } catch { /* fine */ } go(isPhone() ? "home" : finance ? "agent" : "home"); };
   useEffect(() => { const up = () => setOnline(true), down = () => setOnline(false), expired = () => { setSession(null); setScan(false); }; window.addEventListener("online", up); window.addEventListener("offline", down); window.addEventListener("ledgerflow:unauthenticated", expired); return () => { window.removeEventListener("online", up); window.removeEventListener("offline", down); window.removeEventListener("ledgerflow:unauthenticated", expired); }; }, []);
   useEffect(() => {
@@ -112,7 +127,7 @@ export default function App() {
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   }, [finance]);
   async function logout() { try { await signOut(); setSession(null); setScan(false); go(""); } catch (e) { setAuthError(e); } }
-  const signedIn = (s: Session) => { setSession(s); if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : "agent") : s.role === "employee" ? "home" : "overview"); };
+  const signedIn = (s: Session) => { setSession(s); if (page !== "capture" && page !== "pair") go(s.backend === "LOCAL" ? (s.role === "employee" && page === "associate" ? "capture" : page === "bootstrap" ? "overview" : "agent") : s.role === "employee" ? "home" : "overview"); };
   const setAppearance = (value: Appearance) => { updateAppearance(value); try { localStorage.setItem("ledgerflow.appearance", value); } catch { /* preference still applies */ } };
   if (["bootstrap", "associate"].includes(page) && route[1]) return <NativeConnectionGate token={route[1]} bootstrap={page === "bootstrap"} onSignedIn={signedIn} />;
   if (page === "pair" && route[1]) return <PairingGate token={route[1]} onSignedIn={signedIn} />;
@@ -120,6 +135,11 @@ export default function App() {
   if (session === undefined) return <main className="narrow"><Skeleton /></main>;
   if (!session && isLocalBackend()) return <main className="native-connection"><BrandMark size={64}/><h1>Votre session est fermée.</h1><p>Sur le Mac, quittez puis rouvrez LedgerFlow pour retrouver votre espace. Sur iPhone, touchez l’engrenage et associez de nouveau votre Mac.</p><p className="muted">Vos dossiers et les écritures validées restent enregistrés sur le Mac.</p></main>;
   if (!session) return <Login onSignedIn={signedIn} />;
+  if (mac && profileError) return <main className="narrow stack"><h1>Open your workspace</h1><ErrorNote error={profileError}/><button className="btn" onClick={loadProfile}>Try again</button></main>;
+  if (mac && profile === undefined) return <MacIntro/>;
+  if (mac && (!profile || page === "workspace-profile")) return <WorkspaceSetup key={profile ? "edit" : "create"} profile={profile ?? null}
+    onSave={next => { setProfile(next); go("overview"); }} onCancel={profile ? () => go("overview") : undefined}/>;
+  const label = (path: string) => mac ? ({overview: "Dashboard", transactions: "Tasks", receipts: "Receipts", workbook: "Workbooks", activity: "Activity", audit: "Audit history", security: "Security", settings: "Settings", agent: "Agent"} as Record<string, string>)[path] ?? t(`nav.${path}`) : t(`nav.${path}`);
   let body;
   if (page === "how") body = <Explainer onDone={finishHow} />;
   else if (page === "home") body = <Home session={session} />;
@@ -133,16 +153,23 @@ export default function App() {
   else if (page === "versions") body = <div className="stack-lg"><a href="#/workbook">Back to workbook structure</a><Versions key={route[1] ?? "latest"} workbookId={route[1]} /></div>;
   else if (page === "security") body = <Security />;
   else if (["transactions", "inbox", "runs", "receipts", "activity", "audit"].includes(page)) body = <Transactions session={session} selected={route[1]} mode={aliases[page] ?? page} />;
-  else body = <Overview />;
+  else body = <Overview mac={mac} workspace={profile?.name} />;
   const nav = finance ? FINANCE_NAV : EMPLOYEE_NAV;
-  return <div className={`app-shell ${finance ? "finance-shell" : "employee-shell"} ${menu ? "sidebar-open" : ""}`}>
+  return <div className={`app-shell ${finance ? "finance-shell" : "employee-shell"} ${menu ? "sidebar-open" : ""} ${mac ? "mac-shell" : ""}`}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to content</a>
-    {finance ? <aside className="sidebar"><a className="brand" href="#/agent"><BrandMark size={34} /><Wordmark /></a><p className="sidebar-label">{t("shell.workspace")}</p><nav aria-label="Main">{nav.map(([p, , icon]) => <a key={p} href={`#/${p}`} className={p === "security" ? "nav-group-start" : undefined} aria-current={activePage === p ? "page" : undefined}><Icon name={icon} />{t(`nav.${p}`)}</a>)}</nav><div className="sidebar-foot"><a href="#/settings"><span className="account-avatar"><Icon name="user" /></span><span><strong>{session.display_name ?? session.role}</strong><small>{t("shell.account")}</small></span></a></div></aside> : null}
-    <div className="app-body"><header className="workspace-toolbar"><div className="toolbar-location">{finance ? <button className="btn ghost menu-toggle" aria-label="Toggle navigation" aria-expanded={menu} onClick={() => setMenu(v => !v)}><Icon name="menu" /></button> : <a className="brand" href="#/home"><BrandMark /><Wordmark /></a>}{finance ? <><span className="muted">{t("shell.workspace")}</span><span className="toolbar-slash">/</span><strong>{nav.some(n => n[0] === activePage) ? t(`nav.${activePage}`) : activePage === "how" ? t("how.title") : activePage === "home" ? t("nav.home") : t("nav.capture")}</strong></> : null}</div><div className="row"><LangSwitch />{finance ? <><button className="btn phone-association-action" onClick={() => setScan(true)}><Icon name="phone" /><span>{t("shell.scanIphone")}</span></button>{session.backend === "LOCAL" ? <a className="btn phone-direct-capture" href="#/capture"><Icon name="camera"/>Scanner</a> : null}</> : null}<a className="account-button" href={finance ? "#/settings" : "#/profile"} aria-label="Account settings"><Icon name="user" /><span>{session.display_name ?? session.role}</span></a></div></header>
+    {finance ? <aside className="sidebar">
+      <a className="brand" href={mac ? "#/overview" : "#/agent"}><BrandMark size={34} /><Wordmark /></a>
+      {mac && profile ? <a className="mac-company" href="#/workspace-profile"><Icon name="box"/><span><strong>{profile.name}</strong><small>{sourceName(profile.source)}</small></span><Icon name="settings"/></a> : <p className="sidebar-label">{t("shell.workspace")}</p>}
+      <nav aria-label="Main">{(mac ? [nav[1], nav[0], ...nav.slice(2, 6), nav[7], nav[6]] : nav).map(([p, , icon]) =>
+        <a key={p} href={`#/${p}`} className={p === (mac ? "activity" : "security") ? "nav-group-start" : undefined} aria-current={activePage === p ? "page" : undefined}>
+          <Icon name={icon} />{label(p)}</a>)}</nav>
+      <div className="sidebar-foot"><a href="#/settings"><span className="account-avatar"><Icon name="user" /></span><span><strong>{mac ? "Account & settings" : session.display_name ?? session.role}</strong><small>{mac ? "Local profile" : t("shell.account")}</small></span></a></div>
+    </aside> : null}
+    <div className="app-body"><header className="workspace-toolbar"><div className="toolbar-location">{finance ? <button className="btn ghost menu-toggle" aria-label="Toggle navigation" aria-expanded={menu} onClick={() => setMenu(v => !v)}><Icon name="menu" /></button> : <a className="brand" href="#/home"><BrandMark /><Wordmark /></a>}{finance ? <><span className="muted">{t("shell.workspace")}</span><span className="toolbar-slash">/</span><strong>{nav.some(n => n[0] === activePage) ? label(activePage) : activePage === "how" ? t("how.title") : activePage === "home" ? t("nav.home") : t("nav.capture")}</strong></> : null}</div><div className="row"><LangSwitch />{finance ? <><button className="btn phone-association-action" onClick={() => setScan(true)}><Icon name="phone" /><span>{t("shell.scanIphone")}</span></button>{session.backend === "LOCAL" ? <a className="btn phone-direct-capture" href="#/capture"><Icon name="camera"/>Scanner</a> : null}</> : null}<a className="account-button" href={finance ? "#/settings" : "#/profile"} aria-label="Account settings"><Icon name="user" /><span>{session.display_name ?? session.role}</span></a></div></header>
     {session.backend === "DEV-MOCK" || isMockBackend() ? <details className="mockbar" role="note"><summary><Icon name="alert" /><span>Development environment <span className="environment-separator">/</span> {session.inference === "vultr" ? "Vultr inference" : "Mock inference"}</span></summary><p>Execution, verification and approval follow the development service. This is not the public Vultr deployment.</p></details> : null}
     {!online ? <div className="offline-banner" role="status">You’re offline. Reconnect to upload receipts or change your workbook. No financial actions are queued.</div> : null}
     <main id="main-content" tabIndex={-1} className={finance ? (page === "capture" ? "workspace-content capture-content" : "workspace-content") : "employee-content"}><ErrorNote error={authError} />{body}</main></div>
-    {!finance ? <nav className="employee-tabs" aria-label="Main">{nav.map(([p, , icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon} /><span>{t(`nav.${p}`)}</span></a>)}</nav> : session.backend === "LOCAL" ? <nav className="mobile-finance-tabs" aria-label="iPhone">{PHONE_OWNER_NAV.map(([p, key, icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon}/><span>{t(key)}</span></a>)}</nav> : null}
+    {!finance ? <nav className="employee-tabs" aria-label="Main">{nav.map(([p, , icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon} /><span>{t(`nav.${p}`)}</span></a>)}</nav> : session.backend === "LOCAL" && !mac ? <nav className="mobile-finance-tabs" aria-label="iPhone">{PHONE_OWNER_NAV.map(([p, key, icon]) => <a key={p} href={`#/${p}`} aria-current={activePage === p ? "page" : undefined}><Icon name={icon}/><span>{t(key)}</span></a>)}</nav> : null}
     {scan ? <ScanWithPhone session={session} onClose={() => setScan(false)} /> : null}
   </div>;
 }

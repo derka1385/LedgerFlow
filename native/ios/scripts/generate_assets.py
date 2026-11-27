@@ -1,4 +1,4 @@
-"""Render the existing code-native receipt mark; requires Pillow. No generated artwork."""
+"""Render the iOS receipt icon from the same geometry as ReceiptGlyph. Requires Pillow."""
 import json
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -10,8 +10,25 @@ def contents(folder, **values):
     (folder / "Contents.json").write_text(json.dumps({**values, "info": {"author": "xcode", "version": 1}}, indent=2) + "\n")
 
 contents(root)
-green, paper = "#0F5C4A", "#F6F4EE"
-image = Image.open(Path(__file__).resolve().parents[3] / "frontend/public/icons/app-icon-1024.png").convert("RGB")
+image = Image.new("RGB", (1024, 1024), "#103D30")
+draw = ImageDraw.Draw(image)
+def point(x, y):
+    return (int(190 + x * 6.44), int(160 + y * 6.44))
+
+sheet = [(13, 5), (69, 5), (87, 23), (87, 101), (75, 93), (63, 101),
+         (51, 93), (39, 101), (27, 93), (13, 101)]
+draw.polygon([point(x + 1, y + 2) for x, y in sheet], fill="#0A2A22")
+draw.polygon([point(x, y) for x, y in sheet], fill="#F0F3DF")
+draw.polygon([point(69, 5), point(69, 23), point(87, 23)], fill="#90B591")
+def stroke(points, width, fill):
+    draw.line([point(x, y) for x, y in points], width=int(width * 6.44), fill=fill, joint="curve")
+
+stroke([(25, 25), (51, 25)], 4, "#103D30")
+stroke([(25, 37), (58, 37)], 2, "#81998B")
+for y in (51, 62, 73):
+    stroke([(25, y), (74, y)], 1, "#A5BAA8")
+stroke([(49, 48), (49, 75)], 1, "#A5BAA8")
+stroke([(55, 83), (61, 88), (73, 77)], 3, "#103D30")
 
 icons = []
 for idiom, size, scales in [("iphone",20,[2,3]),("iphone",29,[2,3]),("iphone",40,[2,3]),("iphone",60,[2,3]),("ipad",20,[1,2]),("ipad",29,[1,2]),("ipad",40,[1,2]),("ipad",76,[1,2]),("ipad",83.5,[2]),("ios-marketing",1024,[1])]:

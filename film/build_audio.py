@@ -1,6 +1,6 @@
 """Builds the film soundtrack: original synthesized music bed (3 acts) + voiceover placed per scene + SRT captions."""
-import json, subprocess
-DUR = [12,13,13,14,10,13,14,11,15,24,14,11,12,15,14,13]
+import json, os, subprocess
+DUR = [12,13,13,14,12,14,15,11,17,24,15,11,12,15,16,13]
 VO_OFFSET = {"s01": 2.0, "s10": 0.6}
 starts, t = [], 0.0
 for d in DUR: starts.append(t); t += d
@@ -23,9 +23,15 @@ subprocess.run(["ffmpeg","-y","-loglevel","error","-f","lavfi","-i",f"aevalsrc='
 # 2) voiceover track
 inputs, filters, srt = [], [], []
 for i, (sid, text) in enumerate(vo):
-    at = starts[i] + VO_OFFSET.get(sid, 1.2); d = dur(f"audio/{sid}.aiff")
-    inputs += ["-i", f"audio/{sid}.aiff"]; ms = int(at * 1000)
-    filters.append(f"[{i}:a]aresample=48000,adelay={ms}|{ms},apad=whole_dur={TOTAL}[v{i}]")
+    src = f"audio/{sid}.mp3" if os.path.exists(f"audio/{sid}.mp3") else f"audio/{sid}.aiff"  # ElevenLabs first
+    at = starts[i] + VO_OFFSET.get(sid, 1.2); d = dur(src)
+    slot = DUR[i] - VO_OFFSET.get(sid, 1.2) - 0.4
+    VO_SPEED = float(os.environ.get('VO_SPEED', '1.15'))  # livelier delivery; atempo keeps the pitch, music untouched
+    tempo = min(max(d / slot, VO_SPEED), 1.3)
+    if d / slot > 1.3: print(f"WARNING {sid}: {d:.1f}s voice for a {slot:.1f}s slot even at 1.15x; it will overlap the next scene")
+    d = d / tempo
+    inputs += ["-i", src]; ms = int(at * 1000)
+    filters.append(f"[{i}:a]aresample=48000,atempo={tempo:.3f},adelay={ms}|{ms},apad=whole_dur={TOTAL}[v{i}]")
     # captions: split long lines into ~2 chunks by sentence
     parts = [p.strip() for p in text.replace("? ", "?|").replace(". ", ".|").split("|") if p.strip()]
     tot_chars = sum(len(p) for p in parts); cur = at

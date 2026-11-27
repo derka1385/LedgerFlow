@@ -48,15 +48,17 @@ body { font-family: "Schibsted", system-ui, sans-serif; color: #eef4ee; -webkit-
 .bg-light .sel { border-color: var(--forest); box-shadow: 0 0 30px rgba(11,90,69,.18); } .bg-light .sel::after { background: var(--forest); border-color: #fff; }
 /* devices */
 .mac { position: absolute; width: 1240px; }
-.mac .lid { background: linear-gradient(160deg,#2a2d31,#0d0e10 40%,#1b1d20); border-radius: 30px 30px 14px 14px; padding: 22px 22px 30px; box-shadow: 0 0 0 2px #45484d inset, 0 60px 120px rgba(0,0,0,.6); }
+.mac .lid { background: #050506; border-radius: 26px 26px 10px 10px; padding: 14px 14px 22px; box-shadow: 0 0 0 2px #2c2e31, 0 0 0 3px #8a8e94, 0 60px 120px rgba(0,0,0,.6); }
 .mac .screen { position: relative; aspect-ratio: 16/10; border-radius: 10px; overflow: hidden; background: #f2f5f3; }
 .mac .screen::before { content: ""; position: absolute; left: 50%; top: 0; width: 150px; height: 22px; background: #0d0e10; border-radius: 0 0 12px 12px; transform: translateX(-50%); z-index: 3; }
 .mac .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
-.mac .base { height: 26px; margin: 0 -70px; background: linear-gradient(#d8dbe0,#a5a9b0 60%,#7d8188); border-radius: 0 0 26px 26px; position: relative; box-shadow: 0 40px 60px rgba(0,0,0,.55); }
+.mac .base { height: 20px; margin: 0 -60px; background: linear-gradient(#e9ebee,#c4c7cc 35%,#9a9ea5 75%,#6f7379); border-radius: 2px 2px 30px 30px; position: relative; box-shadow: 0 40px 60px rgba(0,0,0,.55); }
 .mac .base::before { content: ""; position: absolute; left: 50%; top: 0; width: 220px; height: 10px; background: linear-gradient(#9da1a8,#c3c6cc); border-radius: 0 0 12px 12px; transform: translateX(-50%); }
-.phone { position: absolute; width: 330px; aspect-ratio: 390/844; border-radius: 56px; padding: 13px; background: linear-gradient(145deg,#6c7075,#2a2c2f 30%,#55595e 60%,#1d1f22); box-shadow: 0 0 0 2px #0c0d0e inset, 0 50px 100px rgba(0,0,0,.6); }
-.phone .screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #f2f5f3; }
-.phone .screen::before { content: ""; position: absolute; left: 50%; top: 10px; width: 112px; height: 30px; background: #000; border-radius: 20px; transform: translateX(-50%); z-index: 3; }
+.phone { position: absolute; width: 330px; aspect-ratio: 1206/2622; border-radius: 58px; padding: 9px; background: linear-gradient(135deg,#d9dbde,#8d9196 18%,#4a4d52 50%,#a3a7ac 82%,#e6e8ea); box-shadow: 0 0 0 1.5px #1b1c1e inset, 0 0 0 1px rgba(255,255,255,.35), 0 60px 120px rgba(0,0,0,.55), 0 20px 40px rgba(0,0,0,.35); }
+.phone::before { content:""; position:absolute; right:-4px; top:22%; width:4px; height:12%; border-radius:0 3px 3px 0; background:linear-gradient(90deg,#6b6f74,#b9bcc0); }
+.phone::after { content:""; position:absolute; left:-4px; top:18%; width:4px; height:7%; border-radius:3px 0 0 3px; background:linear-gradient(90deg,#b9bcc0,#6b6f74); box-shadow:0 70px 0 #8d9196,0 140px 0 #8d9196; }
+.phone .screen { position: relative; width: 100%; height: 100%; border-radius: 50px; overflow: hidden; background: #000; border: 4px solid #050505; }
+
 .phone .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .xf { animation: fade .9s ease both; animation-delay: var(--d, 0s); }
 /* panels */
@@ -125,7 +127,7 @@ table.grid th { background: #e9eeea; color: #5d6a63; font-weight: 600; font-size
   </div>
   <div class="in" style="--d:7.8s">
     <div class="mac" style="left:250px;top:150px;width:1080px"><div class="lid"><div class="screen"><img src="footage/15_committed.png"></div></div><div class="base"></div></div>
-    <div class="phone" style="left:1330px;top:250px;width:300px"><div class="screen"><img src="footage/16_phone_home.png"></div></div>
+    <div class="phone" style="left:1330px;top:250px;width:300px"><div class="screen"><img src="footage/ios_welcome.png"></div></div>
   </div>
   <div class="h-m in" style="--d:9.2s;position:absolute;left:0;right:0;bottom:70px;text-align:center">Your Excel. Your business. Our agent.</div>
 </section>
@@ -147,18 +149,18 @@ table.grid th { background: #e9eeea; color: #5d6a63; font-weight: 600; font-size
 <section class="stage bg-dark" id="s04" data-dur="14">
   <div class="clouds"><i></i><i></i><i></i></div>
   <div class="phone in" style="left:330px;top:70px;width:430px;--d:0s"><div class="screen">
-    <img src="footage/05_phone_capture.png"><img class="xf" style="--d:2.8s" src="footage/06_phone_preview.png"><div class="scan" style="--d:3.8s"></div><img class="xf" style="--d:7.6s" src="footage/07_phone_sent.png"></div></div>
+    <img src="footage/ios_home.png"><img class="xf" style="--d:2.6s" src="footage/ios_welcome.png"></div></div>
   <div style="position:absolute;left:930px;top:330px">
     <div class="h-l in" style="--d:4s">Capture.</div><div class="h-l in" style="--d:5.6s">Send.</div><div class="h-l in" style="--d:8s;color:var(--mint)">Done.</div>
     <div class="sub in" style="--d:9.4s;margin-top:30px">iPhone optional. Direct uploads supported.</div>
   </div>
-  <div class="note fade" style="--d:1s">Real capture · LedgerFlow in a mobile viewport · synthetic receipt E1</div>
+  <div class="note fade" style="--d:1s">LedgerFlow iOS app · Xcode simulator (iPhone 17)</div>
 </section>
 
 <!-- S05 CONNECTED -->
-<section class="stage bg-dark" id="s05" data-dur="10">
+<section class="stage bg-dark" id="s05" data-dur="12">
   <div class="clouds"><i></i><i></i><i></i></div>
-  <div class="phone" style="left:110px;top:240px;width:260px"><div class="screen"><img src="footage/07_phone_sent.png"></div></div>
+  <div class="phone" style="left:110px;top:240px;width:260px"><div class="screen"><img src="footage/ios_welcome.png"></div></div>
   <img src="assets/E1.png" style="position:absolute;width:150px;left:200px;top:470px;border-radius:4px;box-shadow:0 20px 40px rgba(0,0,0,.5);animation:fly 2.2s var(--e) both;animation-delay:1.4s">
   <style>@keyframes fly { 0% { transform: translate(0,0) scale(1); opacity: 0 } 15% { opacity: 1 } 60% { transform: translate(520px,-260px) scale(.9) } 100% { transform: translate(860px,-40px) scale(.5); opacity: 0 } }</style>
   <div class="mac" style="left:560px;top:120px;width:1240px"><div class="lid"><div class="screen"><img src="footage/08_transactions_processing.png"><img class="xf" style="--d:4.6s" src="footage/09_review_top.png"></div></div><div class="base"></div></div>
@@ -167,7 +169,7 @@ table.grid th { background: #e9eeea; color: #5d6a63; font-weight: 600; font-size
 </section>
 
 <!-- S06 UNDERSTAND THE DOCUMENT -->
-<section class="stage bg-dark" id="s06" data-dur="13">
+<section class="stage bg-dark" id="s06" data-dur="14">
   <div class="gridbg"></div>
   <div class="shot in" style="left:90px;top:150px;--d:0s"><img src="footage/09_review_top.png" style="width:1900px;margin:-337px 0 0 -584px;clip-path:inset(337px 730px 0 584px)"></div>
   <div style="position:absolute;left:1050px;top:120px;width:780px">
@@ -183,13 +185,13 @@ table.grid th { background: #e9eeea; color: #5d6a63; font-weight: 600; font-size
       <tr><td style="color:#5d6a63;font-size:20px">Payment</td><td class="ink" style="--d:6.9s">Card · paid</td></tr>
     </table>
     <div class="sel" style="left:250px;width:532px;height:70px;animation:walk 6s var(--e) both;animation-delay:1.6s"></div>
-    <style>@keyframes walk { 0% { top: 0; opacity: 0 } 5% { top: 86px; opacity: 1 } 100% { top: 576px; opacity: 1 } }</style>
+    <style>@keyframes walk { 0% { top: 0; opacity: 0 } 5% { top: 62px; opacity: 1 } 100% { top: 510px; opacity: 1 } }</style>
     <div class="sub fade" style="--d:8.4s;margin-top:26px">Each value keeps the source text it came from. Grey = unverified, ink = checked.</div>
   </div>
 </section>
 
 <!-- S07 THE ACCOUNTING PLAN -->
-<section class="stage bg-dark" id="s07" data-dur="14">
+<section class="stage bg-dark" id="s07" data-dur="15">
   <div class="gridbg"></div>
   <div style="position:absolute;left:100px;top:110px;width:760px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
     <div class="tag fade" style="grid-column:1/-1;--d:.2s">Deterministic rules · no model involved</div>
@@ -246,24 +248,47 @@ wb_out = Workbook(result_bytes)
   </div>
 </section>
 
-<!-- S09 THE SANDBOX -->
-<section class="stage bg-dark" id="s09" data-dur="15">
+<!-- S09 THE SANDBOX: lifecycle of one disposable container -->
+<section class="stage bg-dark" id="s09" data-dur="18">
   <div class="gridbg"></div>
-  <div class="box in" style="--d:.2s;left:90px;top:150px;width:330px">Orchestrator<small>outside the boundary · holds the keys</small></div>
-  <div class="arrow" style="--d:1s;left:420px;top:200px;width:140px"></div>
-  <div class="fade" style="--d:.8s;position:absolute;left:560px;top:110px;width:600px;height:640px;border:3px dashed var(--mint);border-radius:28px;padding:34px">
-    <div class="tag">docker · python:3.12-slim · disposable</div>
-    <div style="display:grid;gap:14px;margin-top:26px">
-      <span class="chip pop" style="--d:1.8s"><b>✓</b>Network disabled</span>
-      <span class="chip pop" style="--d:2.4s"><b>✓</b>No API keys inside</span>
-      <span class="chip pop" style="--d:3s"><b>✓</b>Non-root · uid 10001 · cap-drop ALL</span>
-      <span class="chip pop" style="--d:3.6s"><b>✓</b>Read-only filesystem &amp; input</span>
-      <span class="chip pop" style="--d:4.2s"><b>✓</b>1 CPU · 512 MB · 128 pids</span>
-      <span class="chip pop" style="--d:4.8s"><b>✓</b>128 MiB workspace · 30 s deadline</span>
-    </div>
+  <div class="tag fade" style="--d:.2s;position:absolute;left:90px;top:70px">One receipt · one disposable container · real run 17:16:49 → 17:16:51</div>
+  <!-- orchestrator, outside -->
+  <div class="box in" style="--d:.4s;left:90px;top:170px;width:360px;height:300px">Orchestrator<small>outside the sandbox</small>
+    <div style="margin-top:22px;font-size:20px;line-height:1.9">🔑 Vultr API key<br>🗂 original workbook v1<br>✍️ approval service</div>
+    <div class="tag" style="margin-top:12px;color:#f0c46b">never enters the container</div></div>
+  <!-- container -->
+  <div class="fade" style="--d:.8s;position:absolute;left:560px;top:150px;width:1270px;height:560px;border:3px dashed var(--mint);border-radius:30px;background:rgba(6,41,31,.55)">
+    <div class="tag" style="position:absolute;left:30px;top:-14px;background:#0b2219;padding:0 12px">docker · python:3.12-slim · --network none · --read-only · uid 10001 · 1 CPU · 512 MB · 128 pids · 30 s</div>
+    <div class="out" style="--o:12.2s;position:absolute;left:40px;top:60px;width:330px">
+      <div class="tag">/input · read-only</div>
+      <div class="chip in" style="--d:3.2s;margin-top:14px;width:100%">source.xlsx <span class="mono" style="font-size:15px;opacity:.7">v1 copy</span></div>
+      <div class="chip in" style="--d:3.6s;margin-top:12px;width:100%">plan.json <span class="mono" style="font-size:15px;opacity:.7">8 cells</span></div>
+      <div class="chip in" style="--d:4s;margin-top:12px;width:100%">program.py <span class="mono" style="font-size:15px;opacity:.7">3,590 B</span></div></div>
+    <div class="out" style="--o:12.2s;position:absolute;left:440px;top:60px;width:380px">
+      <div class="tag">process</div>
+      <div class="code in" style="--d:5.4s;margin-top:14px;font-size:17px;padding:20px 24px">$ python program.py
+verify base sha256 ✓
+8 target cells blank ✓
+patch_cells(T-Accounts) ✓
+re-open output ✓
+<span class="k">exit 0 · 1,016 ms</span></div></div>
+    <div class="out" style="--o:12.2s;position:absolute;left:880px;top:60px;width:340px">
+      <div class="tag">/work · tmpfs 128 MiB</div>
+      <div class="chip pop" style="--d:8s;margin-top:14px;width:100%">candidate.xlsx</div>
+      <div class="sub fade" style="--d:8.6s;font-size:20px;margin-top:14px">copied out, then checked by the verifier</div></div>
+    <div class="h-m pop" style="--d:12.4s;position:absolute;left:40px;bottom:40px;font-size:38px;color:#f0c46b">container destroyed · nothing kept</div>
   </div>
-  <div class="shot in" style="--d:6s;left:1220px;top:100px"><img src="footage/12_monitor.png" style="width:1300px;margin:-80px 0 0 -840px;clip-path:inset(80px 0 230px 840px)"></div>
-  <div class="note fade" style="--d:7s;bottom:36px">Execution location in this recording: Docker on the demo Mac. Vultr Cloud Compute runner: prepared with OpenTofu, not yet deployed.</div>
+  <!-- lifecycle rail -->
+  <div style="position:absolute;left:560px;top:760px;width:1270px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;font-size:20px">
+    <div class="card in" style="--d:1.4s;padding:16px 18px"><b>1 · Create</b><div class="tag" style="margin-top:6px">sandbox.created</div></div>
+    <div class="card in" style="--d:3s;padding:16px 18px"><b>2 · Mount</b><div class="tag" style="margin-top:6px">read-only inputs</div></div>
+    <div class="card in" style="--d:5.2s;padding:16px 18px"><b>3 · Run</b><div class="tag" style="margin-top:6px">sandbox.exited 0</div></div>
+    <div class="card in" style="--d:7.8s;padding:16px 18px"><b>4 · Collect</b><div class="tag" style="margin-top:6px">candidate only</div></div>
+    <div class="card in" style="--d:11.6s;padding:16px 18px"><b>5 · Destroy</b><div class="tag" style="margin-top:6px">sandbox.destroyed</div></div>
+  </div>
+  <div class="sel" style="top:752px;height:98px;width:242px;animation:rail 12s var(--e) both;animation-delay:1.4s"></div>
+  <style>@keyframes rail { 0% { left:556px; opacity:0 } 5% { opacity:1 } 15% { left:556px } 28% { left:812px } 45% { left:1068px } 65% { left:1324px } 92% { left:1580px } 100% { left:1580px; opacity:1 } }</style>
+  <div class="note fade" style="--d:2s;bottom:34px">Docker on the demo Mac in this recording · Vultr Cloud Compute runner prepared, not yet deployed</div>
 </section>
 
 <!-- S10 CONTAINMENT UNDER FAILURE -->
@@ -296,7 +321,7 @@ wb_out = Workbook(result_bytes)
 </section>
 
 <!-- S11 VERIFY -->
-<section class="stage bg-light" id="s11" data-dur="14">
+<section class="stage bg-light" id="s11" data-dur="15">
   <div class="gridbg"></div>
   <div style="position:absolute;left:110px;top:140px;width:760px">
     <div class="tag fade" style="--d:.2s">Independent verifier · reads the actual output file</div>
@@ -314,7 +339,7 @@ wb_out = Workbook(result_bytes)
       <tr><th>7</th><td class="ink" style="--d:6.4s">[6110]</td><td class="ink" style="--d:6.6s">1000</td></tr>
       <tr><th>8</th><td class="ink" style="--d:6.8s">[2640]</td><td class="ink" style="--d:7s">250</td></tr>
     </table>
-    <div class="sel pop" style="--d:7.4s;left:66px;top:66px;width:300px;height:134px"></div>
+    <div class="sel pop" style="--d:7.4s;left:116px;top:66px;width:266px;height:134px"></div>
     <div class="h-m in" style="--d:8.6s;margin-top:90px">Don't trust the output.<br><span style="color:var(--forest)">Verify it.</span></div>
   </div>
 </section>
@@ -345,10 +370,10 @@ wb_out = Workbook(result_bytes)
       <table class="grid" style="background:#fff;margin-top:12px"><tr><th></th><th>cell</th><th>value</th></tr>
       <tr><th>1940 cr</th><td>R7 · S7</td><td class="ink" style="--d:3.6s">[6110] 1000</td></tr><tr><th>1940 cr</th><td>R8 · S8</td><td class="ink" style="--d:4s">[2640] 250</td></tr>
       <tr><th>2640 dr</th><td>K24 · L24</td><td class="ink" style="--d:4.4s">[1940] 250</td></tr><tr><th>6110 dr</th><td>A57 · B57</td><td class="ink" style="--d:4.8s">[1940] 1000</td></tr></table>
-      <div class="sel pop" style="--d:5.4s;left:300px;top:110px;width:262px;height:270px"></div></div>
+      <div class="sel pop" style="--d:5.4s;left:322px;top:96px;width:250px;height:270px"></div></div>
   </div>
   <div class="h-l in" style="--d:6.6s;position:absolute;left:110px;bottom:90px">Real work. <span style="color:var(--forest)">Real output.</span></div>
-  <div class="note fade" style="--d:7s;left:auto;right:80px;color:var(--ink)">8 cells changed in Nordvik Trading AB_v2.xlsx · every other cell identical to v1</div>
+  <div class="note fade" style="--d:7s;left:auto;right:80px;color:var(--ink)"></div>
 </section>
 
 <!-- S14 MEASURED, NOT ASSUMED -->
@@ -369,7 +394,7 @@ wb_out = Workbook(result_bytes)
 </section>
 
 <!-- S15 ARCHITECTURE -->
-<section class="stage bg-dark" id="s15" data-dur="14">
+<section class="stage bg-dark" id="s15" data-dur="16">
   <div class="gridbg"></div>
   <div class="box in" style="--d:.2s;left:80px;top:140px;width:330px">Browser app<small>web agent · core</small></div>
   <div class="box in" style="--d:.5s;left:80px;top:290px;width:330px">Mac app<small>local engine</small></div>
@@ -396,7 +421,7 @@ wb_out = Workbook(result_bytes)
   <div class="clouds"><i></i><i></i><i></i></div><div class="gridbg"></div>
   <div style="animation:orbit 13s ease-in-out both">
     <div class="mac" style="left:230px;top:150px;width:1060px"><div class="lid"><div class="screen"><img src="footage/15_committed.png"></div></div><div class="base"></div></div>
-    <div class="phone" style="left:1320px;top:230px;width:300px"><div class="screen"><img src="footage/16_phone_home.png"></div></div>
+    <div class="phone" style="left:1320px;top:230px;width:300px"><div class="screen"><img src="footage/ios_welcome.png"></div></div>
   </div>
   <style>@keyframes orbit { 0% { transform: scale(1.06) translateX(30px) } 55% { transform: scale(1) translateX(0); opacity: 1 } 70% { opacity: 0 } 100% { opacity: 0 } }</style>
   <div style="position:absolute;left:0;right:0;top:320px;text-align:center">

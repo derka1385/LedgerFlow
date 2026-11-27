@@ -1,18 +1,94 @@
 [
- ["s01", "Every day, businesses generate receipts. And behind every receipt, someone has to turn a piece of paper into an accounting transaction."],
- ["s02", "Businesses already have their own financial systems. We didn't want to replace them. We wanted to automate the work happening inside them. Introducing LedgerFlow."],
- ["s03", "Connect your existing Excel workbook. LedgerFlow identifies its accounts, its structure, and the exact places where new entries can safely be written."],
- ["s04", "Employees don't need to understand double-entry bookkeeping. They capture a receipt, and send it to their workspace. The iPhone is optional. A direct upload works too."],
- ["s05", "One receipt, one workflow, with the browser-based agent at its core. Seconds later, the receipt is waiting on the Mac."],
- ["s06", "Vultr Serverless Inference reads the receipt and turns it into structured financial information. Every value is linked to the text it came from, and still has to be checked."],
- ["s07", "Financial decisions cannot depend on model confidence alone. Deterministic accounting rules build a balanced entry, and define the exact cells the agent is allowed to change."],
- ["s08", "LedgerFlow doesn't just recommend an entry. It uses Vultr to generate a program that performs the work."],
- ["s09", "Every generated program runs in a disposable sandbox. No network, no secrets, one CPU, five hundred twelve megabytes, a hard deadline. Then the container is destroyed."],
- ["s10", "But what happens when the code misbehaves? Here, a hostile program tries the network, tries to overwrite its input, and then never stops. The sandbox blocks each attempt, kills it at the deadline, and destroys the container."],
- ["s11", "Running is not enough. An independent verifier opens the resulting workbook, checks every change, keeps formulas and features intact, and confirms the entry is balanced."],
- ["s12", "The accountant sees exactly what will change. Approval is bound to the verified file itself, not to the model's recommendation."],
- ["s13", "The result is a real Excel workbook. Eight cells written, nothing else touched, and the original version preserved."],
- ["s14", "We compared eighteen model configurations on real Vultr inference, attacked the sandbox with hostile programs, and measured how well existing workbooks are preserved."],
- ["s15", "Cloud inference, deterministic controls, sandboxed execution, and independent verification. An agent that doesn't just answer questions, but performs real work."],
- ["s16", "Your employees capture the receipts. LedgerFlow performs the work. LedgerFlow. Every receipt lands in the right cells. With proof."]
+ [
+  "s01",
+  "Every day, businesses generate receipts. And behind every receipt, someone has to turn a piece of paper into an accounting transaction."
+ ],
+ [
+  "s02",
+  "Businesses already have their own financial systems. We didn't want to replace them. We wanted to automate the work happening inside them. Introducing LedgerFlow."
+ ],
+ [
+  "s03",
+  "Connect your existing Excel workbook. LedgerFlow identifies its accounts, its structure, and the exact places where new entries can safely be written."
+ ],
+ [
+  "s04",
+  "Employees don't need to understand double-entry bookkeeping. They capture a receipt, and send it to their workspace. The iPhone is optional. A direct upload works too."
+ ],
+ [
+  "s05",
+  "One receipt, one workflow, with the browser-based agent at its core. Seconds later, the receipt is waiting on the Mac."
+ ],
+ [
+  "s06",
+  "Vultr Serverless Inference reads the receipt and turns it into structured financial information. Every value is linked to the text it came from, and still has to be checked."
+ ],
+ [
+  "s07",
+  "Financial decisions cannot depend on model confidence alone. Deterministic accounting rules build a balanced entry, and define the exact cells the agent is allowed to change."
+ ],
+ [
+  "s08",
+  "LedgerFlow doesn't just recommend an entry. It uses Vultr to generate a program that performs the work."
+ ],
+ [
+  "s09",
+  "Every generated program runs in a disposable sandbox. No network, no secrets, one CPU, five hundred twelve megabytes, a hard deadline. Then the container is destroyed."
+ ],
+ [
+  "s10",
+  "But what happens when the code misbehaves? Here, a hostile program tries the network, tries to overwrite its input, and then never stops. The sandbox blocks each attempt, kills it at the deadline, and destroys the container."
+ ],
+ [
+  "s11",
+  "Running is not enough. An independent verifier opens the resulting workbook, checks every change, keeps formulas and features intact, and confirms the entry is balanced."
+ ],
+ [
+  "s12",
+  "The accountant sees exactly what will change. Approval is bound to the verified file itself, not to the model's recommendation."
+ ],
+ [
+  "s13",
+  "The result is a real Excel workbook. Eight cells written, nothing else touched, and the original version preserved."
+ ],
+ [
+  "s14",
+  "We compared eighteen model configurations on real Vultr inference, attacked the sandbox with hostile programs, and measured how well existing workbooks are preserved."
+ ],
+ [
+  "s15",
+  "Cloud inference, deterministic controls, sandboxed execution, and independent verification. An agent that doesn't just answer questions, but performs real work."
+ ],
+ [
+  "s16",
+  "Your employees capture the receipts. LedgerFlow performs the work. LedgerFlow. Every receipt lands in the right cells. With proof."
+ ],
+ [
+  "ma",
+  "Here is the real app. You sign in, name your agent, and LedgerFlow sets up a workspace on your Mac."
+ ],
+ [
+  "mb",
+  "Then you bring your own Excel workbook. LedgerFlow maps its accounts and the exact places it may write, and you confirm."
+ ],
+ [
+  "pa",
+  "The iPhone is optional. Pair it once: the Mac shows a code, the phone scans it, and they talk over local Wi-Fi. Then scan a receipt wherever you are. The phone reads the text and sends it to the Mac."
+ ],
+ [
+  "md",
+  "Seconds later, the receipt lands on the Mac. Vultr inference reads every field, and each value shows the text it came from. Here the receipt is incomplete, so LedgerFlow asks instead of guessing. Nothing is written until a human answers."
+ ],
+ [
+  "pb",
+  "The status flows back to the phone. History, this month's total, and the same agent, in your pocket."
+ ],
+ [
+  "nt",
+  "When a decision is needed, LedgerFlow asks a person. A notification on the phone: review needed. The agent prepares, a human approves."
+ ],
+ [
+  "beta",
+  "LedgerFlow is in beta. Try it with your own receipts, on your own Excel."
+ ]
 ]

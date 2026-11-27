@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: "Schibsted"; src: url(assets/schibsted-grotesk-latin-wght-normal.woff2); font-weight: 400 900; }
+@font-face { font-family: "Martian"; src: url(assets/martian-mono-latin-400-normal.woff2); }
+* { margin:0; box-sizing:border-box } html,body { width:1920px; height:1080px; background:transparent; overflow:hidden; font-family:Schibsted; color:#eef4ee }
+.bg { position:absolute; inset:0; background: radial-gradient(ellipse at 75% 5%, #2f7a57 0%, #153a2d 38%, #081812 75%, #040907 100%) }
+.bg::after { content:""; position:absolute; inset:0; background-image: linear-gradient(rgba(143,227,184,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(143,227,184,.06) 1px, transparent 1px); background-size: 96px 40px }
+.mac { position:absolute; left:var(--x); top:var(--y); width:calc(var(--w) + 28px); height:calc(var(--h) + 36px); border:14px solid #050506; border-bottom-width:22px; border-radius:26px 26px 12px 12px; box-shadow: 0 0 0 2px #2c2e31, 0 0 0 3px #8a8e94, 0 60px 120px rgba(0,0,0,.6) }
+.mac::after { content:""; position:absolute; left:50%; top:-1px; width:170px; height:20px; background:#050506; border-radius:0 0 12px 12px; transform:translateX(-50%) }
+.base { position:absolute; left:calc(var(--x) - 70px); top:calc(var(--y) + var(--h) + 36px); width:calc(var(--w) + 168px); height:22px; background:linear-gradient(#e9ebee,#c4c7cc 35%,#9a9ea5 75%,#6f7379); border-radius:2px 2px 30px 30px; box-shadow:0 30px 50px rgba(0,0,0,.5) }
+.phone { position:absolute; left:calc(var(--x) - 13px); top:calc(var(--y) - 13px); width:calc(var(--w) + 26px); height:calc(var(--h) + 26px); border-radius:64px; border:7px solid #a7abb0; outline:1px solid #e3e5e8; box-shadow: 0 60px 120px rgba(0,0,0,.55); }
+.phone-hole { position:absolute; left:var(--x); top:var(--y); width:var(--w); height:var(--h); border-radius:52px; box-shadow: 0 0 0 30px #050505 }
+.text { position:absolute; left:var(--tx); top:var(--ty); width:var(--tw) }
+.tag { font-family:Martian; font-size:19px; color:#8fe3b8; letter-spacing:.02em }
+h1 { font-size:68px; font-weight:740; letter-spacing:-.03em; line-height:1.04; margin-top:18px }
+p { font-size:28px; opacity:.8; line-height:1.4; margin-top:22px }
+.note { position:absolute; left:80px; bottom:40px; font-family:Martian; font-size:18px; opacity:.6 }
+</style></head><body>
+<script>
+const q = new URLSearchParams(location.search), mode = q.get("mode"), part = q.get("part");
+const set = (k, v) => document.documentElement.style.setProperty(k, v);
+for (const k of ["x","y","w","h","tx","ty","tw"]) set("--" + k, (q.get(k) || 0) + "px");
+let html = "";
+if (part === "bg") html = '<div class="bg"></div>';
+else {
+  html = mode === "mac" ? '<div class="mac"></div><div class="base"></div>' : mode === "phone" ? '<div class="phone"></div><div class="phone-hole"></div>' : '';
+  html += `<div class="text"><div class="tag">${q.get("tag")||""}</div><h1>${q.get("title")||""}</h1><p>${q.get("sub")||""}</p></div><div class="note">${q.get("note")||""}</div>`;
+}
+document.body.innerHTML = html;
+</script></body></html>

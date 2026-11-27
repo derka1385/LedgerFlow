@@ -1,160 +1,212 @@
 1
-00:00:02,000 --> 00:00:04,449
+00:00:01,500 --> 00:00:03,814
 Every day, businesses generate receipts.
 
 2
-00:00:04,449 --> 00:00:10,205
+00:00:03,814 --> 00:00:09,253
 And behind every receipt, someone has to turn a piece of paper into an accounting transaction.
 
 3
-00:00:13,200 --> 00:00:16,334
+00:00:10,500 --> 00:00:13,458
 Businesses already have their own financial systems.
 
 4
-00:00:16,334 --> 00:00:18,202
+00:00:13,458 --> 00:00:15,222
 We didn't want to replace them.
 
 5
-00:00:18,202 --> 00:00:21,396
+00:00:15,222 --> 00:00:18,237
 We wanted to automate the work happening inside them.
 
 6
-00:00:21,396 --> 00:00:22,783
+00:00:18,237 --> 00:00:19,546
 Introducing LedgerFlow.
 
 7
-00:00:26,200 --> 00:00:28,469
-Connect your existing Excel workbook.
+00:00:22,500 --> 00:00:23,772
+Here is the real app.
 
 8
-00:00:28,469 --> 00:00:35,337
-LedgerFlow identifies its accounts, its structure, and the exact places where new entries can safely be written.
+00:00:23,772 --> 00:00:28,436
+You sign in, name your agent, and LedgerFlow sets up a workspace on your Mac.
 
 9
-00:00:39,200 --> 00:00:42,792
-Employees don't need to understand double-entry bookkeeping.
+00:00:32,700 --> 00:00:35,135
+Then you bring your own Excel workbook.
 
 10
-00:00:42,792 --> 00:00:46,085
-They capture a receipt, and send it to their workspace.
+00:00:35,135 --> 00:00:40,130
+LedgerFlow maps its accounts and the exact places it may write, and you confirm.
 
 11
-00:00:46,085 --> 00:00:47,462
+00:00:41,330 --> 00:00:42,831
 The iPhone is optional.
 
 12
-00:00:47,462 --> 00:00:49,019
-A direct upload works too.
+00:00:42,831 --> 00:00:43,679
+Pair it once:
 
 13
-00:00:53,200 --> 00:00:57,385
-One receipt, one workflow, with the browser-based agent at its core.
+00:00:43,679 --> 00:00:48,441
+the Mac shows a code, the phone scans it, and they talk over local Wi-Fi.
 
 14
-00:00:57,385 --> 00:01:00,400
-Seconds later, the receipt is waiting on the Mac.
+00:00:48,441 --> 00:00:50,854
+Then scan a receipt wherever you are.
 
 15
-00:01:03,200 --> 00:01:08,490
-Vultr Serverless Inference reads the receipt and turns it into structured financial information.
+00:00:50,854 --> 00:00:54,051
+The phone reads the text and sends it to the Mac.
 
 16
-00:01:08,490 --> 00:01:12,678
-Every value is linked to the text it came from, and still has to be checked.
+00:00:59,430 --> 00:01:02,225
+Seconds later, the receipt lands on the Mac.
 
 17
-00:01:16,200 --> 00:01:19,619
-Financial decisions cannot depend on model confidence alone.
+00:01:02,225 --> 00:01:07,178
+Vultr inference reads every field, and each value shows the text it came from.
 
 18
-00:01:19,619 --> 00:01:26,058
-Deterministic accounting rules build a balanced entry, and define the exact cells the agent is allowed to change.
+00:01:07,178 --> 00:01:11,687
+Here the receipt is incomplete, so LedgerFlow asks instead of guessing.
 
 19
-00:01:30,200 --> 00:01:32,776
-LedgerFlow doesn't just recommend an entry.
+00:01:11,687 --> 00:01:14,291
+Nothing is written until a human answers.
 
 20
-00:01:32,776 --> 00:01:36,311
-It uses Vultr to generate a program that performs the work.
+00:01:15,491 --> 00:01:21,103
+Vultr Serverless Inference reads the receipt and turns it into structured financial information.
 
 21
-00:01:41,200 --> 00:01:44,988
-Every generated program runs in a disposable sandbox.
+00:01:21,103 --> 00:01:25,546
+Every value is linked to the text it came from, and still has to be checked.
 
 22
-00:01:44,988 --> 00:01:50,705
-No network, no secrets, one CPU, five hundred twelve megabytes, a hard deadline.
+00:01:26,746 --> 00:01:30,598
+Financial decisions cannot depend on model confidence alone.
 
 23
-00:01:50,705 --> 00:01:52,992
-Then the container is destroyed.
+00:01:30,598 --> 00:01:37,852
+Deterministic accounting rules build a balanced entry, and define the exact cells the agent is allowed to change.
 
 24
-00:01:55,600 --> 00:01:58,195
-But what happens when the code misbehaves?
+00:01:39,052 --> 00:01:41,571
+LedgerFlow doesn't just recommend an entry.
 
 25
-00:01:58,195 --> 00:02:04,002
-Here, a hostile program tries the network, tries to overwrite its input, and then never stops.
+00:01:41,571 --> 00:01:45,028
+It uses Vultr to generate a program that performs the work.
 
 26
-00:02:04,002 --> 00:02:09,316
-The sandbox blocks each attempt, kills it at the deadline, and destroys the container.
+00:01:46,228 --> 00:01:50,379
+Every generated program runs in a disposable sandbox.
 
 27
-00:02:20,200 --> 00:02:21,563
-Running is not enough.
+00:01:50,379 --> 00:01:56,644
+No network, no secrets, one CPU, five hundred twelve megabytes, a hard deadline.
 
 28
-00:02:21,563 --> 00:02:30,610
-An independent verifier opens the resulting workbook, checks every change, keeps formulas and features intact, and confirms the entry is balanced.
+00:01:56,644 --> 00:01:59,151
+Then the container is destroyed.
 
 29
-00:02:34,200 --> 00:02:36,903
-The accountant sees exactly what will change.
+00:02:00,451 --> 00:02:03,193
+But what happens when the code misbehaves?
 
 30
-00:02:36,903 --> 00:02:41,768
-Approval is bound to the verified file itself, not to the model's recommendation.
+00:02:03,193 --> 00:02:09,332
+Here, a hostile program tries the network, tries to overwrite its input, and then never stops.
 
 31
-00:02:45,200 --> 00:02:47,257
-The result is a real Excel workbook.
+00:02:09,332 --> 00:02:14,948
+The sandbox blocks each attempt, kills it at the deadline, and destroys the container.
 
 32
-00:02:47,257 --> 00:02:51,714
-Eight cells written, nothing else touched, and the original version preserved.
+00:02:20,351 --> 00:02:21,784
+Running is not enough.
 
 33
-00:02:57,200 --> 00:03:06,804
-We compared eighteen model configurations on real Vultr inference, attacked the sandbox with hostile programs, and measured how well existing workbooks are preserved.
+00:02:21,784 --> 00:02:31,294
+An independent verifier opens the resulting workbook, checks every change, keeps formulas and features intact, and confirms the entry is balanced.
 
 34
-00:03:12,200 --> 00:03:18,272
-Cloud inference, deterministic controls, sandboxed execution, and independent verification.
+00:02:32,494 --> 00:02:34,978
+The status flows back to the phone.
 
 35
-00:03:18,272 --> 00:03:22,810
-An agent that doesn't just answer questions, but performs real work.
+00:02:34,978 --> 00:02:39,521
+History, this month's total, and the same agent, in your pocket.
 
 36
-00:03:26,200 --> 00:03:28,553
-Your employees capture the receipts.
+00:02:43,794 --> 00:02:47,497
+When a decision is needed, LedgerFlow asks a person.
 
 37
-00:03:28,553 --> 00:03:30,449
-LedgerFlow performs the work.
+00:02:47,497 --> 00:02:49,491
+A notification on the phone:
 
 38
-00:03:30,449 --> 00:03:31,167
-LedgerFlow.
+00:02:49,491 --> 00:02:50,488
+review needed.
 
 39
-00:03:31,167 --> 00:03:33,717
-Every receipt lands in the right cells.
+00:02:50,488 --> 00:02:53,123
+The agent prepares, a human approves.
 
 40
-00:03:33,717 --> 00:03:34,436
+00:02:54,794 --> 00:02:57,578
+The accountant sees exactly what will change.
+
+41
+00:02:57,578 --> 00:03:02,588
+Approval is bound to the verified file itself, not to the model's recommendation.
+
+42
+00:03:03,788 --> 00:03:05,994
+The result is a real Excel workbook.
+
+43
+00:03:05,994 --> 00:03:10,774
+Eight cells written, nothing else touched, and the original version preserved.
+
+44
+00:03:11,974 --> 00:03:21,828
+We compared eighteen model configurations on real Vultr inference, attacked the sandbox with hostile programs, and measured how well existing workbooks are preserved.
+
+45
+00:03:25,474 --> 00:03:32,292
+Cloud inference, deterministic controls, sandboxed execution, and independent verification.
+
+46
+00:03:32,292 --> 00:03:37,387
+An agent that doesn't just answer questions, but performs real work.
+
+47
+00:03:38,587 --> 00:03:40,918
+Your employees capture the receipts.
+
+48
+00:03:40,918 --> 00:03:42,795
+LedgerFlow performs the work.
+
+49
+00:03:42,795 --> 00:03:43,507
+LedgerFlow.
+
+50
+00:03:43,507 --> 00:03:46,032
+Every receipt lands in the right cells.
+
+51
+00:03:46,032 --> 00:03:46,744
 With proof.
+
+52
+00:03:50,587 --> 00:03:51,901
+LedgerFlow is in beta.
+
+53
+00:03:51,901 --> 00:03:54,827
+Try it with your own receipts, on your own Excel.
 
